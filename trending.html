@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Discover the most popular and trending articles on HowToAiWorld. Read what everyone is talking about.">
+    <meta name="robots" content="index, follow">
+    <title>Trending Blogs - HowToAiWorld</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="canonical" href="https://howtoaiworld.com/trending.html">
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+
+    <main class="main-content">
+        <div class="container">
+            <div class="content-grid">
+                <section class="main-articles">
+                    <!-- Dynamic trending content will be loaded here by blog-loader.js -->
+                    <div style="text-align: center; padding: 60px 20px;">
+                        <p style="font-size: 18px; color: #666;">Loading trending articles...</p>
+                    </div>
+                </section>
+
+                <aside class="sidebar">
+                    <div class="sidebar-section ad-section" aria-label="Advertisement">
+                        <p class="ad-label">Advertisement</p>
+                        <div class="ad-placeholder">
+                            <p>Ad Space<br>300x250</p>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-section">
+                        <h3 class="sidebar-title">Popular Categories</h3>
+                        <ul id="popular-categories" style="list-style: none; padding: 0;">
+                            <!-- Popular categories with counts will be dynamically loaded -->
+                        </ul>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+
+    <script src="components.js"></script>
+    <script src="blog-loader.js"></script>
+</body>
+</html>

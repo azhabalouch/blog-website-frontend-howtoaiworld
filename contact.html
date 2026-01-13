@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Contact HowToAiWorld. Get in touch with us for inquiries, feedback, or collaboration opportunities.">
+    <meta name="robots" content="index, follow">
+    <title>Contact Us - HowToAiWorld</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="canonical" href="https://howtoaiworld.com/contact.html">
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+
+    <main class="main-content">
+        <div class="container">
+            <div class="content-grid">
+                <section class="main-articles">
+                    <article class="featured-article">
+                        <h2 class="article-title">Contact Us</h2>
+                        
+                        <div class="article-content">
+                            <p>We'd love to hear from you! Whether you have a question, feedback, or a story idea, please don't hesitate to reach out. Our team is here to help and respond to your inquiries as quickly as possible.</p>
+                            
+                            <form class="contact-form" id="contactForm" style="margin-top: 30px;" aria-label="Contact form">
+                                <div id="formMessage" style="display: none; padding: 15px; margin-bottom: 20px; border-radius: 4px;"></div>
+                                
+                                <div style="margin-bottom: 20px;">
+                                    <label for="name" style="display: block; margin-bottom: 8px; font-weight: bold;">Name *</label>
+                                    <input type="text" id="name" name="name" required aria-required="true" style="width: 100%; padding: 12px; border: 1px solid #ddd; font-family: 'Times New Roman', Times, serif; font-size: 15px;">
+                                </div>
+                                
+                                <div style="margin-bottom: 20px;">
+                                    <label for="email" style="display: block; margin-bottom: 8px; font-weight: bold;">Email *</label>
+                                    <input type="email" id="email" name="email" required aria-required="true" style="width: 100%; padding: 12px; border: 1px solid #ddd; font-family: 'Times New Roman', Times, serif; font-size: 15px;">
+                                </div>
+                                
+                                <div style="margin-bottom: 20px;">
+                                    <label for="subject" style="display: block; margin-bottom: 8px; font-weight: bold;">Subject *</label>
+                                    <input type="text" id="subject" name="subject" required aria-required="true" style="width: 100%; padding: 12px; border: 1px solid #ddd; font-family: 'Times New Roman', Times, serif; font-size: 15px;">
+                                </div>
+                                
+                                <div style="margin-bottom: 20px;">
+                                    <label for="message" style="display: block; margin-bottom: 8px; font-weight: bold;">Message *</label>
+                                    <textarea id="message" name="message" rows="6" required aria-required="true" style="width: 100%; padding: 12px; border: 1px solid #ddd; font-family: 'Times New Roman', Times, serif; font-size: 15px; resize: vertical;"></textarea>
+                                </div>
+                                
+                                <button type="submit" style="padding: 15px 40px; background-color: #2c2c2c; color: #fff; border: none; cursor: pointer; font-family: 'Times New Roman', Times, serif; font-size: 16px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Send Message</button>
+                            </form>
+                            
+                            <script>
+                            document.getElementById('contactForm').addEventListener('submit', function(e) {
+                                e.preventDefault();
+                                const messageDiv = document.getElementById('formMessage');
+                                messageDiv.style.display = 'block';
+                                messageDiv.style.backgroundColor = '#d4edda';
+                                messageDiv.style.color = '#155724';
+                                messageDiv.style.border = '1px solid #c3e6cb';
+                                messageDiv.textContent = 'Thank you for your message! We will get back to you soon.';
+                                this.reset();
+                                setTimeout(() => {
+                                    messageDiv.style.display = 'none';
+                                }, 5000);
+                            });
+                            </script>
+                            
+                            <div style="margin-top: 50px; padding-top: 30px; border-top: 2px solid #ddd;">
+                                <h3 style="font-size: 24px; margin-bottom: 20px; font-weight: bold;">Other Ways to Reach Us</h3>
+                                
+                                <div style="margin-bottom: 20px;">
+                                    <h4 style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Email</h4>
+                                    <p>General Inquiries: info@howtoaiworld.com<br>
+                                    Editorial: editorial@howtoaiworld.com<br>
+                                    Advertising: advertising@howtoaiworld.com</p>
+                                </div>
+                                
+                                <div style="margin-bottom: 20px;">
+                                    <h4 style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Address</h4>
+                                    <p>[Your Business Address]<br>
+                                    [City, State ZIP]<br>
+                                    [Country]</p>
+                                </div>
+                                
+                                <div style="margin-bottom: 20px;">
+                                    <h4 style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Business Hours</h4>
+                                    <p>Monday - Friday: 9:00 AM - 6:00 PM<br>
+                                    Saturday - Sunday: Closed</p>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </section>
+
+                <aside class="sidebar">
+                    <div class="sidebar-section">
+                        <h3 class="sidebar-title">Quick Response</h3>
+                        <p style="font-size: 15px; line-height: 1.6;">We typically respond to all inquiries within 24-48 hours during business days.</p>
+                    </div>
+
+                    <div class="sidebar-section">
+                        <h3 class="sidebar-title">Follow Us</h3>
+                        <p style="font-size: 15px; line-height: 1.6; margin-bottom: 15px;">Stay connected with us on social media for the latest updates.</p>
+                        <ul style="list-style: none;">
+                            <li style="margin-bottom: 10px;"><a href="#" style="color: #2c2c2c; text-decoration: none;">Facebook</a></li>
+                            <li style="margin-bottom: 10px;"><a href="#" style="color: #2c2c2c; text-decoration: none;">Twitter</a></li>
+                            <li style="margin-bottom: 10px;"><a href="#" style="color: #2c2c2c; text-decoration: none;">LinkedIn</a></li>
+                            <li><a href="#" style="color: #2c2c2c; text-decoration: none;">Instagram</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="sidebar-section ad-section" aria-label="Advertisement">
+                        <p class="ad-label">Advertisement</p>
+                        <div class="ad-placeholder">
+                            <p>Ad Space<br>300x250</p>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+
+    <script src="components.js"></script>
+</body>
+</html>

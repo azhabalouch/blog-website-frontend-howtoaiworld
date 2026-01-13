@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Your trusted source for the latest news, trending stories, and insightful blog articles. Read quality content on various topics daily.">
+    <meta name="keywords" content="blog, news, articles, trending stories, latest updates, newspaper">
+    <meta name="author" content="HowToAiWorld">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+    
+    <!-- Open Graph Meta Tags for Social Media -->
+    <meta property="og:title" content="HowToAiWorld - Your Daily News & Blog">
+    <meta property="og:description" content="Your trusted source for the latest news, trending stories, and insightful blog articles.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://howtoaiworld.com">
+    <meta property="og:image" content="https://howtoaiworld.com/og-image.jpg">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="HowToAiWorld - Your Daily News & Blog">
+    <meta name="twitter:description" content="Your trusted source for the latest news, trending stories, and insightful blog articles.">
+    
+    <!-- Accessibility -->
+    <meta name="theme-color" content="#2c2c2c">
+    
+    <title>HowToAiWorld - Your Daily News & Blog</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="canonical" href="https://howtoaiworld.com">
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <div class="content-grid">
+                <!-- Main Articles Section -->
+                <section class="main-articles" role="main">
+                    <!-- Dynamic content will be loaded here by blog-loader.js -->
+                </section>
+
+                <!-- Sidebar -->
+                <aside class="sidebar" role="complementary">
+                    <!-- Trending Section -->
+                    <div class="sidebar-section trending-section">
+                        <h3 class="sidebar-title">Trending Now</h3>
+                        <ul class="trending-list" id="trending-sidebar">
+                            <!-- Dynamic trending posts will be loaded here -->
+                        </ul>
+                    </div>
+
+                    <!-- Ad Space (AdSense Ready) -->
+                    <div class="sidebar-section ad-section" aria-label="Advertisement">
+                        <p class="ad-label">Advertisement</p>
+                        <!-- Google AdSense code will go here -->
+                        <div class="ad-placeholder">
+                            <p>Ad Space<br>300x250</p>
+                        </div>
+                    </div>
+
+                    <!-- Categories -->
+                    <div class="sidebar-section categories-section">
+                        <h3 class="sidebar-title">Categories</h3>
+                        <ul class="categories-list" id="categories-list">
+                            <!-- Categories will be dynamically loaded with correct counts -->
+                        </ul>
+                    </div>
+
+                    <!-- Popular Categories -->
+                    <div class="sidebar-section">
+                        <h3 class="sidebar-title">Popular Categories</h3>
+                        <ul id="popular-categories" style="list-style: none; padding: 0;">
+                            <!-- Popular categories with counts will be loaded here -->
+                        </ul>
+                    </div>
+
+                    <!-- Newsletter Signup -->
+                    <div class="sidebar-section newsletter-section">
+                        <h3 class="sidebar-title">Subscribe to Newsletter</h3>
+                        <form class="newsletter-form" id="newsletterForm" aria-label="Newsletter subscription form">
+                            <label for="newsletter-email" class="sr-only">Email address</label>
+                            <input type="email" id="newsletter-email" name="email" placeholder="Enter your email" required aria-required="true">
+                            <button type="submit">Subscribe</button>
+                            <div id="newsletterMessage" style="display: none; margin-top: 10px; font-size: 13px;"></div>
+                        </form>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+
+    <script src="components.js"></script>
+    <script>
+        // Newsletter form handler
+        function initNewsletter() {
+            const newsletterForm = document.getElementById('newsletterForm');
+            if (newsletterForm) {
+                newsletterForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const messageDiv = document.getElementById('newsletterMessage');
+                    messageDiv.style.display = 'block';
+                    messageDiv.style.color = '#155724';
+                    messageDiv.textContent = '✓ Successfully subscribed!';
+                    this.reset();
+                    setTimeout(() => {
+                        messageDiv.style.display = 'none';
+                    }, 3000);
+                });
+            }
+        }
+        // Initialize newsletter when components are loaded
+        setTimeout(initNewsletter, 500);
+    </script>
+    <script src="blog-loader.js"></script>
+</body>
+</html>
