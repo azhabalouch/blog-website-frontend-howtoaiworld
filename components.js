@@ -79,14 +79,20 @@ function insertComponent(content, tagName, isHeader) {
             setActiveNavLink();
             updateCurrentDate();
         }, 50);
+    } else {
+        setTimeout(() => {
+            updateFooterYear();
+        }, 50);
     }
 }
 
 // Helper function to create element from HTML string
 function createElementFromHTML(htmlString) {
-    const div = document.createElement('div');
-    div.innerHTML = htmlString.trim();
-    return div.firstChild;
+    const template = document.createElement('template');
+    template.innerHTML = htmlString.trim();
+    const fragment = document.createDocumentFragment();
+    fragment.append(...template.content.childNodes);
+    return fragment;
 }
 
 // Set active navigation link based on current page
@@ -120,6 +126,14 @@ function updateCurrentDate() {
     if (dateElement) {
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         dateElement.textContent = new Date().toLocaleDateString('en-US', options);
+    }
+}
+
+// Update footer year for copyright
+function updateFooterYear() {
+    const yearElement = document.getElementById('footer-year');
+    if (yearElement) {
+        yearElement.textContent = new Date().getFullYear();
     }
 }
 

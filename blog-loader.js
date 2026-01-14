@@ -1,7 +1,7 @@
 // Blog display functionality
 // This script loads and displays blogs from remote JSON
 
-const BLOG_DATA_URL = 'https://azhabalouch.github.io/blog-data/blogs_data.json';
+const BLOG_DATA_URL = 'https://azhabalouch.github.io/blogs-data-api/api.json';
 
 let cachedPosts = [];
 let dataLoaded = false;
@@ -19,12 +19,20 @@ async function fetchBlogData() {
         if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to fetch blog data`);
         
         const data = await response.json();
-        cachedPosts = Array.isArray(data) ? data : (data.posts || []);
+        
+        // Handle both array format and object with blogs property
+        if (Array.isArray(data)) {
+            cachedPosts = data;
+        } else if (data.blogs && Array.isArray(data.blogs)) {
+            cachedPosts = data.blogs;
+        } else {
+            cachedPosts = [];
+        }
         
         // Pre-parse and cache dates for better performance
         postsWithParsedDates = cachedPosts.map(post => ({
             ...post,
-            parsedDate: new Date(post.date)
+            parsedDate: parseDate(post.date)
         }));
         
         dataLoaded = true;
@@ -58,20 +66,10 @@ function getRecentPosts(limit = 10) {
         .slice(0, limit);
 }
 
-// Get trending posts
-function getTrendingPosts(limit = 10) {
+// Get featured posts - shows 3 most recent blogs (no featured tag needed)
+function getFeaturedPosts(limit = 3) {
     if (postsWithParsedDates.length === 0) return [];
     return postsWithParsedDates
-        .filter(post => post.trending === true)
-        .sort((a, b) => b.parsedDate - a.parsedDate)
-        .slice(0, limit);
-}
-
-// Get featured posts
-function getFeaturedPosts(limit = 5) {
-    if (postsWithParsedDates.length === 0) return [];
-    return postsWithParsedDates
-        .filter(post => post.featured === true)
         .sort((a, b) => b.parsedDate - a.parsedDate)
         .slice(0, limit);
 }
@@ -82,11 +80,35 @@ function getPostById(id) {
     return cachedPosts.find(post => post.id == id) || null;
 }
 
+// Parse date from various formats (handles "DD\MM\YYYY" format from API)
+function parseDate(dateString) {
+    if (dateString instanceof Date) return dateString;
+    
+    // Handle format: "19\\12\\2025" or "19\12\2025"
+    if (dateString && dateString.includes('\\')) {
+        const parts = dateString.split('\\');
+        if (parts.length === 3) {
+            const day = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
+            const year = parseInt(parts[2], 10);
+            return new Date(year, month, day);
+        }
+    }
+    
+    // Fallback to standard date parsing
+    try {
+        return new Date(dateString);
+    } catch (e) {
+        return null;
+    }
+}
+
 // Format date
 const dateFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
 function formatDate(dateString) {
     try {
-        const date = dateString instanceof Date ? dateString : new Date(dateString);
+        const date = parseDate(dateString);
+        if (!date) return dateString;
         return date.toLocaleDateString('en-US', dateFormatOptions);
     } catch (e) {
         return dateString;
@@ -96,7 +118,8 @@ function formatDate(dateString) {
 // Format date for datetime attribute
 function formatDateTime(dateString) {
     try {
-        const date = dateString instanceof Date ? dateString : new Date(dateString);
+        const date = parseDate(dateString);
+        if (!date) return '';
         return date.toISOString().split('T')[0];
     } catch (e) {
         return '';
@@ -116,6 +139,10 @@ function createArticleHTML(post, isExcerpt = true) {
     const content = isExcerpt ? post.excerpt : post.content;
     const readMoreLink = isExcerpt ? `<a href="blog-post.html?id=${post.id}" class="read-more">Read More →</a>` : '';
     
+    // Featured image HTML (only show on excerpts)
+    const featuredImageHtml = isExcerpt && post.featured_image ? 
+        `<div class="article-featured-image"><img src="${post.featured_image}" alt="${escapeHtml(post.title)}" /></div>` : '';
+    
     return `
         <article class="blog-article" data-post-id="${post.id}">
             <h3 class="article-title">${escapeHtml(post.title)}</h3>
@@ -124,8 +151,9 @@ function createArticleHTML(post, isExcerpt = true) {
                 <span class="separator">|</span>
                 <time datetime="${formatDateTime(post.parsedDate || post.date)}">${formatDate(post.parsedDate || post.date)}</time>
                 <span class="separator">|</span>
-                <a href="index.html?category=${encodeURIComponent(post.category)}" class="category-tag" style="color: #c41e3a; text-decoration: none; font-weight: bold;">${escapeHtml(post.category)}</a>
+                <a href="index.html?category=${encodeURIComponent(post.category)}" class="category-tag">${escapeHtml(post.category)}</a>
             </div>
+            ${featuredImageHtml}
             <div class="article-content">
                 ${content}
             </div>
@@ -134,7 +162,7 @@ function createArticleHTML(post, isExcerpt = true) {
     `;
 }
 
-// Load homepage blogs - Show trending, featured, and all recent blogs
+// Load homepage blogs - Show featured (3 most recent) and all other recent blogs
 function loadHomepageBlogs() {
     const mainArticles = document.querySelector('.main-articles');
     if (!mainArticles) return;
@@ -152,7 +180,7 @@ function loadHomepageBlogs() {
                     <time datetime="2025-12-02">December 2, 2025</time>
                 </div>
                 <div class="article-content">
-                    <p>Welcome to our newspaper-style blog platform. We bring you the latest news, trending stories, and insightful articles on topics that matter.</p>
+                    <p>Welcome to our newspaper-style blog platform. We bring you the latest news, insightful articles, and expert insights on topics that matter.</p>
                     <p>No blog posts have been published yet!</p>
                 </div>
             </article>
@@ -160,19 +188,21 @@ function loadHomepageBlogs() {
         return;
     }
     
-    const featuredPosts = getFeaturedPosts(100);
+    const featuredPosts = getFeaturedPosts(3);
     const recentPosts = getRecentPosts(1000); // Get all posts
     
     // Track IDs to avoid duplicates
     const displayedIds = new Set();
     let html = '';
     
-    // Featured Section
+    // Featured Section (3 most recent posts)
     if (featuredPosts.length > 0) {
-        html += '<h2 class="section-title" style="font-size: 28px; margin-bottom: 20px; color: #ff6b35; border-bottom: 3px solid #ff6b35; padding-bottom: 10px;">⭐ Featured Posts</h2>';
+        html += '<h2 class="section-title">⭐ Featured Posts</h2>';
         featuredPosts.forEach((post, index) => {
             displayedIds.add(post.id);
-            const badge = '<div style="background-color: #ff6b35; color: #fff; display: inline-block; padding: 5px 12px; font-size: 12px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase;">⭐ Featured</div>';
+            const badge = '<div class="featured-badge">⭐ Featured</div>';
+            const featuredImageHtml = post.featured_image ? 
+                `<div class="article-featured-image"><img src="${post.featured_image}" alt="${escapeHtml(post.title)}" /></div>` : '';
             html += `
                 <article class="blog-article">
                     ${badge}
@@ -184,6 +214,7 @@ function loadHomepageBlogs() {
                         <span class="separator">|</span>
                         <span class="category-tag" data-category="${escapeHtml(post.category)}">${escapeHtml(post.category)}</span>
                     </div>
+                    ${featuredImageHtml}
                     <div class="article-content">
                         ${post.excerpt}
                     </div>
@@ -192,13 +223,13 @@ function loadHomepageBlogs() {
             `;
             if (index < featuredPosts.length - 1) html += '<div class="article-divider"></div>';
         });
-        html += '<div class="article-divider" style="margin: 40px 0;"></div>';
+        html += '<div class="article-divider"></div>';
     }
     
     // Recent Blogs Section - Exclude featured
     const uniqueRecent = recentPosts.filter(p => !displayedIds.has(p.id));
     if (uniqueRecent.length > 0) {
-        html += '<h2 class="section-title" style="font-size: 28px; margin-bottom: 20px; color: #2c2c2c; border-bottom: 3px solid #2c2c2c; padding-bottom: 10px;">📰 Recent Posts</h2>';
+        html += '<h2 class="section-title">📰 Recent Posts</h2>';
         uniqueRecent.forEach((post, index) => {
             html += createArticleHTML(post, true);
             if (index < uniqueRecent.length - 1) html += '<div class="article-divider"></div>';
@@ -207,8 +238,7 @@ function loadHomepageBlogs() {
     
     mainArticles.innerHTML = html;
     
-    // Update trending sidebar and categories
-    updateTrendingSidebar();
+    // Update categories
     updateCategoriesSidebar();
     updatePopularCategories();
 }
@@ -234,22 +264,22 @@ function loadRecentBlogsPage() {
     mainArticles.innerHTML = html;
 }
 
-// Load trending blogs page
-function loadTrendingBlogsPage() {
+// Load featured blogs page - show 3 most recent blogs
+function loadFeaturedBlogsPage() {
     const mainArticles = document.querySelector('.main-articles');
     if (!mainArticles) return;
     
-    const posts = getTrendingPosts(100);
+    const posts = getFeaturedPosts(3);
     
     let html = `
-        <h2 class="article-title">Trending Now</h2>
-        <p style="margin-bottom: 30px; font-style: italic; color: #666;">The most popular articles our readers are engaging with right now.</p>
+        <h2 class="article-title">Featured Articles</h2>
+        <p class="subtitle">Our latest 3 most recent articles on HowToAiWorld.</p>
     `;
     
     posts.forEach((post, index) => {
-        const badge = index === 0 ? 
-            '<div style="background-color: #c41e3a; color: #fff; display: inline-block; padding: 5px 12px; font-size: 12px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase;">🔥 Most Popular</div>' :
-            index < 3 ? '<div style="background-color: #ff6b35; color: #fff; display: inline-block; padding: 5px 12px; font-size: 12px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase;">⚡ Trending</div>' : '';
+        const badge = '<div class="featured-badge">⭐ Featured</div>';
+        const featuredImageHtml = post.featured_image ? 
+            `<div class="article-featured-image"><img src="${post.featured_image}" alt="${escapeHtml(post.title)}" /></div>` : '';
         
         html += `
             <article class="blog-article">
@@ -262,6 +292,7 @@ function loadTrendingBlogsPage() {
                     <span class="separator">|</span>
                     <span>${escapeHtml(post.category)}</span>
                 </div>
+                ${featuredImageHtml}
                 <div class="article-content">
                     ${post.excerpt}
                 </div>
@@ -272,30 +303,14 @@ function loadTrendingBlogsPage() {
     });
     
     if (posts.length === 0) {
-        html += '<p>No trending posts available yet. Check back soon!</p>';
+        html += '<p>No articles available yet. Check back soon!</p>';
     }
     
     mainArticles.innerHTML = html;
     
-    // Update popular categories sidebar
+    // Update sidebar
+    updateCategoriesSidebar();
     updatePopularCategories();
-}
-
-// Update trending sidebar
-function updateTrendingSidebar() {
-    const trendingList = document.querySelector('.trending-list');
-    if (!trendingList) return;
-    
-    const posts = getTrendingPosts(5);
-    
-    if (posts.length === 0) {
-        trendingList.innerHTML = '<li style="color: #666;">No trending posts yet</li>';
-        return;
-    }
-    
-    trendingList.innerHTML = posts.map(post => 
-        `<li><a href="blog-post.html?id=${post.id}">${escapeHtml(post.title)}</a></li>`
-    ).join('');
 }
 
 // Get all unique categories with counts
@@ -339,11 +354,11 @@ function updatePopularCategories() {
     const categories = getCategoriesWithCounts().slice(0, 4);
     
     if (categories.length === 0) {
-        popularList.innerHTML = '<li style="color: #666; padding: 10px 0;">No categories yet</li>';
+        popularList.innerHTML = '<li class="empty-state">No categories yet</li>';
         return;
     }
     
-    popularList.innerHTML = categories.map(cat => `<li style="padding: 10px 0; border-bottom: 1px solid #eee;"><a href="index.html?category=${encodeURIComponent(cat.name)}" style="color: #2c2c2c; text-decoration: none; display: flex; justify-content: space-between;"><span>${escapeHtml(cat.name)}</span><span style="color: #c41e3a; font-weight: bold;">${cat.count}</span></a></li>`).join('');
+    popularList.innerHTML = categories.map(cat => `<li class="category-item"><a href="index.html?category=${encodeURIComponent(cat.name)}" class="category-link"><span>${escapeHtml(cat.name)}</span><span class="count">${cat.count}</span></a></li>`).join('');
 }
 
 // Get posts by category
@@ -374,8 +389,8 @@ function loadCategoryPage(category) {
     
     const posts = getPostsByCategory(category);
     
-    let html = `<h2 class="section-title" style="font-size: 28px; margin-bottom: 20px; color: #2c2c2c; border-bottom: 3px solid #2c2c2c; padding-bottom: 10px;">📂 ${escapeHtml(category)} (${posts.length} posts)</h2>`;
-    html += `<p style="margin-bottom: 30px;"><a href="index.html" style="color: #c41e3a;">← Back to all posts</a></p>`;
+    let html = `<h2 class="section-title">📂 ${escapeHtml(category)} (${posts.length} posts)</h2>`;
+    html += `<p class="back-link"><a href="index.html">← Back to all posts</a></p>`;
     
     if (posts.length === 0) {
         html += '<p>No posts found in this category.</p>';
@@ -387,7 +402,6 @@ function loadCategoryPage(category) {
     }
     
     mainArticles.innerHTML = html;
-    updateTrendingSidebar();
     updateCategoriesSidebar();
     updatePopularCategories();
 }
@@ -405,8 +419,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         loadHomepageWithFilter();
     } else if (currentPage === 'recent-blogs.html') {
         loadRecentBlogsPage();
-    } else if (currentPage === 'trending.html') {
-        loadTrendingBlogsPage();
+    } else if (currentPage === 'featured.html') {
+        loadFeaturedBlogsPage();
     } else if (currentPage === 'blog-post.html') {
         loadBlogPost();
     }

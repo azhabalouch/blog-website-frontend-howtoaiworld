@@ -12,7 +12,7 @@
 <body>
     <!-- Header will be loaded dynamically -->
 
-    <main class="main-content">
+    <main class="main-content" id="main-content" role="main" aria-label="Main content">
         <div class="container">
             <div class="content-grid">
                 <section class="main-articles" id="blog-post-container">
@@ -23,13 +23,6 @@
                 </section>
 
                 <aside class="sidebar">
-                    <div class="sidebar-section trending-section">
-                        <h3 class="sidebar-title">Trending Now</h3>
-                        <ul class="trending-list" id="trending-sidebar">
-                            <!-- Trending posts will be loaded here -->
-                        </ul>
-                    </div>
-
                     <div class="sidebar-section ad-section" aria-label="Advertisement">
                         <p class="ad-label">Advertisement</p>
                         <div class="ad-placeholder">
@@ -50,7 +43,7 @@
                             <label for="newsletter-email-blog" class="sr-only">Email address</label>
                             <input type="email" id="newsletter-email-blog" name="email" placeholder="Enter your email" required aria-required="true">
                             <button type="submit">Subscribe</button>
-                            <div id="newsletterMessageBlog" style="display: none; margin-top: 10px; font-size: 13px;"></div>
+                            <div id="newsletterMessageBlog" role="status" aria-live="polite" style="display: none; margin-top: 10px; font-size: 13px;"></div>
                         </form>
                     </div>
                 </aside>
@@ -94,26 +87,25 @@
             const article = document.createElement('article');
             article.className = 'featured-article';
             
-            // Add badges
+            // Add badges (no featured field in API, so no badges needed)
             let badgesHTML = '';
-            if (post.featured) {
-                badgesHTML += '<span style="background-color: #c41e3a; color: #fff; padding: 5px 12px; font-size: 12px; font-weight: bold; margin-bottom: 15px; display: inline-block; text-transform: uppercase;">⭐ Featured</span>';
-            }
-            if (post.trending) {
-                badgesHTML += '<span style="background-color: #ff6b35; color: #fff; padding: 5px 12px; font-size: 12px; font-weight: bold; margin-bottom: 15px; display: inline-block; text-transform: uppercase; margin-left: 10px;">🔥 Trending</span>';
-            }
+            
+            // Featured image HTML
+            const featuredImageHtml = post.featured_image ? 
+                `<div class="article-featured-image" style="margin-bottom: 30px; text-align: center;"><img src="${post.featured_image}" alt="${escapeHtml(post.title)}" style="max-width: 100%; height: auto; border-radius: 8px;" /></div>` : '';
             
             // Build article HTML
             article.innerHTML = `
                 ${badgesHTML}
-                <h1 class="article-title">${post.title}</h1>
+                <h1 class="article-title">${escapeHtml(post.title)}</h1>
                 <div class="article-meta">
-                    <span class="author">By ${post.author}</span>
+                    <span class="author">By ${escapeHtml(post.author)}</span>
                     <span class="separator">|</span>
                     <time datetime="${formatDateTime(post.date)}">${formatDate(post.date)}</time>
                     <span class="separator">|</span>
-                    <a href="index.html?category=${encodeURIComponent(post.category)}" style="color: #c41e3a; text-decoration: none; font-weight: bold;">${post.category}</a>
+                    <a href="index.html?category=${encodeURIComponent(post.category)}" style="color: #c41e3a; text-decoration: none; font-weight: bold;">${escapeHtml(post.category)}</a>
                 </div>
+                ${featuredImageHtml}
                 <div class="article-content">
                 </div>
                 <div style="margin-top: 40px; padding-top: 30px; border-top: 2px solid #ddd;">
@@ -122,30 +114,78 @@
             `;
             
             // Set content HTML separately to preserve formatting
+            // Remove the h1 title from content since we already display it above
             const contentDiv = article.querySelector('.article-content');
-            contentDiv.innerHTML = post.content;
+            let contentHtml = post.content;
+            
+            // Remove the first h1 tag from content to avoid duplication
+            if (contentHtml) {
+                contentHtml = contentHtml.replace(/<h1[^>]*>.*?<\/h1>/, '');
+            }
+            
+            // Insert content images around the middle of the article
+            const tempWrapper = document.createElement('div');
+            tempWrapper.innerHTML = contentHtml || '';
+            const paragraphs = tempWrapper.querySelectorAll('p');
+            if (post.content_images && Array.isArray(post.content_images) && post.content_images.length > 0 && paragraphs.length > 0) {
+                const midIndex = Math.floor(paragraphs.length / 2);
+                const imageMarkup = post.content_images.map((url, idx) =>
+                    `<figure class="content-inline-image"><img src="${url}" alt="${escapeHtml(post.title)} image ${idx + 1}"></figure>`
+                ).join('');
+                const imageContainer = document.createElement('div');
+                imageContainer.innerHTML = imageMarkup;
+                paragraphs[midIndex].insertAdjacentElement('afterend', imageContainer);
+            }
+            
+            contentDiv.innerHTML = tempWrapper.innerHTML;
+            
+            // Add FAQ section if it exists (supports faq or FAQ)
+            const faqItems = post.faq || post.FAQ;
+            if (faqItems && Array.isArray(faqItems) && faqItems.length > 0) {
+                const faqDiv = document.createElement('div');
+                faqDiv.className = 'article-faq';
+                
+                const faqList = faqItems.map((item, idx) => {
+                    const q = escapeHtml(item.question || 'Question');
+                    const a = escapeHtml(item.answer || '');
+                    return `
+                        <div class="faq-item" data-index="${idx}">
+                            <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-${idx}">
+                                <span class="faq-question-text">${q}</span>
+                                <span class="faq-toggle" aria-hidden="true">+</span>
+                            </button>
+                            <div id="faq-answer-${idx}" class="faq-answer" hidden>
+                                <p>${a}</p>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                faqDiv.innerHTML = `
+                    <div class="faq-heading">
+                        <p class="faq-kicker">Need quick answers?</p>
+                        <h3>Frequently Asked Questions</h3>
+                    </div>
+                    <div class="faq-list">${faqList}</div>
+                `;
+                article.appendChild(faqDiv);
+                faqDiv.querySelectorAll('.faq-question').forEach((btn) => {
+                    btn.addEventListener('click', () => {
+                        const answerId = btn.getAttribute('aria-controls');
+                        const answer = faqDiv.querySelector(`#${answerId}`);
+                        const isOpen = btn.getAttribute('aria-expanded') === 'true';
+                        btn.setAttribute('aria-expanded', String(!isOpen));
+                        answer.hidden = isOpen;
+                        btn.parentElement.classList.toggle('open', !isOpen);
+                    });
+                });
+            }
             
             // Replace container with article
             document.getElementById('blog-post-container').innerHTML = '';
             document.getElementById('blog-post-container').appendChild(article);
             
-            // Load trending sidebar and categories
-            loadTrendingSidebar();
+            // Load categories
             updateCategoriesSidebar();
-        }
-        
-        function loadTrendingSidebar() {
-            const posts = getTrendingPosts(5);
-            const trendingList = document.getElementById('trending-sidebar');
-            
-            if (posts.length === 0) {
-                trendingList.innerHTML = '<li style="color: #666;">No trending posts yet</li>';
-                return;
-            }
-            
-            trendingList.innerHTML = posts.map(post => 
-                `<li><a href="blog-post.html?id=${post.id}">${post.title}</a></li>`
-            ).join('');
         }
         
         // Newsletter form handler

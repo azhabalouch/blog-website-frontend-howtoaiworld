@@ -32,24 +32,16 @@
     <!-- Header will be loaded dynamically -->
 
     <!-- Main Content -->
-    <main class="main-content">
+    <main class="main-content" id="main-content" role="main" aria-label="Main content">
         <div class="container">
             <div class="content-grid">
                 <!-- Main Articles Section -->
-                <section class="main-articles" role="main">
+                <section class="main-articles" aria-label="Articles">
                     <!-- Dynamic content will be loaded here by blog-loader.js -->
                 </section>
 
                 <!-- Sidebar -->
                 <aside class="sidebar" role="complementary">
-                    <!-- Trending Section -->
-                    <div class="sidebar-section trending-section">
-                        <h3 class="sidebar-title">Trending Now</h3>
-                        <ul class="trending-list" id="trending-sidebar">
-                            <!-- Dynamic trending posts will be loaded here -->
-                        </ul>
-                    </div>
-
                     <!-- Ad Space (AdSense Ready) -->
                     <div class="sidebar-section ad-section" aria-label="Advertisement">
                         <p class="ad-label">Advertisement</p>
@@ -82,7 +74,7 @@
                             <label for="newsletter-email" class="sr-only">Email address</label>
                             <input type="email" id="newsletter-email" name="email" placeholder="Enter your email" required aria-required="true">
                             <button type="submit">Subscribe</button>
-                            <div id="newsletterMessage" style="display: none; margin-top: 10px; font-size: 13px;"></div>
+                            <div id="newsletterMessage" role="status" aria-live="polite" style="display: none; margin-top: 10px; font-size: 13px;"></div>
                         </form>
                     </div>
                 </aside>
