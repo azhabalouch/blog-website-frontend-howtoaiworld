@@ -151,6 +151,33 @@ body {
     padding-bottom: 30px;
 }
 
+/* Make entire blog card clickable */
+.article-card-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    padding: 20px;
+    margin: -20px;
+    border-radius: 8px;
+}
+
+.article-card-link:hover {
+    transform: translateY(-2px);
+    opacity: 0.95;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.article-card-link:hover .article-title {
+    color: #c41e3a;
+}
+
+.article-card-link:hover .read-more {
+    color: #c41e3a;
+    text-decoration: underline;
+}
+
 .blog-article:last-child {
     margin-bottom: 0;
     padding-bottom: 0;
@@ -798,6 +825,17 @@ a:focus-visible {
 
 .back-link a:hover {
     text-decoration: underline;
+}
+
+.back-to-posts-link {
+    color: #2c2c2c;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.back-to-posts-link:hover {
+    color: #c41e3a;
 }
 
 /* Subtitle Styles */

@@ -137,7 +137,7 @@ function escapeHtml(text) {
 function createArticleHTML(post, isExcerpt = true) {
     if (!post || !post.id) return '';
     const content = isExcerpt ? post.excerpt : post.content;
-    const readMoreLink = isExcerpt ? `<a href="blog-post.html?id=${post.id}" class="read-more">Read More →</a>` : '';
+    const readMoreLink = isExcerpt ? `<span class="read-more">Read More →</span>` : '';
     
     // Featured image HTML (only show on excerpts)
     const featuredImageHtml = isExcerpt && post.featured_image ? 
@@ -145,19 +145,21 @@ function createArticleHTML(post, isExcerpt = true) {
     
     return `
         <article class="blog-article" data-post-id="${post.id}">
-            <h3 class="article-title">${escapeHtml(post.title)}</h3>
-            <div class="article-meta">
-                <span class="author">By ${escapeHtml(post.author)}</span>
-                <span class="separator">|</span>
-                <time datetime="${formatDateTime(post.parsedDate || post.date)}">${formatDate(post.parsedDate || post.date)}</time>
-                <span class="separator">|</span>
-                <a href="index.html?category=${encodeURIComponent(post.category)}" class="category-tag">${escapeHtml(post.category)}</a>
-            </div>
-            ${featuredImageHtml}
-            <div class="article-content">
-                ${content}
-            </div>
-            ${readMoreLink}
+            <a href="blog-post.html?id=${post.id}" class="article-card-link">
+                <h3 class="article-title">${escapeHtml(post.title)}</h3>
+                <div class="article-meta">
+                    <span class="author">By ${escapeHtml(post.author)}</span>
+                    <span class="separator">|</span>
+                    <time datetime="${formatDateTime(post.parsedDate || post.date)}">${formatDate(post.parsedDate || post.date)}</time>
+                    <span class="separator">|</span>
+                    <span class="category-tag">${escapeHtml(post.category)}</span>
+                </div>
+                ${featuredImageHtml}
+                <div class="article-content">
+                    ${content}
+                </div>
+                ${readMoreLink}
+            </a>
         </article>
     `;
 }
@@ -205,20 +207,22 @@ function loadHomepageBlogs() {
                 `<div class="article-featured-image"><img src="${post.featured_image}" alt="${escapeHtml(post.title)}" /></div>` : '';
             html += `
                 <article class="blog-article">
-                    ${badge}
-                    <h3 class="article-title">${escapeHtml(post.title)}</h3>
-                    <div class="article-meta">
-                        <span class="author">By ${escapeHtml(post.author)}</span>
-                        <span class="separator">|</span>
-                        <time datetime="${formatDateTime(post.parsedDate || post.date)}">${formatDate(post.parsedDate || post.date)}</time>
-                        <span class="separator">|</span>
-                        <span class="category-tag" data-category="${escapeHtml(post.category)}">${escapeHtml(post.category)}</span>
-                    </div>
-                    ${featuredImageHtml}
-                    <div class="article-content">
-                        ${post.excerpt}
-                    </div>
-                    <a href="blog-post.html?id=${post.id}" class="read-more">Read More →</a>
+                    <a href="blog-post.html?id=${post.id}" class="article-card-link">
+                        ${badge}
+                        <h3 class="article-title">${escapeHtml(post.title)}</h3>
+                        <div class="article-meta">
+                            <span class="author">By ${escapeHtml(post.author)}</span>
+                            <span class="separator">|</span>
+                            <time datetime="${formatDateTime(post.parsedDate || post.date)}">${formatDate(post.parsedDate || post.date)}</time>
+                            <span class="separator">|</span>
+                            <span class="category-tag" data-category="${escapeHtml(post.category)}">${escapeHtml(post.category)}</span>
+                        </div>
+                        ${featuredImageHtml}
+                        <div class="article-content">
+                            ${post.excerpt}
+                        </div>
+                        <span class="read-more">Read More →</span>
+                    </a>
                 </article>
             `;
             if (index < featuredPosts.length - 1) html += '<div class="article-divider"></div>';
@@ -283,20 +287,22 @@ function loadFeaturedBlogsPage() {
         
         html += `
             <article class="blog-article">
-                ${badge}
-                <h3 class="article-title">${escapeHtml(post.title)}</h3>
-                <div class="article-meta">
-                    <span class="author">By ${escapeHtml(post.author)}</span>
-                    <span class="separator">|</span>
-                    <time datetime="${formatDateTime(post.parsedDate || post.date)}">${formatDate(post.parsedDate || post.date)}</time>
-                    <span class="separator">|</span>
-                    <span>${escapeHtml(post.category)}</span>
-                </div>
-                ${featuredImageHtml}
-                <div class="article-content">
-                    ${post.excerpt}
-                </div>
-                <a href="blog-post.html?id=${post.id}" class="read-more">Read More →</a>
+                <a href="blog-post.html?id=${post.id}" class="article-card-link">
+                    ${badge}
+                    <h3 class="article-title">${escapeHtml(post.title)}</h3>
+                    <div class="article-meta">
+                        <span class="author">By ${escapeHtml(post.author)}</span>
+                        <span class="separator">|</span>
+                        <time datetime="${formatDateTime(post.parsedDate || post.date)}">${formatDate(post.parsedDate || post.date)}</time>
+                        <span class="separator">|</span>
+                        <span>${escapeHtml(post.category)}</span>
+                    </div>
+                    ${featuredImageHtml}
+                    <div class="article-content">
+                        ${post.excerpt}
+                    </div>
+                    <span class="read-more">Read More →</span>
+                </a>
             </article>
         `;
         if (index < posts.length - 1) html += '<div class="article-divider"></div>';
