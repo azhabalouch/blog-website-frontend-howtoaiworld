@@ -80,16 +80,16 @@ function getPostById(id) {
     return cachedPosts.find(post => post.id == id) || null;
 }
 
-// Parse date from various formats (handles "DD\MM\YYYY" format from API)
+// Parse date from various formats (handles "MM//DD//YYYY" format from API)
 function parseDate(dateString) {
     if (dateString instanceof Date) return dateString;
     
-    // Handle format: "19\\12\\2025" or "19\12\2025"
-    if (dateString && dateString.includes('\\')) {
-        const parts = dateString.split('\\');
+    // Handle format: "12//19//2025"
+    if (dateString && dateString.includes('//')) {
+        const parts = dateString.split('//');
         if (parts.length === 3) {
-            const day = parseInt(parts[0], 10);
-            const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
+            const month = parseInt(parts[0], 10) - 1; // Month is 0-indexed
+            const day = parseInt(parts[1], 10);
             const year = parseInt(parts[2], 10);
             return new Date(year, month, day);
         }
