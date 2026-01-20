@@ -123,21 +123,33 @@
                 contentHtml = contentHtml.replace(/<h1[^>]*>.*?<\/h1>/, '');
             }
             
-            // Insert content images around the middle of the article
-            const tempWrapper = document.createElement('div');
-            tempWrapper.innerHTML = contentHtml || '';
-            const paragraphs = tempWrapper.querySelectorAll('p');
-            if (post.content_images && Array.isArray(post.content_images) && post.content_images.length > 0 && paragraphs.length > 0) {
-                const midIndex = Math.floor(paragraphs.length / 2);
-                const imageMarkup = post.content_images.map((url, idx) =>
-                    `<figure class="content-inline-image"><img src="${url}" alt="${escapeHtml(post.title)} image ${idx + 1}"></figure>`
-                ).join('');
-                const imageContainer = document.createElement('div');
-                imageContainer.innerHTML = imageMarkup;
-                paragraphs[midIndex].insertAdjacentElement('afterend', imageContainer);
+            // Handle content images
+            if (post.content_images && Array.isArray(post.content_images) && post.content_images.length > 0) {
+                // Insert first image in the middle if exists
+                if (post.content_images.length >= 1) {
+                    const tempWrapper = document.createElement('div');
+                    tempWrapper.innerHTML = contentHtml || '';
+                    const paragraphs = tempWrapper.querySelectorAll('p');
+                    if (paragraphs.length > 0) {
+                        const midIndex = Math.floor(paragraphs.length / 2);
+                        const imageMarkup = `<figure class="content-inline-image"><img src="${post.content_images[0]}" alt="${escapeHtml(post.title)} image 1"></figure>`;
+                        const imageContainer = document.createElement('div');
+                        imageContainer.innerHTML = imageMarkup;
+                        paragraphs[midIndex].insertAdjacentElement('afterend', imageContainer);
+                    }
+                    contentHtml = tempWrapper.innerHTML;
+                }
             }
             
-            contentDiv.innerHTML = tempWrapper.innerHTML;
+            contentDiv.innerHTML = contentHtml;
+            
+            // Add second image at the end if exists
+            if (post.content_images && Array.isArray(post.content_images) && post.content_images.length >= 2) {
+                const secondImageMarkup = `<figure class="content-inline-image"><img src="${post.content_images[1]}" alt="${escapeHtml(post.title)} image 2"></figure>`;
+                const secondImageDiv = document.createElement('div');
+                secondImageDiv.innerHTML = secondImageMarkup;
+                contentDiv.appendChild(secondImageDiv);
+            }
             
             // Add FAQ section if it exists (supports faq or FAQ)
             const faqItems = post.faq || post.FAQ;
