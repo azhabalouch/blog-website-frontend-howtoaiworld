@@ -47,6 +47,7 @@
     padding: 13px 14px;
     border: 1.5px solid #d6d6d6;
     border-radius: 7px;
+    font-family: 'Times New Roman', Times, serif;
     font-size: 1rem;
     background: #fafbfc;
     transition: border-color 0.2s, box-shadow 0.2s;
@@ -61,14 +62,12 @@
 
 .contact-submit-modern {
     padding: 15px 0;
-    background: linear-gradient(90deg, #c41e3a 0%, #2c2c2c 100%);
+    background: #2c2c2c;
     color: #fff;
     border: none;
     border-radius: 7px;
     font-size: 1.1rem;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    font-family: 'Times New Roman', Times, serif;
     cursor: pointer;
     transition: background 0.2s, box-shadow 0.2s;
     margin-top: 10px;
@@ -77,8 +76,44 @@
 
 .contact-submit-modern:hover,
 .contact-submit-modern:focus {
-    background: linear-gradient(90deg, #2c2c2c 0%, #c41e3a 100%);
+    background: #c41e3a;
     box-shadow: 0 4px 16px rgba(196, 30, 58, 0.10);
+}
+
+/* Contact Info Sections */
+.contact-info-container {
+    border-radius: 16px;
+    padding: 32px;
+    margin: 0 auto 24px auto;
+    border: 1px solid #ececec;
+    text-align: left;
+}
+
+.contact-info-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #2c2c2c;
+    margin-bottom: 16px;
+    letter-spacing: 0.5px;
+}
+
+.contact-info-desc {
+    font-size: 1.05rem;
+    color: #555;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.contact-email-link {
+    color: #c41e3a;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.contact-email-link:hover {
+    color: #a0182f;
+    text-decoration: underline;
 }
 
 @media (max-width: 600px) {
@@ -87,6 +122,14 @@
         max-width: 100%;
     }
     .contact-form-title {
+        font-size: 1.4rem;
+    }
+
+    .contact-info-container {
+        padding: 24px 16px;
+        margin: 0 auto 20px auto;
+    }
+    .contact-info-title {
         font-size: 1.4rem;
     }
 }
@@ -682,6 +725,7 @@ body {
     background-color: #fff;
     padding: 25px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
 }
 
 .sidebar-title {
@@ -786,6 +830,18 @@ button:focus-visible,
 a:focus-visible {
     outline: 2px solid #c41e3a;
     outline-offset: 2px;
+}
+
+/* Legal Links */
+.sidebar-legal-link {
+    color: #2c2c2c;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.3s;
+}
+
+.sidebar-legal-link:hover {
+    color: #c41e3a;
 }
 
 /* Footer Styles */

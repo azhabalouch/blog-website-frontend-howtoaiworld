@@ -18,6 +18,22 @@
 
         gtag('config', 'G-HWT034PQT2');
     </script>
+
+    <!-- Sender.net Email Marketing Integration -->
+    <script>
+        (function (s, e, n, d, er) {
+            s['Sender'] = er;
+            s[er] = s[er] || function () {
+            (s[er].q = s[er].q || []).push(arguments)
+            }, s[er].l = 1 * new Date();
+            var a = e.createElement(n),
+                m = e.getElementsByTagName(n)[0];
+            a.async = 1;
+            a.src = d;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://cdn.sender.net/accounts_resources/universal.js', 'sender');
+        sender('6ec66dfe790619')
+    </script>
 </head>
 <body>
     <!-- Header will be loaded dynamically -->
@@ -68,20 +84,7 @@
                 </section>
 
                 <aside class="sidebar">
-                    <div class="sidebar-section">
-                        <h3 class="sidebar-title">Legal Pages</h3>
-                        <ul style="list-style: none;">
-                            <li style="padding: 10px 0; border-bottom: 1px solid #eee;">
-                                <a href="privacy.html" style="color: #2c2c2c; text-decoration: none;">Privacy Policy</a>
-                            </li>
-                            <li style="padding: 10px 0; border-bottom: 1px solid #eee;">
-                                <a href="terms.html" style="color: #2c2c2c; text-decoration: none;">Terms of Service</a>
-                            </li>
-                            <li style="padding: 10px 0;">
-                                <a href="disclaimer.html" style="color: #2c2c2c; text-decoration: none;">Disclaimer</a>
-                            </li>
-                        </ul>
-                    </div>
+                    <div id="sidebar-components"></div>
                 </aside>
             </div>
         </div>

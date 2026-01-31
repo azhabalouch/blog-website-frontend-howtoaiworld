@@ -18,6 +18,22 @@
 
         gtag('config', 'G-HWT034PQT2');
     </script>
+
+    <!-- Sender.net Email Marketing Integration -->
+    <script>
+        (function (s, e, n, d, er) {
+            s['Sender'] = er;
+            s[er] = s[er] || function () {
+            (s[er].q = s[er].q || []).push(arguments)
+            }, s[er].l = 1 * new Date();
+            var a = e.createElement(n),
+                m = e.getElementsByTagName(n)[0];
+            a.async = 1;
+            a.src = d;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://cdn.sender.net/accounts_resources/universal.js', 'sender');
+        sender('6ec66dfe790619')
+    </script>
 </head>
 <body>
     <!-- Header will be loaded dynamically -->
@@ -77,7 +93,7 @@
                             <h3 style="font-size: 24px; margin: 30px 0 15px; font-weight: bold;">Security of Your Information</h3>
                             <p>We use administrative, technical, and physical security measures to help protect your personal information. While we have taken reasonable steps to secure the personal information you provide to us, please be aware that despite our efforts, no security measures are perfect or impenetrable, and no method of data transmission can be guaranteed against any interception or other type of misuse.</p>
                             
-                            <h3 style="font-size: 24px; margin: 30px 0 15px; font-weight: bold;">Contact Us</h3>
+                            <h3 style="font-size: 24px; margin: 30px 0 15px; font-weight: bold;">Contact</h3>
                             <p>If you have questions or comments about this Privacy Policy, please contact us at:</p>
                             <p style="margin-top: 15px;">
                                 Email: privacy@howtoaiworld.com<br>
@@ -88,20 +104,7 @@
                 </section>
 
                 <aside class="sidebar">
-                    <div class="sidebar-section">
-                        <h3 class="sidebar-title">Legal Pages</h3>
-                        <ul style="list-style: none;">
-                            <li style="padding: 10px 0; border-bottom: 1px solid #eee;">
-                                <a href="privacy.html" style="color: #2c2c2c; text-decoration: none;">Privacy Policy</a>
-                            </li>
-                            <li style="padding: 10px 0; border-bottom: 1px solid #eee;">
-                                <a href="terms.html" style="color: #2c2c2c; text-decoration: none;">Terms of Service</a>
-                            </li>
-                            <li style="padding: 10px 0;">
-                                <a href="disclaimer.html" style="color: #2c2c2c; text-decoration: none;">Disclaimer</a>
-                            </li>
-                        </ul>
-                    </div>
+                    <div id="sidebar-components"></div>
                 </aside>
             </div>
         </div>

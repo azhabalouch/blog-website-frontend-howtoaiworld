@@ -4,6 +4,67 @@ function loadComponents() {
     loadComponent('nav.html', 'header', true);
     // Load footer  
     loadComponent('footer.html', 'footer', false);
+
+    // Load sidebar components if sidebar-components div exists
+    if (document.getElementById('sidebar-components')) {
+        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+        
+        // Load specific components based on page
+        if (currentPage === 'index.html' || currentPage === '') {
+            loadSidebarComponent('sidebar-ad.html');
+            loadSidebarComponent('sidebar-categories.html');
+            loadSidebarComponent('sidebar-popular-categories.html');
+            loadSidebarComponent('sidebar-newsletter.html');
+        } else if (currentPage === 'contact.html') {
+            loadSidebarComponent('sidebar-inquiry-message.html');
+            loadSidebarComponent('sidebar-social.html');
+            loadSidebarComponent('sidebar-ad.html');
+        } else if (currentPage === 'featured.html') {
+            loadSidebarComponent('sidebar-ad.html');
+            loadSidebarComponent('sidebar-categories.html');
+            loadSidebarComponent('sidebar-popular-categories.html');
+            loadSidebarComponent('sidebar-newsletter.html');
+        } else if (currentPage === 'about.html') {
+            loadSidebarComponent('sidebar-ad.html');
+            loadSidebarComponent('sidebar-contact.html');
+        } else if (currentPage === 'recent-blogs.html') {
+            loadSidebarComponent('sidebar-categories.html');
+            loadSidebarComponent('sidebar-ad.html');
+            loadSidebarComponent('sidebar-newsletter.html');
+        } else if (currentPage === 'blog-post.html') {
+            loadSidebarComponent('sidebar-ad.html');
+            loadSidebarComponent('sidebar-categories.html');
+            loadSidebarComponent('sidebar-newsletter.html');
+        } else if (currentPage === 'trending.html') {
+            loadSidebarComponent('sidebar-ad.html');
+            loadSidebarComponent('sidebar-popular-categories.html');
+        } else if (currentPage === 'thanks.html') {
+            loadSidebarComponent('sidebar-contact.html');
+            loadSidebarComponent('sidebar-social.html');
+            loadSidebarComponent('sidebar-ad.html');
+        } else if (currentPage === 'privacy.html' || currentPage === 'terms.html' || currentPage === 'disclaimer.html') {
+            loadSidebarComponent('sidebar-legal.html');
+        }
+        // Add more conditions for other pages as needed
+    }
+}
+
+// Helper to load sidebar components
+function loadSidebarComponent(filePath) {
+    const xhr = new XMLHttpRequest();
+    xhr.onload = function() {
+        if (xhr.status === 0 || xhr.status === 200) {
+            const sidebarDiv = document.getElementById('sidebar-components');
+            if (sidebarDiv) {
+                sidebarDiv.insertAdjacentHTML('beforeend', xhr.responseText);
+            }
+        }
+    };
+    xhr.onerror = function() {};
+    try {
+        xhr.open('GET', filePath, true);
+        xhr.send();
+    } catch (e) {}
 }
 
 // Helper function to load individual components

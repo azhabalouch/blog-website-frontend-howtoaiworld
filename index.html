@@ -37,6 +37,22 @@
 
         gtag('config', 'G-HWT034PQT2');
     </script>
+
+    <!-- Sender.net Email Marketing Integration -->
+    <script>
+        (function (s, e, n, d, er) {
+            s['Sender'] = er;
+            s[er] = s[er] || function () {
+            (s[er].q = s[er].q || []).push(arguments)
+            }, s[er].l = 1 * new Date();
+            var a = e.createElement(n),
+                m = e.getElementsByTagName(n)[0];
+            a.async = 1;
+            a.src = d;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://cdn.sender.net/accounts_resources/universal.js', 'sender');
+        sender('6ec66dfe790619')
+    </script>
 </head>
 <body>
     <!-- Header will be loaded dynamically -->
@@ -52,41 +68,7 @@
 
                 <!-- Sidebar -->
                 <aside class="sidebar" role="complementary">
-                    <!-- Ad Space (AdSense Ready) -->
-                    <div class="sidebar-section ad-section" aria-label="Advertisement">
-                        <p class="ad-label">Advertisement</p>
-                        <!-- Google AdSense code will go here -->
-                        <div class="ad-placeholder">
-                            <p>Ad Space<br>300x250</p>
-                        </div>
-                    </div>
-
-                    <!-- Categories -->
-                    <div class="sidebar-section categories-section">
-                        <h3 class="sidebar-title">Categories</h3>
-                        <ul class="categories-list" id="categories-list">
-                            <!-- Categories will be dynamically loaded with correct counts -->
-                        </ul>
-                    </div>
-
-                    <!-- Popular Categories -->
-                    <div class="sidebar-section">
-                        <h3 class="sidebar-title">Popular Categories</h3>
-                        <ul id="popular-categories" style="list-style: none; padding: 0;">
-                            <!-- Popular categories with counts will be loaded here -->
-                        </ul>
-                    </div>
-
-                    <!-- Newsletter Signup -->
-                    <div class="sidebar-section newsletter-section">
-                        <h3 class="sidebar-title">Subscribe to Newsletter</h3>
-                        <form class="newsletter-form" id="newsletterForm" aria-label="Newsletter subscription form">
-                            <label for="newsletter-email" class="sr-only">Email address</label>
-                            <input type="email" id="newsletter-email" name="email" placeholder="Enter your email" required aria-required="true">
-                            <button type="submit">Subscribe</button>
-                            <div id="newsletterMessage" role="status" aria-live="polite" style="display: none; margin-top: 10px; font-size: 13px;"></div>
-                        </form>
-                    </div>
+                    <div id="sidebar-components"></div>
                 </aside>
             </div>
         </div>
@@ -95,27 +77,6 @@
     <!-- Footer will be loaded dynamically -->
 
     <script src="components.js"></script>
-    <script>
-        // Newsletter form handler
-        function initNewsletter() {
-            const newsletterForm = document.getElementById('newsletterForm');
-            if (newsletterForm) {
-                newsletterForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    const messageDiv = document.getElementById('newsletterMessage');
-                    messageDiv.style.display = 'block';
-                    messageDiv.style.color = '#155724';
-                    messageDiv.textContent = '✓ Successfully subscribed!';
-                    this.reset();
-                    setTimeout(() => {
-                        messageDiv.style.display = 'none';
-                    }, 3000);
-                });
-            }
-        }
-        // Initialize newsletter when components are loaded
-        setTimeout(initNewsletter, 500);
-    </script>
     <script src="blog-loader.js"></script>
 </body>
 </html>

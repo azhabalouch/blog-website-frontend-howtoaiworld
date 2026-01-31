@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Contact HowToAiWorld. Get in touch with us for inquiries, feedback, or collaboration opportunities.">
     <meta name="robots" content="index, follow">
-    <title>Contact Us - HowToAiWorld</title>
+    <title>Contact - HowToAiWorld</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="canonical" href="https://howtoaiworld.com/contact.html">
 
@@ -18,6 +18,22 @@
 
         gtag('config', 'G-HWT034PQT2');
     </script>
+
+    <!-- Sender.net Email Marketing Integration -->
+    <script>
+        (function (s, e, n, d, er) {
+            s['Sender'] = er;
+            s[er] = s[er] || function () {
+            (s[er].q = s[er].q || []).push(arguments)
+            }, s[er].l = 1 * new Date();
+            var a = e.createElement(n),
+                m = e.getElementsByTagName(n)[0];
+            a.async = 1;
+            a.src = d;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://cdn.sender.net/accounts_resources/universal.js', 'sender');
+        sender('6ec66dfe790619')
+    </script>
 </head>
 <body>
     <!-- Header will be loaded dynamically -->
@@ -27,7 +43,7 @@
             <div class="content-grid">
                 <section class="main-articles">
                     <div class="contact-form-container">
-                        <h2 class="contact-form-title">Contact Us</h2>
+                        <h2 class="contact-form-title">Contact</h2>
                         <p class="contact-form-desc">We'd love to hear from you! Fill out the form below and our team will get back to you soon.</p>
                         <form action="https://api.web3forms.com/submit" method="POST" class="contact-form-modern">
                             <input type="hidden" name="access_key" value="62765342-bb78-41ba-8e76-7d7a8b5b8bb0">
@@ -48,31 +64,21 @@
                             <button class="contact-submit-modern" type="submit">Send Message</button>
                         </form>
                     </div>
+
+                    <div class="contact-info-container">
+                        <h2 class="contact-info-title">Send Direct Email</h2>
+                        <p class="contact-info-desc">You can also reach us directly at <a href="mailto:contact@howtoaiworld.com" class="contact-email-link">contact@howtoaiworld.com</a></p>
+                    </div>
+
+                    <div class="contact-info-container">
+                        <h2 class="contact-info-title">Our Office</h2>
+                        <p class="contact-info-desc">123 AI Street,<br>Tech City, TC 45678<br>Country</p>
+                    </div>
                 </section>
 
                 <aside class="sidebar">
-                    <div class="sidebar-section">
-                        <h3 class="sidebar-title">Quick Response</h3>
-                        <p style="font-size: 15px; line-height: 1.6;">We typically respond to all inquiries within 24-48 hours during business days.</p>
-                    </div>
-
-                    <div class="sidebar-section">
-                        <h3 class="sidebar-title">Follow Us</h3>
-                        <p style="font-size: 15px; line-height: 1.6; margin-bottom: 15px;">Stay connected with us on social media for the latest updates.</p>
-                        <ul style="list-style: none;">
-                            <li style="margin-bottom: 10px;"><a href="#" style="color: #2c2c2c; text-decoration: none;">Facebook</a></li>
-                            <li style="margin-bottom: 10px;"><a href="#" style="color: #2c2c2c; text-decoration: none;">Twitter</a></li>
-                            <li style="margin-bottom: 10px;"><a href="#" style="color: #2c2c2c; text-decoration: none;">LinkedIn</a></li>
-                            <li><a href="#" style="color: #2c2c2c; text-decoration: none;">Instagram</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="sidebar-section ad-section" aria-label="Advertisement">
-                        <p class="ad-label">Advertisement</p>
-                        <div class="ad-placeholder">
-                            <p>Ad Space<br>300x250</p>
-                        </div>
-                    </div>
+                    <!-- Sidebar Components -->
+                    <div id="sidebar-components"></div>
                 </aside>
             </div>
         </div>

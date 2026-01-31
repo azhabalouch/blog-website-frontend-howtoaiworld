@@ -18,6 +18,22 @@
 
         gtag('config', 'G-HWT034PQT2');
     </script>
+
+    <!-- Sender.net Email Marketing Integration -->
+    <script>
+        (function (s, e, n, d, er) {
+            s['Sender'] = er;
+            s[er] = s[er] || function () {
+            (s[er].q = s[er].q || []).push(arguments)
+            }, s[er].l = 1 * new Date();
+            var a = e.createElement(n),
+                m = e.getElementsByTagName(n)[0];
+            a.async = 1;
+            a.src = d;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://cdn.sender.net/accounts_resources/universal.js', 'sender');
+        sender('6ec66dfe790619')
+    </script>
 </head>
 <body>
     <!-- Header will be loaded dynamically -->
@@ -36,28 +52,7 @@
                 </section>
 
                 <aside class="sidebar">
-                    <div class="sidebar-section">
-                        <h3 class="sidebar-title">Quick Response</h3>
-                        <p style="font-size: 15px; line-height: 1.6;">We typically respond to all inquiries within 24-48 hours during business days.</p>
-                    </div>
-
-                    <div class="sidebar-section">
-                        <h3 class="sidebar-title">Follow Us</h3>
-                        <p style="font-size: 15px; line-height: 1.6; margin-bottom: 15px;">Stay connected with us on social media for the latest updates.</p>
-                        <ul style="list-style: none;">
-                            <li style="margin-bottom: 10px;"><a href="#" style="color: #2c2c2c; text-decoration: none;">Facebook</a></li>
-                            <li style="margin-bottom: 10px;"><a href="#" style="color: #2c2c2c; text-decoration: none;">Twitter</a></li>
-                            <li style="margin-bottom: 10px;"><a href="#" style="color: #2c2c2c; text-decoration: none;">LinkedIn</a></li>
-                            <li><a href="#" style="color: #2c2c2c; text-decoration: none;">Instagram</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="sidebar-section ad-section" aria-label="Advertisement">
-                        <p class="ad-label">Advertisement</p>
-                        <div class="ad-placeholder">
-                            <p>Ad Space<br>300x250</p>
-                        </div>
-                    </div>
+                    <div id="sidebar-components"></div>
                 </aside>
             </div>
         </div>
