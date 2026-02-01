@@ -14,7 +14,7 @@ function escapeHtml(text) {
 function generateRSS(posts) {
     let items = '';
     posts.forEach(post => {
-        items += `\n    <item>\n      <title>${escapeHtml(post.title)}</title>\n      <link>https://www.howtoaiworld.com/blog-post.html?id=${post.id}</link>\n      <description>${escapeHtml(post.excerpt || post.content || '')}</description>\n      <pubDate>${(new Date(post.date)).toUTCString()}</pubDate>\n      <guid>https://www.howtoaiworld.com/blog-post.html?id=${post.id}</guid>\n    </item>`;
+        items += `\n    <item>\n      <title>${escapeHtml(post.title)}</title>\n      <link>https://www.howtoaiworld.com/pages/blog-post.html?id=${post.id}</link>\n      <description>${escapeHtml(post.excerpt || post.content || '')}</description>\n      <pubDate>${(new Date(post.date)).toUTCString()}</pubDate>\n      <guid>https://www.howtoaiworld.com/pages/blog-post.html?id=${post.id}</guid>\n    </item>`;
     });
     return `<?xml version="1.0" encoding="UTF-8" ?>\n<rss version="2.0">\n  <channel>\n    <title>HowToAiWorld Blog</title>\n    <link>https://www.howtoaiworld.com/</link>\n    <description>Latest blogs and updates from HowToAiWorld</description>\n    <language>en-us</language>${items}\n  </channel>\n</rss>`;
 }

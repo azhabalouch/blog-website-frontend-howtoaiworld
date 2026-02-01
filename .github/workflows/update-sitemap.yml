@@ -1,0 +1,72 @@
+name: Update Sitemap on Push
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - '**.html'
+      - '**.css'
+      - '**.js'
+
+jobs:
+  update-sitemap:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # Fetch last 2 commits to compare changes
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      
+      - name: Get changed files
+        id: changed-files
+        run: |
+          # Get list of changed files in this push
+          CHANGED_FILES=$(git diff --name-only HEAD^ HEAD | grep -E '(pages|legal)/.*\.html$|^index\.html$' || true)
+          
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "No HTML files changed"
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changed HTML files:"
+            echo "$CHANGED_FILES"
+            
+            # Convert to space-separated list for Python script
+            FILES_LIST=$(echo "$CHANGED_FILES" | tr '\n' ' ')
+            echo "files=$FILES_LIST" >> $GITHUB_OUTPUT
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Update sitemap.xml
+        if: steps.changed-files.outputs.has_changes == 'true'
+        run: |
+          python update-sitemap.py ${{ steps.changed-files.outputs.files }}
+      
+      - name: Check if sitemap was modified
+        if: steps.changed-files.outputs.has_changes == 'true'
+        id: check-changes
+        run: |
+          if git diff --quiet sitemap.xml; then
+            echo "sitemap_changed=false" >> $GITHUB_OUTPUT
+            echo "No changes to sitemap.xml"
+          else
+            echo "sitemap_changed=true" >> $GITHUB_OUTPUT
+            echo "Sitemap.xml was updated"
+          fi
+      
+      - name: Commit and push sitemap changes
+        if: steps.check-changes.outputs.sitemap_changed == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add sitemap.xml
+          git commit -m "🤖 Auto-update sitemap.xml lastmod dates [skip ci]"
+          git push

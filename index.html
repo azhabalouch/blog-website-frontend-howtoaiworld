@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+     <!-- Cookiebot for Cookie Consent -->
+    <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="402f2129-fdd2-44e0-b450-f6d922daebf4" data-blockingmode="auto" type="text/javascript"></script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Your trusted source for the latest news, trending stories, and insightful blog articles. Read quality content on various topics daily.">
@@ -25,7 +28,7 @@
     <meta name="theme-color" content="#2c2c2c">
     
     <title>HowToAiWorld - Your Daily News & Blog</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="canonical" href="https://howtoaiworld.com">
 
     <!-- Google tag (gtag.js) -->
@@ -71,12 +74,19 @@
                     <div id="sidebar-components"></div>
                 </aside>
             </div>
+            
+            <!-- Pagination Controls -->
+            <div id="pagination-controls" class="pagination-controls" style="display: none;">
+                <button id="prev-page" class="pagination-btn" aria-label="Previous page">← Previous</button>
+                <span id="page-info" class="page-info"></span>
+                <button id="next-page" class="pagination-btn" aria-label="Next page">Next →</button>
+            </div>
         </div>
     </main>
 
     <!-- Footer will be loaded dynamically -->
 
-    <script src="components.js"></script>
-    <script src="blog-loader.js"></script>
+    <script src="assets/js/components.js"></script>
+    <script src="assets/js/blog-loader.js"></script>
 </body>
 </html>

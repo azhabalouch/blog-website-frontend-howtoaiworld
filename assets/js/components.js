@@ -1,49 +1,49 @@
 // Load dynamic components (nav and footer) from separate files
 function loadComponents() {
     // Load navigation
-    loadComponent('nav.html', 'header', true);
+    loadComponent('/components/nav.html', 'header', true);
     // Load footer  
-    loadComponent('footer.html', 'footer', false);
+    loadComponent('/components/footer.html', 'footer', false);
 
     // Load sidebar components if sidebar-components div exists
     if (document.getElementById('sidebar-components')) {
-        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+        const currentPage = window.location.pathname.replace(/^\/(pages|legal)\//, '').replace(/\.html$/, '').split('/').pop() || 'index';
         
         // Load specific components based on page
-        if (currentPage === 'index.html' || currentPage === '') {
-            loadSidebarComponent('sidebar-ad.html');
-            loadSidebarComponent('sidebar-categories.html');
-            loadSidebarComponent('sidebar-popular-categories.html');
-            loadSidebarComponent('sidebar-newsletter.html');
-        } else if (currentPage === 'contact.html') {
-            loadSidebarComponent('sidebar-inquiry-message.html');
-            loadSidebarComponent('sidebar-social.html');
-            loadSidebarComponent('sidebar-ad.html');
-        } else if (currentPage === 'featured.html') {
-            loadSidebarComponent('sidebar-ad.html');
-            loadSidebarComponent('sidebar-categories.html');
-            loadSidebarComponent('sidebar-popular-categories.html');
-            loadSidebarComponent('sidebar-newsletter.html');
-        } else if (currentPage === 'about.html') {
-            loadSidebarComponent('sidebar-ad.html');
-            loadSidebarComponent('sidebar-contact.html');
-        } else if (currentPage === 'recent-blogs.html') {
-            loadSidebarComponent('sidebar-categories.html');
-            loadSidebarComponent('sidebar-ad.html');
-            loadSidebarComponent('sidebar-newsletter.html');
-        } else if (currentPage === 'blog-post.html') {
-            loadSidebarComponent('sidebar-ad.html');
-            loadSidebarComponent('sidebar-categories.html');
-            loadSidebarComponent('sidebar-newsletter.html');
-        } else if (currentPage === 'trending.html') {
-            loadSidebarComponent('sidebar-ad.html');
-            loadSidebarComponent('sidebar-popular-categories.html');
-        } else if (currentPage === 'thanks.html') {
-            loadSidebarComponent('sidebar-contact.html');
-            loadSidebarComponent('sidebar-social.html');
-            loadSidebarComponent('sidebar-ad.html');
-        } else if (currentPage === 'privacy.html' || currentPage === 'terms.html' || currentPage === 'disclaimer.html') {
-            loadSidebarComponent('sidebar-legal.html');
+        if (currentPage === 'index' || currentPage === '' || currentPage === '/') {
+            loadSidebarComponent('/components/sidebar-ad.html');
+            loadSidebarComponent('/components/sidebar-categories.html');
+            loadSidebarComponent('/components/sidebar-popular-categories.html');
+            loadSidebarComponent('/components/sidebar-newsletter.html');
+        } else if (currentPage === 'contact') {
+            loadSidebarComponent('/components/sidebar-inquiry-message.html');
+            loadSidebarComponent('/components/sidebar-social.html');
+            loadSidebarComponent('/components/sidebar-ad.html');
+        } else if (currentPage === 'featured') {
+            loadSidebarComponent('/components/sidebar-ad.html');
+            loadSidebarComponent('/components/sidebar-categories.html');
+            loadSidebarComponent('/components/sidebar-popular-categories.html');
+            loadSidebarComponent('/components/sidebar-newsletter.html');
+        } else if (currentPage === 'about') {
+            loadSidebarComponent('/components/sidebar-ad.html');
+            loadSidebarComponent('/components/sidebar-contact.html');
+        } else if (currentPage === 'recent-blogs') {
+            loadSidebarComponent('/components/sidebar-categories.html');
+            loadSidebarComponent('/components/sidebar-ad.html');
+            loadSidebarComponent('/components/sidebar-newsletter.html');
+        } else if (currentPage === 'blog-post') {
+            loadSidebarComponent('/components/sidebar-ad.html');
+            loadSidebarComponent('/components/sidebar-categories.html');
+            loadSidebarComponent('/components/sidebar-newsletter.html');
+        } else if (currentPage === 'trending') {
+            loadSidebarComponent('/components/sidebar-ad.html');
+            loadSidebarComponent('/components/sidebar-popular-categories.html');
+        } else if (currentPage === 'thanks') {
+            loadSidebarComponent('/components/sidebar-contact.html');
+            loadSidebarComponent('/components/sidebar-social.html');
+            loadSidebarComponent('/components/sidebar-ad.html');
+        } else if (currentPage === 'privacy' || currentPage === 'terms' || currentPage === 'disclaimer') {
+            loadSidebarComponent('/components/sidebar-legal.html');
         }
         // Add more conditions for other pages as needed
     }
