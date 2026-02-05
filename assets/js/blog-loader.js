@@ -458,10 +458,14 @@ function updatePopularCategories() {
     const popularList = document.getElementById('popular-categories');
     if (!popularList) return;
     
-    const categories = getCategoriesWithCounts().slice(0, 4);
+    // Only show categories with 5 or more posts (truly popular)
+    const MIN_POSTS_THRESHOLD = 5;
+    const categories = getCategoriesWithCounts()
+        .filter(cat => cat.count >= MIN_POSTS_THRESHOLD)
+        .slice(0, 4);
     
     if (categories.length === 0) {
-        popularList.innerHTML = '<li class="empty-state">No categories yet</li>';
+        popularList.innerHTML = '<li class="empty-state">No popular categories yet</li>';
         return;
     }
     
