@@ -17,12 +17,35 @@
     
     <nav class="main-nav" role="navigation" aria-label="Main navigation">
         <div class="container">
-            <ul class="nav-menu">
-                <li><a href="/" data-nav="home">Home</a></li>
-                <li><a href="/pages/featured.html" data-nav="featured">Featured</a></li>
-                <li><a href="/pages/about.html" data-nav="about">About</a></li>
-                <li><a href="/pages/contact.html" data-nav="contact">Contact</a></li>
-            </ul>
+            <div class="nav-content">
+                <ul class="nav-menu">
+                    <li><a href="/" data-nav="home">Home</a></li>
+                    <li><a href="/pages/featured.html" data-nav="featured">Featured</a></li>
+                    <li><a href="/pages/about.html" data-nav="about">About</a></li>
+                    <li><a href="/pages/contact.html" data-nav="contact">Contact</a></li>
+                </ul>
+                <div class="nav-search-wrapper">
+                    <button id="search-toggle-btn" class="search-toggle-btn" aria-label="Toggle search">
+                        <span class="search-icon-nav">🔍</span>
+                        <span class="search-text">Search</span>
+                    </button>
+                    <div id="nav-search-panel" class="nav-search-panel" style="display: none;">
+                        <div class="nav-search-content">
+                            <input 
+                                type="text" 
+                                id="blog-search-input" 
+                                placeholder="Search blogs by name, authors, categories..." 
+                                aria-label="Search blogs"
+                                autocomplete="off"
+                            />
+                            <select id="category-filter" aria-label="Filter by category">
+                                <option value="">All Categories</option>
+                            </select>
+                            <button id="nav-search-close" class="nav-search-close" aria-label="Close search">&times;</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </nav>
 </header>

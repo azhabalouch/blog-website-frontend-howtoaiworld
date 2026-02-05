@@ -11,6 +11,7 @@ function loadComponents() {
         
         // Load specific components based on page
         if (currentPage === 'index' || currentPage === '' || currentPage === '/') {
+            loadSidebarComponent('/components/sidebar-featured.html');
             loadSidebarComponent('/components/sidebar-ad.html');
             loadSidebarComponent('/components/sidebar-categories.html');
             loadSidebarComponent('/components/sidebar-popular-categories.html');
