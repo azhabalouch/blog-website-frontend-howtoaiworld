@@ -41,9 +41,18 @@
     <meta name="twitter:card" content="summary_large_image">
     <title id="page-title">Blog Post - Howtoaiworld</title>
     <link rel="stylesheet" href="/assets/css/styles.css">
-    <link rel="canonical" href="https://howtoaiworld.com">
+    <link rel="canonical" href="https://howtoaiworld.com/pages/blog-post/">
     <link rel="preconnect" href="https://azhabalouch.github.io">
     <link rel="dns-prefetch" href="https://azhabalouch.github.io">
+    <script>
+        (function () {
+            var canonicalLink = document.querySelector('link[rel="canonical"]');
+            if (canonicalLink) {
+                var url = window.location.origin + window.location.pathname + window.location.search;
+                canonicalLink.setAttribute('href', url);
+            }
+        })();
+    </script>
 
 
 </head>

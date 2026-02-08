@@ -1037,6 +1037,38 @@ a:focus-visible {
     left: -10px;
 }
 
+.footer-section ul li button {
+    color: #ccc;
+    background: none;
+    border: none;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-block;
+    position: relative;
+    padding-left: 0;
+    text-align: left;
+}
+
+.footer-section ul li button:hover {
+    color: #c41e3a;
+    padding-left: 5px;
+}
+
+.footer-section ul li button::before {
+    content: '›';
+    position: absolute;
+    left: -15px;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.footer-section ul li button:hover::before {
+    opacity: 1;
+    left: -10px;
+}
+
 .footer-bottom {
     text-align: center;
     padding-top: 25px;
