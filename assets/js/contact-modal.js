@@ -24,8 +24,9 @@ function initContactModal() {
         // Focus the first input field after modal opens
         const firstInput = modal.querySelector('input[type="text"], input[type="email"], textarea');
         if (firstInput) {
-            // Use setTimeout to ensure modal is visible before focusing
-            setTimeout(() => firstInput.focus(), 100);
+            // Small delay to ensure modal animation completes and element is visible
+            const MODAL_FOCUS_DELAY = 100;
+            setTimeout(() => firstInput.focus(), MODAL_FOCUS_DELAY);
         }
         
         // Add focus trap
@@ -54,7 +55,7 @@ function initContactModal() {
         focusTrapHandler = function(e) {
             if (e.key === 'Tab' && modal.classList.contains('active')) {
                 const focusableElements = modal.querySelectorAll(
-                    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+                    'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex="0"]'
                 );
                 const focusableArray = Array.from(focusableElements);
                 const firstFocusable = focusableArray[0];
