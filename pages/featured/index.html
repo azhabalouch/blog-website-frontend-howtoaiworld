@@ -51,17 +51,22 @@
     <main class="main-content">
         <div class="container">
             <div class="content-grid">
-                <section class="main-articles">
+                <!-- Main Articles Section -->
+                <section class="main-articles" aria-label="Featured Articles">
                     <!-- Dynamic featured content will be loaded here by blog-loader.js -->
-                    <div style="text-align: center; padding: 60px 20px;">
-                        <p style="font-size: 18px; color: #666;">Loading featured articles...</p>
-                    </div>
                 </section>
 
                 <!-- Sidebar -->
                 <aside class="sidebar" role="complementary">
                     <div id="sidebar-components"></div>
                 </aside>
+            </div>
+            
+            <!-- Pagination Controls (hidden for featured page) -->
+            <div id="pagination-controls" class="pagination-controls" style="display: none;">
+                <button id="prev-page" class="pagination-btn" aria-label="Previous page">← Previous</button>
+                <span id="page-info" class="page-info"></span>
+                <button id="next-page" class="pagination-btn" aria-label="Next page">Next →</button>
             </div>
         </div>
     </main>
