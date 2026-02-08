@@ -1983,7 +1983,7 @@ img.loaded {
     transform: rotate(90deg);
 }
 
-.contact-modal-title {
+.contact-form-title {
     font-size: 28px;
     font-weight: bold;
     color: #2c2c2c;
@@ -1991,32 +1991,32 @@ img.loaded {
     font-family: 'Times New Roman', Times, serif;
 }
 
-.contact-modal-desc {
+.contact-form-desc {
     font-size: 15px;
     color: #666;
     margin-bottom: 25px;
     line-height: 1.6;
 }
 
-.contact-modal-form {
+.contact-form-modern {
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
 
-.contact-modal-form .form-group {
+.contact-form-modern .form-group {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-.contact-modal-form .contact-form-label {
+.contact-form-modern .contact-form-label {
     font-size: 14px;
     color: #2c2c2c;
     font-weight: 600;
 }
 
-.contact-modal-form .contact-form-input {
+.contact-form-modern .contact-form-input {
     padding: 12px 14px;
     border: 2px solid #e0e0e0;
     border-radius: 8px;
@@ -2026,20 +2026,20 @@ img.loaded {
     transition: all 0.3s ease;
 }
 
-.contact-modal-form .contact-form-input:focus {
+.contact-form-modern .contact-form-input:focus {
     border-color: #c41e3a;
     outline: none;
     box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1);
     background: #fff;
 }
 
-.contact-modal-form textarea.contact-form-input {
+.contact-form-modern textarea.contact-form-input {
     resize: vertical;
     min-height: 120px;
     font-family: 'Times New Roman', Times, serif;
 }
 
-.contact-submit-modal {
+.contact-submit-modern {
     padding: 14px 0;
     background: linear-gradient(135deg, #c41e3a 0%, #a01830 100%);
     color: #fff;
@@ -2056,13 +2056,13 @@ img.loaded {
     box-shadow: 0 4px 12px rgba(196, 30, 58, 0.3);
 }
 
-.contact-submit-modal:hover {
+.contact-submit-modern:hover {
     background: linear-gradient(135deg, #a01830 0%, #8a1529 100%);
     box-shadow: 0 6px 20px rgba(196, 30, 58, 0.4);
     transform: translateY(-2px);
 }
 
-.contact-submit-modal:active {
+.contact-submit-modern:active {
     transform: translateY(0);
 }
 

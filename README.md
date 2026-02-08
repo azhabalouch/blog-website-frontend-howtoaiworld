@@ -105,8 +105,6 @@ blog-website-frontend-howtoaiworld/
 │   └── sidebar-social.html             # Social media links
 │
 ├── pages/                      # Website pages
-│   ├── about.html             # About page
-│   ├── contact.html           # Contact page
 │   ├── about/
 │   │   └── index.html         # About page (SEO-friendly URL)
 │   ├── blog-post/
@@ -119,9 +117,6 @@ blog-website-frontend-howtoaiworld/
 │       └── index.html         # Thank you page after form submission
 │
 └── legal/                      # Legal documentation pages
-    ├── disclaimer.html        # Disclaimer page
-    ├── privacy.html          # Privacy policy
-    ├── terms.html            # Terms of service
     ├── disclaimer/
     │   └── index.html        # Disclaimer (SEO-friendly URL)
     ├── privacy/
@@ -503,9 +498,8 @@ Run this script whenever you modify HTML pages to keep sitemap dates accurate fo
 
 **Rules**:
 - Allow all pages (`/`)
-- Disallow crawling JavaScript files (`/assets/js/`)
 - Disallow crawling component files (`/components/`)
-- Points to sitemap location
+- Specify sitemap location
 
 #### `CNAME`
 **Purpose**: Custom domain configuration for GitHub Pages
@@ -585,12 +579,12 @@ A: Yes! Create a new HTML file in the `pages/` directory, and the component syst
 **Q: How does the search work?**  
 A: Search is client-side. It filters the cached blog posts by matching your search term against the title, description, and content fields. Results update in real-time as you type.
 
-**Q: Why are there duplicate HTML files (e.g., `about.html` and `about/index.html`)?**  
-A: This supports both URL formats:
-- `howtoaiworld.com/pages/about.html`
-- `howtoaiworld.com/pages/about/` (SEO-friendly)
+**Q: What URL structure does the site use?**  
+A: The site uses SEO-friendly directory-based URLs with `index.html` files:
+- `howtoaiworld.com/pages/about/` → `/pages/about/index.html`
+- `howtoaiworld.com/legal/privacy/` → `/legal/privacy/index.html`
 
-The `index.html` versions are preferred for cleaner URLs.
+This provides cleaner URLs without file extensions.
 
 **Q: How often is blog data refreshed?**  
 A: Blog data is cached in session storage for 5 minutes. After that, the next page load will fetch fresh data from the API.
