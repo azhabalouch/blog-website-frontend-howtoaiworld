@@ -63,13 +63,13 @@ function initContactModal() {
 
                 const data = await response.json();
 
-                if (response.ok) {
+                if (response.ok && data.success) {
                     closeModal();
                     form.reset();
                     // Redirect to thank you page on success
                     window.location.href = '/pages/thanks/';
                 } else {
-                    alert("Error: " + data.message);
+                    alert("Error: " + (data.message || "Failed to send message"));
                 }
 
             } catch (error) {

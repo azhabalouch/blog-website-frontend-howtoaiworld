@@ -8,7 +8,7 @@ function loadComponents() {
     // Load sidebar components if sidebar-components div exists
     if (document.getElementById('sidebar-components')) {
         // Normalize pathname: remove trailing slashes and index.html, then get the last segment
-        let pathname = window.location.pathname.replace(/\/index\.html$/, '').replace(/\/$/, '');
+        let pathname = normalizePathname(window.location.pathname);
         const currentPage = pathname.replace(/^\/(pages|legal)\//, '').split('/').pop() || 'index';
         
         // Load specific components based on page
@@ -135,17 +135,22 @@ function createElementFromHTML(htmlString) {
     return fragment;
 }
 
+// Helper function to normalize pathnames for consistent comparison
+function normalizePathname(pathname) {
+    return pathname.replace(/\/index\.html$/, '').replace(/\/$/, '') || '/';
+}
+
 // Set active navigation link based on current page
 function setActiveNavLink() {
     // Normalize pathname: remove trailing slashes and index.html
-    let pathname = window.location.pathname.replace(/\/index\.html$/, '').replace(/\/$/, '') || '/';
+    let pathname = normalizePathname(window.location.pathname);
     const navLinks = document.querySelectorAll('.nav-menu a');
     
     if (navLinks.length === 0) return;
     
     navLinks.forEach(link => {
         // Normalize the link's pathname as well
-        let linkPathname = link.pathname.replace(/\/index\.html$/, '').replace(/\/$/, '') || '/';
+        let linkPathname = normalizePathname(link.pathname);
         
         // Check if the normalized pathnames match
         if (linkPathname === pathname) {
