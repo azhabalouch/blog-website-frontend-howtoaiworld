@@ -376,7 +376,7 @@ function updateDate()
 - Different pages load different sidebar components
 - Runs callback functions after components load (e.g., contact modal init)
 
-#### `assets/js/contact-modal.js` (51 lines)
+#### `assets/js/contact-modal.js`
 **Purpose**: Handles the contact modal popup in the footer
 
 **Functionality**:
