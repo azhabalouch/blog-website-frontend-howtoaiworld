@@ -7,7 +7,9 @@ function loadComponents() {
 
     // Load sidebar components if sidebar-components div exists
     if (document.getElementById('sidebar-components')) {
-        const currentPage = window.location.pathname.replace(/^\/(pages|legal)\//, '').replace(/\.html$/, '').split('/').pop() || 'index';
+        // Normalize pathname: remove trailing slashes and index.html, then get the last segment
+        let pathname = window.location.pathname.replace(/\/index\.html$/, '').replace(/\/$/, '');
+        const currentPage = pathname.replace(/^\/(pages|legal)\//, '').split('/').pop() || 'index';
         
         // Load specific components based on page
         if (currentPage === 'index' || currentPage === '' || currentPage === '/') {

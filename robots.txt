@@ -1,7 +1,5 @@
 User-agent: *
 Allow: /
-Disallow: /assets/js/
-Disallow: /components/
 
 # Sitemap
 Sitemap: https://howtoaiworld.com/sitemap.xml

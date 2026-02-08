@@ -40,11 +40,32 @@ function initContactModal() {
 
     // Form submission
     if (form) {
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
-            alert('Thank you for your message! We\'ll get back to you soon.');
-            closeModal();
-            form.reset();
+
+            try {
+                const formData = new FormData(form);
+                const action = form.action;
+                const method = (form.method || 'POST').toUpperCase();
+
+                const response = await fetch(action, {
+                    method: method,
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Form submission failed with status ' + response.status);
+                }
+
+                // On successful submission, show feedback, close modal, reset form, and redirect
+                alert('Thank you for your message! We\'ll get back to you soon.');
+                closeModal();
+                form.reset();
+                window.location.href = '/pages/thanks/';
+            } catch (error) {
+                console.error('Error submitting contact form:', error);
+                alert('Sorry, there was a problem sending your message. Please try again.');
+            }
         });
     }
 }
