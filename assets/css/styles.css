@@ -331,13 +331,14 @@ body {
 /* Article Styles */
 .main-articles {
     background-color: #fff;
-    padding: 40px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 50px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .blog-article {
-    margin-bottom: 40px;
-    padding-bottom: 30px;
+    margin-bottom: 45px;
+    padding-bottom: 0;
+    position: relative;
 }
 
 /* Make entire blog card clickable */
@@ -345,17 +346,20 @@ body {
     display: block;
     text-decoration: none;
     color: inherit;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
-    padding: 20px;
-    margin: -20px;
-    border-radius: 8px;
+    padding: 35px;
+    margin: -35px;
+    border-radius: 12px;
+    background: #ffffff;
+    border: 1px solid #e8e8e8;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
 }
 
 .article-card-link:hover {
-    transform: translateY(-2px);
-    opacity: 0.95;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+    border-color: #d0d0d0;
 }
 
 .article-card-link:hover .article-title {
@@ -364,7 +368,11 @@ body {
 
 .article-card-link:hover .read-more {
     color: #c41e3a;
-    text-decoration: underline;
+    transform: translateX(5px);
+}
+
+.article-card-link:hover .article-featured-image img {
+    transform: scale(1.05);
 }
 
 .blog-article:last-child {
@@ -398,18 +406,26 @@ body {
 }
 
 .blog-article .article-title {
-    font-size: 26px;
-    border-bottom: 2px solid #ddd;
+    font-size: 28px;
+    border-bottom: none;
     font-weight: bold;
+    margin-bottom: 18px;
+    line-height: 1.4;
+    color: #1a1a1a;
+    transition: color 0.3s ease;
 }
 
 .article-meta {
-    font-size: 13px;
+    font-size: 14px;
     color: #666;
-    margin-bottom: 25px;
-    font-style: italic;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #ddd;
+    margin-bottom: 20px;
+    font-style: normal;
+    padding-bottom: 0;
+    border-bottom: none;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
 }
 
 .featured-article .article-meta {
@@ -418,22 +434,63 @@ body {
 }
 
 .article-meta .author {
-    font-weight: bold;
+    font-weight: 600;
+    color: #2c2c2c;
+    display: inline-flex;
+    align-items: center;
 }
 
 .article-meta .separator {
-    margin: 0 8px;
+    color: #d0d0d0;
+    font-weight: normal;
+}
+
+.article-meta .category-tag {
+    display: inline-block;
+    padding: 4px 12px;
+    background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+    border: 1px solid #d0d0d0;
+    border-radius: 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2c2c2c;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.article-card-link:hover .category-tag {
+    background: linear-gradient(135deg, #c41e3a 0%, #8b1428 100%);
+    color: #fff;
+    border-color: #c41e3a;
+    transform: translateY(-1px);
+}
+
+.article-meta time {
+    color: #666;
+    font-weight: 500;
+}
+
+.article-meta .reading-time {
+    display: inline-flex;
+    align-items: center;
+    color: #666;
+    font-weight: 500;
+    font-size: 13px;
 }
 
 .article-content {
     text-align: justify;
-    line-height: 1.8;
+    line-height: 1.9;
     font-size: 16px;
+    color: #333;
+    letter-spacing: 0.2px;
 }
 
 .article-content p {
     margin-bottom: 15px;
     font-size: 16px;
+    line-height: 1.9;
 }
 
 .article-content h1,
@@ -492,17 +549,22 @@ body {
 
 /* Featured Image Styles */
 .article-featured-image {
-    margin-bottom: 25px;
+    margin-bottom: 24px;
+    margin-top: 20px;
     overflow: hidden;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: #f5f5f5;
 }
 
 .article-featured-image img {
     width: 100%;
-    height: auto;
+    height: 100%;
     display: block;
-    max-width: 100%;
+    object-fit: cover;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* FAQ Section Styles */
@@ -715,8 +777,8 @@ body {
 }
 
 .article-divider {
-    border-bottom: 1px solid #ddd;
-    margin: 30px 0;
+    border-bottom: 1px solid #e8e8e8;
+    margin: 40px 0;
 }
 
 .blog-article {
@@ -724,12 +786,15 @@ body {
 }
 
 .read-more {
-    display: inline-block;
-    margin-top: 10px;
+    display: inline-flex;
+    align-items: center;
+    margin-top: 16px;
     color: #c41e3a;
     text-decoration: none;
-    font-weight: bold;
-    transition: color 0.3s;
+    font-weight: 600;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    letter-spacing: 0.3px;
 }
 
 .read-more:hover {
@@ -1028,6 +1093,32 @@ a:focus-visible {
     
     .blog-article .article-title {
         font-size: 22px;
+        line-height: 1.4;
+    }
+    
+    .article-card-link {
+        padding: 20px;
+        margin: -20px;
+    }
+    
+    .article-meta {
+        font-size: 13px;
+        gap: 8px;
+    }
+    
+    .article-meta .category-tag {
+        font-size: 12px;
+        padding: 3px 10px;
+    }
+    
+    .section-title {
+        font-size: 26px;
+        margin-bottom: 25px;
+        padding-left: 15px;
+    }
+    
+    .section-title::before {
+        width: 4px;
     }
     
     .footer-grid {
@@ -1036,7 +1127,7 @@ a:focus-visible {
     }
     
     .main-articles {
-        padding: 20px;
+        padding: 25px 20px;
     }
     
     .pagination-controls {
@@ -1075,16 +1166,30 @@ a:focus-visible {
 
 /* Section Title Styles */
 .section-title {
-    font-size: 28px;
-    margin-bottom: 20px;
-    color: #2c2c2c;
-    border-bottom: 3px solid #2c2c2c;
-    padding-bottom: 10px;
+    font-size: 32px;
+    margin-bottom: 50px;
+    color: #1a1a1a;
+    border-bottom: none;
+    padding-bottom: 0;
+    font-weight: bold;
+    letter-spacing: -0.5px;
+    position: relative;
+    padding-left: 20px;
+}
+
+.section-title::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 5px;
+    bottom: 5px;
+    width: 5px;
+    background: linear-gradient(180deg, #c41e3a 0%, #8b1428 100%);
+    border-radius: 3px;
 }
 
 .section-title:first-of-type {
-    color: #ff6b35;
-    border-bottom-color: #ff6b35;
+    color: #1a1a1a;
 }
 
 /* Category Tag Styles */
@@ -1689,13 +1794,28 @@ a:focus-visible {
 /* Lazy Loading Image Styles */
 img.lazy-image {
     opacity: 0;
-    transition: opacity 0.3s ease-in;
-    background: #f0f0f0;
+    transform: scale(0.95);
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
 }
 
 img.lazy-image.loaded,
 img.loaded {
     opacity: 1;
+    transform: scale(1);
+    animation: none;
+    background: none;
 }
 
 .article-featured-image img {

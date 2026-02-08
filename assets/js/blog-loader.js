@@ -167,7 +167,8 @@ function escapeHtml(text) {
 function createArticleHTML(post, isExcerpt = true) {
     if (!post || !post.id) return '';
     const content = isExcerpt ? post.excerpt : post.content;
-    const readMoreLink = isExcerpt ? `<span class="read-more">Read More →</span>` : '';
+    const readMoreLink = isExcerpt ? `<span class="read-more">Continue Reading →</span>` : '';
+    const readingTime = calculateReadingTime(post.content || post.excerpt);
     
     // Featured image HTML with lazy loading
     const featuredImageHtml = isExcerpt && post.featured_image ? 
@@ -184,9 +185,11 @@ function createArticleHTML(post, isExcerpt = true) {
                 <h3 class="article-title">${escapeHtml(post.title)}</h3>
                 <div class="article-meta">
                     <span class="author">By ${escapeHtml(post.author)}</span>
-                    <span class="separator">|</span>
+                    <span class="separator">•</span>
                     <time datetime="${formatDateTime(post.parsedDate || post.date)}">${formatDate(post.parsedDate || post.date)}</time>
-                    <span class="separator">|</span>
+                    <span class="separator">•</span>
+                    <span class="reading-time">${readingTime}</span>
+                    <span class="separator">•</span>
                     <span class="category-tag">${escapeHtml(post.category)}</span>
                 </div>
                 ${featuredImageHtml}
@@ -197,6 +200,16 @@ function createArticleHTML(post, isExcerpt = true) {
             </a>
         </article>
     `;
+}
+
+// Calculate reading time based on word count
+function calculateReadingTime(content) {
+    if (!content) return '1 min read';
+    const wordsPerMinute = 200;
+    const text = content.replace(/<[^>]*>/g, ''); // Remove HTML tags
+    const wordCount = text.trim().split(/\s+/).length;
+    const minutes = Math.ceil(wordCount / wordsPerMinute);
+    return `${minutes} min read`;
 }
 
 // Load homepage blogs - Show featured (3 most recent) and all other recent blogs with pagination
@@ -232,7 +245,7 @@ function loadHomepageBlogs(page = 1) {
     
     if (currentPage === 1) {
         // Page 1: Show 7 recent blogs (no featured section to avoid duplication)
-        html += '<h2 class="section-title">📰 Recent Posts</h2>';
+        html += '<h2 class="section-title">Latest Articles</h2>';
         
         const postsToDisplay = recentPosts.slice(0, postsPerPage);
         if (postsToDisplay.length > 0) {
@@ -253,7 +266,7 @@ function loadHomepageBlogs(page = 1) {
         const skipCount = (currentPage - 1) * postsPerPage;
         const postsToDisplay = recentPosts.slice(skipCount, skipCount + postsPerPage);
         
-        html += '<h2 class="section-title">📰 Recent Posts</h2>';
+        html += '<h2 class="section-title">Latest Articles</h2>';
         
         if (postsToDisplay.length > 0) {
             postsToDisplay.forEach((post, index) => {
