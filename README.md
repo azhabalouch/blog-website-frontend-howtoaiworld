@@ -2,6 +2,8 @@
 
 A modern, responsive blog website focused on AI, machine learning, and technology news. This is a static frontend application that dynamically loads blog content from a remote API, providing an optimized reading experience with advanced features like search, filtering, pagination, and SEO optimization.
 
+**⚠️ PROPRIETARY CODE**: This repository contains proprietary code owned by our company. All rights reserved. Not for public use, distribution, or modification outside of authorized company personnel.
+
 ## 📋 Table of Contents
 
 - [Overview](#overview)
@@ -13,7 +15,7 @@ A modern, responsive blog website focused on AI, machine learning, and technolog
 - [File Documentation](#file-documentation)
 - [SEO and Performance](#seo-and-performance)
 - [Frequently Asked Questions](#frequently-asked-questions)
-- [Contributing](#contributing)
+- [Team Guidelines](#team-guidelines)
 - [License](#license)
 
 ---
@@ -556,15 +558,11 @@ Run this script whenever you modify HTML pages to keep sitemap dates accurate fo
 **Q: What is this website for?**  
 A: Howtoaiworld is a blog website that publishes articles about artificial intelligence, machine learning, technology news, and digital innovation. It's designed to educate and inform readers about the latest trends in AI.
 
-**Q: Is this open source?**  
-A: Yes, the frontend code is publicly available on GitHub. Feel free to fork, modify, and use it for your own projects.
+**Q: Is this open source or publicly available?**  
+A: No, this is proprietary code owned by our company. It is for internal use only and not available for public use, distribution, or modification.
 
-**Q: Can I use this for my own blog?**  
-A: Absolutely! Just make sure to:
-- Update the API URL to point to your blog data
-- Change branding, colors, and content
-- Update meta tags and SEO information
-- Configure your own analytics and tracking IDs
+**Q: Can external parties use this code?**  
+A: No, this codebase is confidential and proprietary. Unauthorized use, copying, or distribution is prohibited.
 
 ### Technical Questions
 
@@ -654,67 +652,91 @@ A: There's no database. Blog posts are stored in a JSON file, which is perfect f
 
 ---
 
-## 🤝 Contributing
+## 👥 Team Guidelines
 
-Contributions are welcome! Here's how you can help:
+### For Company Team Members Only
+
+This section is for authorized company developers and team members working on this project.
 
 ### Reporting Bugs
-1. Check if the issue already exists
+1. Check if the issue already exists in our internal tracker
 2. Create a detailed bug report with:
    - Steps to reproduce
    - Expected behavior
    - Actual behavior
    - Screenshots (if applicable)
    - Browser and OS information
+3. Notify the team lead if it's a critical issue
 
 ### Suggesting Features
-1. Open an issue describing the feature
-2. Explain the use case and benefits
-3. Wait for discussion before implementing
+1. Discuss with the team lead or project manager
+2. Document the feature request with use cases and benefits
+3. Wait for approval before implementing
 
-### Code Contributions
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Make your changes
-4. Test thoroughly
-5. Commit with clear messages (`git commit -m 'Add amazing feature'`)
-6. Push to your branch (`git push origin feature/AmazingFeature`)
-7. Open a Pull Request
+### Making Code Changes
+1. Create a feature branch from `main` (`git checkout -b feature/feature-name`)
+2. Make your changes following our coding standards
+3. Test thoroughly across different browsers and devices
+4. Commit with clear, descriptive messages
+5. Push to your branch and create a pull request
+6. Request code review from at least one team member
+7. Merge only after approval
 
 ### Coding Standards
 - Use consistent indentation (2 spaces)
-- Comment complex logic
-- Use semantic HTML
-- Follow existing code style
-- Test on multiple browsers
-- Ensure mobile responsiveness
+- Comment complex logic clearly
+- Use semantic HTML5 elements
+- Follow existing code style and patterns
+- Test on Chrome, Firefox, Safari, and mobile browsers
+- Ensure mobile responsiveness and accessibility
+- Keep code DRY (Don't Repeat Yourself)
+
+### Security Guidelines
+- Never commit API keys or sensitive credentials
+- Keep dependencies updated
+- Follow secure coding practices
+- Report security issues immediately to the team lead
 
 ---
 
-## 📄 License
+## 📄 License & Copyright
 
-This project is available for use under the MIT License (or specify your license). Feel free to use, modify, and distribute as needed.
+**Proprietary and Confidential**
+
+Copyright © 2026 Howtoaiworld. All rights reserved.
+
+This code and associated documentation are proprietary and confidential. Unauthorized copying, distribution, modification, public display, or public performance of this code, via any medium, is strictly prohibited.
+
+**Restrictions:**
+- No public use or distribution
+- No copying or forking for external use
+- No modification outside of authorized company development
+- For internal company use only
+
+Access to this repository is restricted to authorized company personnel only.
 
 ---
 
-## 📞 Contact & Support
+## 📞 Internal Contact & Support
 
+**For Company Team Members:**
 - **Website**: [howtoaiworld.com](https://howtoaiworld.com)
-- **GitHub**: [azhabalouch](https://github.com/azhabalouch)
-- **Issues**: [Report a bug or request a feature](https://github.com/azhabalouch/blog-website-frontend-howtoaiworld/issues)
+- **Repository Owner**: [azhabalouch](https://github.com/azhabalouch)
+- **Internal Issues**: Contact the development team lead or project manager
+- **Technical Support**: Reach out via company communication channels
 
 ---
 
-## 🙏 Acknowledgments
+## 🙏 Third-Party Services
 
-- **Cookiebot** for GDPR-compliant cookie consent
-- **Google Analytics** for traffic insights
-- **GitHub Pages** for free hosting
+- **Cookiebot** for GDPR-compliant cookie consent management
+- **Google Analytics** for traffic insights and analytics
+- **GitHub** for version control and repository hosting
 - **Schema.org** for structured data standards
-- All contributors and users of this project
 
 ---
 
-**Built with ❤️ for the AI and tech community**
+**Internal Company Project - Confidential**
 
 *Last Updated: February 8, 2026*
+*Repository: Private & Proprietary*
