@@ -47,33 +47,27 @@ function initContactModal() {
 
             const formData = new FormData(form);
             
-            // Convert to object to trim values and ensure proper formatting
-            const object = {};
-            formData.forEach((value, key) => {
-                object[key] = value.trim();
-            });
-            object.access_key = "62765342-bb78-41ba-8e76-7d7a8b5b8bb0";
-
+            // Read the action URL from the form
+            const action = form.action;
+            
             const originalText = submitBtn.textContent;
 
             submitBtn.textContent = "Sending...";
             submitBtn.disabled = true;
 
             try {
-                const response = await fetch("https://api.web3forms.com/submit", {
+                const response = await fetch(action, {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(object)
+                    body: formData
                 });
 
                 const data = await response.json();
 
                 if (response.ok) {
-                    alert("Success! Your message has been sent.");
                     closeModal();
                     form.reset();
+                    // Redirect to thank you page on success
+                    window.location.href = '/pages/thanks/';
                 } else {
                     alert("Error: " + data.message);
                 }

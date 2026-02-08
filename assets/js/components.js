@@ -137,17 +137,18 @@ function createElementFromHTML(htmlString) {
 
 // Set active navigation link based on current page
 function setActiveNavLink() {
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    // Normalize pathname: remove trailing slashes and index.html
+    let pathname = window.location.pathname.replace(/\/index\.html$/, '').replace(/\/$/, '') || '/';
     const navLinks = document.querySelectorAll('.nav-menu a');
     
     if (navLinks.length === 0) return;
     
     navLinks.forEach(link => {
-        const href = link.getAttribute('href');
-        // Check if the link matches the current page
-        if (href === currentPage || 
-            (currentPage === '' && href === 'index.html') ||
-            (currentPage === '/' && href === 'index.html')) {
+        // Normalize the link's pathname as well
+        let linkPathname = link.pathname.replace(/\/index\.html$/, '').replace(/\/$/, '') || '/';
+        
+        // Check if the normalized pathnames match
+        if (linkPathname === pathname) {
             link.classList.add('active');
             link.setAttribute('aria-current', 'page');
         } else {
