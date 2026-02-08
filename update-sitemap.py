@@ -2,12 +2,40 @@
 """
 Sitemap Updater Script
 Updates lastmod dates in sitemap.xml for only the changed HTML files
+Automatically detects changed files from the latest GitHub commit on main
 """
 
 import xml.etree.ElementTree as ET
 import sys
 from datetime import datetime
 import os
+import subprocess
+
+def get_changed_files_from_commit():
+    """
+    Get list of changed files from the latest commit on main branch
+    
+    Returns:
+        List of file paths that were changed in the latest commit
+    """
+    try:
+        # Get files changed in the latest commit
+        result = subprocess.run(
+            ['git', 'diff-tree', '--no-commit-id', '--name-only', '-r', 'HEAD'],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        changed_files = result.stdout.strip().split('\n')
+        # Filter out empty strings
+        changed_files = [f for f in changed_files if f]
+        return changed_files
+    except subprocess.CalledProcessError as e:
+        print(f"Error getting changed files from git: {e}")
+        return []
+    except FileNotFoundError:
+        print("Error: git command not found")
+        return []
 
 def update_sitemap(changed_files):
     """
@@ -86,18 +114,24 @@ def update_sitemap(changed_files):
         return False
 
 def main():
-    """Main function to process command line arguments"""
-    if len(sys.argv) < 2:
-        print("Usage: python update-sitemap.py <file1> <file2> ...")
-        print("Example: python update-sitemap.py index.html about.html contact.html")
-        sys.exit(1)
-    
-    # Get list of changed files from command line arguments
-    changed_files = sys.argv[1:]
-    
+    """Main function to get changed files from latest commit and update sitemap"""
     print("=" * 60)
     print("SITEMAP UPDATER")
     print("=" * 60)
+    
+    # Get changed files from command line args or from latest git commit
+    if len(sys.argv) > 1:
+        changed_files = sys.argv[1:]
+        print("Using files from command line arguments")
+    else:
+        print("Detecting changed files from latest git commit on main...")
+        changed_files = get_changed_files_from_commit()
+    
+    if not changed_files:
+        print("No changed files detected.")
+        sys.exit(0)
+    
+    print(f"Detected files: {', '.join(changed_files)}")
     
     success = update_sitemap(changed_files)
     
