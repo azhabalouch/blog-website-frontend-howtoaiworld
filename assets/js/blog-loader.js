@@ -743,7 +743,6 @@ document.addEventListener('DOMContentLoaded', async function() {
             showLoadingError('home');
         } else {
             initializeSearch();
-            initializeNavSearch();
             loadHomepageWithFilter();
         }
     } else if (page === 'featured') {
@@ -770,53 +769,6 @@ function showLoadingError(pageType) {
             <button onclick="window.location.reload()" style="padding: 12px 24px; background: #2196F3; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">Refresh Page</button>
         </div>
     `;
-}
-
-// Initialize navigation search panel
-function initializeNavSearch() {
-    const searchPanel = document.getElementById('nav-search-panel');
-    const searchToggleBtn = document.getElementById('search-toggle-btn');
-    const searchCloseBtn = document.getElementById('nav-search-close');
-    
-    if (searchToggleBtn) {
-        searchToggleBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (searchPanel) {
-                const isVisible = searchPanel.style.display === 'block';
-                searchPanel.style.display = isVisible ? 'none' : 'block';
-                if (!isVisible) {
-                    setTimeout(() => {
-                        document.getElementById('blog-search-input')?.focus();
-                    }, 100);
-                }
-            }
-        });
-    }
-    
-    if (searchCloseBtn) {
-        searchCloseBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (searchPanel) {
-                searchPanel.style.display = 'none';
-            }
-        });
-    }
-    
-    // Close on click outside
-    document.addEventListener('click', (e) => {
-        if (searchPanel && searchPanel.style.display === 'block') {
-            if (!searchPanel.contains(e.target) && e.target !== searchToggleBtn && !searchToggleBtn.contains(e.target)) {
-                searchPanel.style.display = 'none';
-            }
-        }
-    });
-    
-    // Close on Escape
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && searchPanel?.style.display === 'block') {
-            searchPanel.style.display = 'none';
-        }
-    });
 }
 
 // Initialize lazy loading with Intersection Observer

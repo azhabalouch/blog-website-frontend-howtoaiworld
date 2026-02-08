@@ -144,6 +144,8 @@ function insertComponent(content, tagName, isHeader) {
         setTimeout(() => {
             setActiveNavLink();
             updateCurrentDate();
+            // Initialize search after nav is loaded
+            initializeNavSearch();
         }, 50);
     } else {
         setTimeout(() => {
@@ -220,4 +222,49 @@ if (document.readyState === 'loading') {
 } else {
     // DOM is already loaded
     loadComponents();
+}
+
+// Initialize navigation search panel (moved from blog-loader.js)
+function initializeNavSearch() {
+    const searchPanel = document.getElementById('nav-search-panel');
+    const searchToggleBtn = document.getElementById('search-toggle-btn');
+    const searchCloseBtn = document.getElementById('nav-search-close');
+    
+    if (!searchToggleBtn || !searchPanel) return;
+    
+    searchToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isVisible = searchPanel.style.display === 'block';
+        searchPanel.style.display = isVisible ? 'none' : 'block';
+        
+        if (!isVisible) {
+            setTimeout(() => {
+                const searchInput = document.getElementById('blog-search-input');
+                if (searchInput) searchInput.focus();
+            }, 100);
+        }
+    });
+    
+    if (searchCloseBtn) {
+        searchCloseBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            searchPanel.style.display = 'none';
+        });
+    }
+    
+    // Close on click outside
+    document.addEventListener('click', (e) => {
+        if (searchPanel.style.display === 'block') {
+            if (!searchPanel.contains(e.target) && e.target !== searchToggleBtn && !searchToggleBtn.contains(e.target)) {
+                searchPanel.style.display = 'none';
+            }
+        }
+    });
+    
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && searchPanel.style.display === 'block') {
+            searchPanel.style.display = 'none';
+        }
+    });
 }
