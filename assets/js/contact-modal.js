@@ -40,29 +40,49 @@ function initContactModal() {
 
     // Form submission
     if (form) {
-        form.addEventListener('submit', async function(e) {
+        const submitBtn = form.querySelector('button[type="submit"]');
+
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            try {
-                const formData = new FormData(form);
-                const action = form.action;
+            const formData = new FormData(form);
+            
+            // Convert to object to trim values and ensure proper formatting
+            const object = {};
+            formData.forEach((value, key) => {
+                object[key] = value.trim();
+            });
+            object.access_key = "62765342-bb78-41ba-8e76-7d7a8b5b8bb0";
 
-                const response = await fetch(action, {
-                    method: 'POST',
-                    body: formData
+            const originalText = submitBtn.textContent;
+
+            submitBtn.textContent = "Sending...";
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch("https://api.web3forms.com/submit", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(object)
                 });
 
-                if (!response.ok) {
-                    throw new Error('Form submission failed with status ' + response.status);
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert("Success! Your message has been sent.");
+                    closeModal();
+                    form.reset();
+                } else {
+                    alert("Error: " + data.message);
                 }
 
-                // On successful submission, close modal, reset form, and redirect to thank you page
-                closeModal();
-                form.reset();
-                window.location.href = '/pages/thanks/';
             } catch (error) {
-                console.error('Error submitting contact form:', error);
-                alert('Sorry, there was a problem sending your message. Please try again.');
+                alert("Something went wrong. Please try again.");
+            } finally {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
             }
         });
     }
