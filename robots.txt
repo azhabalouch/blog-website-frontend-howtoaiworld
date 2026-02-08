@@ -1,6 +1,11 @@
 User-agent: *
 Allow: /
 Disallow: /components/
+Disallow: /pages/blog-post
+Disallow: /admin/
+Disallow: /login/
+
+Crawl-delay: 1
 
 # Sitemap
 Sitemap: https://howtoaiworld.com/sitemap.xml
