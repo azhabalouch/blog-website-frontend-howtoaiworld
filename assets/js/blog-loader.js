@@ -19,6 +19,23 @@ let currentCategoryFilter = '';
 // Lazy loading state
 let intersectionObserver = null;
 
+// Trigger sidebar updates if elements exist
+function triggerSidebarUpdates() {
+    if (!dataLoaded) return;
+    
+    requestAnimationFrame(function() {
+        if (document.getElementById('featured-blogs-list')) {
+            updateFeaturedSidebar();
+        }
+        if (document.getElementById('popular-categories')) {
+            updatePopularCategories();
+        }
+        if (document.getElementById('categories-list')) {
+            updateCategoriesSidebar();
+        }
+    });
+}
+
 // Fetch blog data from remote URL with caching
 async function fetchBlogData() {
     try {
@@ -44,6 +61,10 @@ async function fetchBlogData() {
                 
                 dataLoaded = true;
                 initializeLazyLoading();
+                
+                // Trigger sidebar updates in case they loaded before data
+                triggerSidebarUpdates();
+                
                 return true;
             }
         }
@@ -74,6 +95,10 @@ async function fetchBlogData() {
         
         dataLoaded = true;
         initializeLazyLoading();
+        
+        // Trigger sidebar updates in case they loaded before data
+        triggerSidebarUpdates();
+        
         return true;
     } catch (error) {
         cachedPosts = [];
@@ -285,10 +310,7 @@ function loadHomepageBlogs(page = 1) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     
-    // Update categories
-    updateCategoriesSidebar();
-    updatePopularCategories();
-    updateFeaturedSidebar();
+    // Sidebar will be updated automatically via sidebarComponentLoaded events
     
     // Apply lazy loading to images
     observeLazyImages();
@@ -407,10 +429,7 @@ function loadFeaturedBlogsPage() {
     
     mainArticles.innerHTML = html;
     
-    // Update sidebar
-    updateCategoriesSidebar();
-    updatePopularCategories();
-    updateFeaturedSidebar();
+    // Sidebar will be updated automatically via sidebarComponentLoaded events
     
     // Apply lazy loading to images
     observeLazyImages();
@@ -449,25 +468,10 @@ function updateCategoriesSidebar() {
     categoriesList.innerHTML = html;
 }
 
-// Retry counters for sidebar updates
-let popularCategoriesRetries = 0;
-let featuredSidebarRetries = 0;
-const MAX_RETRIES = 20; // Max 2 seconds (20 * 100ms)
-
 // Update popular categories with counts
 function updatePopularCategories() {
     const popularList = document.getElementById('popular-categories');
-    if (!popularList) {
-        // Retry after a short delay if element doesn't exist yet
-        if (popularCategoriesRetries < MAX_RETRIES) {
-            popularCategoriesRetries++;
-            setTimeout(updatePopularCategories, 100);
-        }
-        return;
-    }
-    
-    // Reset retry counter
-    popularCategoriesRetries = 0;
+    if (!popularList) return;
     
     // Only show categories with 5 or more posts (truly popular)
     const MIN_POSTS_THRESHOLD = 5;
@@ -486,17 +490,7 @@ function updatePopularCategories() {
 // Update featured blogs sidebar
 function updateFeaturedSidebar() {
     const featuredList = document.getElementById('featured-blogs-list');
-    if (!featuredList) {
-        // Retry after a short delay if element doesn't exist yet
-        if (featuredSidebarRetries < MAX_RETRIES) {
-            featuredSidebarRetries++;
-            setTimeout(updateFeaturedSidebar, 100);
-        }
-        return;
-    }
-    
-    // Reset retry counter
-    featuredSidebarRetries = 0;
+    if (!featuredList) return;
     
     const featured = getFeaturedPosts(3); // Get top 3 featured posts
     
@@ -562,8 +556,7 @@ function loadCategoryPage(category) {
     }
     
     mainArticles.innerHTML = html;
-    updateCategoriesSidebar();
-    updatePopularCategories();
+    // Sidebar will be updated automatically via sidebarComponentLoaded events
 }
 
 // Detect current page from URL path
@@ -725,10 +718,7 @@ async function loadBlogPost() {
         document.getElementById('blog-post-container').innerHTML = '';
         document.getElementById('blog-post-container').appendChild(article);
         
-        // Load categories
-        updateCategoriesSidebar();
-        updatePopularCategories();
-        updateFeaturedSidebar();
+        // Sidebar will be updated automatically via sidebarComponentLoaded events
         
     } catch (error) {
         console.error('Error loading blog post:', error);
@@ -1056,20 +1046,21 @@ document.addEventListener('sidebarComponentLoaded', function(e) {
     
     const filePath = e.detail.filePath;
     
-    // Populate featured sidebar when it loads
-    if (filePath.includes('sidebar-featured.html')) {
-        featuredSidebarRetries = 0; // Reset counter
-        updateFeaturedSidebar();
-    }
-    
-    // Populate popular categories when it loads
-    if (filePath.includes('sidebar-popular-categories.html')) {
-        popularCategoriesRetries = 0; // Reset counter
-        updatePopularCategories();
-    }
-    
-    // Populate categories sidebar when it loads
-    if (filePath.includes('sidebar-categories.html')) {
-        updateCategoriesSidebar();
-    }
+    // Use requestAnimationFrame to ensure DOM is fully updated
+    requestAnimationFrame(function() {
+        // Populate featured sidebar when it loads
+        if (filePath.includes('sidebar-featured.html')) {
+            updateFeaturedSidebar();
+        }
+        
+        // Populate popular categories when it loads
+        if (filePath.includes('sidebar-popular-categories.html')) {
+            updatePopularCategories();
+        }
+        
+        // Populate categories sidebar when it loads
+        if (filePath.includes('sidebar-categories.html')) {
+            updateCategoriesSidebar();
+        }
+    });
 });
