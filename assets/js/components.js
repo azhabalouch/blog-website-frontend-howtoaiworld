@@ -7,42 +7,31 @@ function loadComponents() {
 
     // Load sidebar components if sidebar-components div exists
     if (document.getElementById('sidebar-components')) {
-        const currentPage = window.location.pathname.replace(/^\/(pages|legal)\//, '').replace(/\.html$/, '').split('/').pop() || 'index';
+        // Normalize pathname: remove trailing slashes and index.html, then get the last segment
+        let pathname = normalizePathname(window.location.pathname);
+        const currentPage = pathname.replace(/^\/(pages|legal)\//, '').split('/').pop() || 'index';
         
         // Load specific components based on page
         if (currentPage === 'index' || currentPage === '' || currentPage === '/') {
             loadSidebarComponent('/components/sidebar-featured.html');
-            loadSidebarComponent('/components/sidebar-ad.html');
             loadSidebarComponent('/components/sidebar-categories.html');
             loadSidebarComponent('/components/sidebar-popular-categories.html');
             loadSidebarComponent('/components/sidebar-newsletter.html');
         } else if (currentPage === 'contact') {
             loadSidebarComponent('/components/sidebar-inquiry-message.html');
             loadSidebarComponent('/components/sidebar-social.html');
-            loadSidebarComponent('/components/sidebar-ad.html');
         } else if (currentPage === 'featured') {
-            loadSidebarComponent('/components/sidebar-ad.html');
             loadSidebarComponent('/components/sidebar-categories.html');
             loadSidebarComponent('/components/sidebar-popular-categories.html');
             loadSidebarComponent('/components/sidebar-newsletter.html');
         } else if (currentPage === 'about') {
-            loadSidebarComponent('/components/sidebar-ad.html');
             loadSidebarComponent('/components/sidebar-contact.html');
-        } else if (currentPage === 'recent-blogs') {
-            loadSidebarComponent('/components/sidebar-categories.html');
-            loadSidebarComponent('/components/sidebar-ad.html');
-            loadSidebarComponent('/components/sidebar-newsletter.html');
         } else if (currentPage === 'blog-post') {
-            loadSidebarComponent('/components/sidebar-ad.html');
             loadSidebarComponent('/components/sidebar-categories.html');
             loadSidebarComponent('/components/sidebar-newsletter.html');
-        } else if (currentPage === 'trending') {
-            loadSidebarComponent('/components/sidebar-ad.html');
-            loadSidebarComponent('/components/sidebar-popular-categories.html');
         } else if (currentPage === 'thanks') {
             loadSidebarComponent('/components/sidebar-contact.html');
             loadSidebarComponent('/components/sidebar-social.html');
-            loadSidebarComponent('/components/sidebar-ad.html');
         } else if (currentPage === 'privacy' || currentPage === 'terms' || currentPage === 'disclaimer') {
             loadSidebarComponent('/components/sidebar-legal.html');
         }
@@ -52,20 +41,18 @@ function loadComponents() {
 
 // Helper to load sidebar components
 function loadSidebarComponent(filePath) {
-    const xhr = new XMLHttpRequest();
-    xhr.onload = function() {
-        if (xhr.status === 0 || xhr.status === 200) {
-            const sidebarDiv = document.getElementById('sidebar-components');
-            if (sidebarDiv) {
-                sidebarDiv.insertAdjacentHTML('beforeend', xhr.responseText);
+    fetch(filePath)
+        .then(function(response) {
+            if (response.ok) return response.text();
+            return '';
+        })
+        .then(function(html) {
+            if (html) {
+                var sidebarDiv = document.getElementById('sidebar-components');
+                if (sidebarDiv) sidebarDiv.insertAdjacentHTML('beforeend', html);
             }
-        }
-    };
-    xhr.onerror = function() {};
-    try {
-        xhr.open('GET', filePath, true);
-        xhr.send();
-    } catch (e) {}
+        })
+        .catch(function() {});
 }
 
 // Helper function to load individual components
@@ -75,36 +62,23 @@ function loadComponent(filePath, tagName, isHeader) {
     xhr.onload = function() {
         if (xhr.status === 0 || xhr.status === 200) {
             insertComponent(xhr.responseText, tagName, isHeader);
-        } else {
-            console.warn('Could not load ' + filePath + ' (status: ' + xhr.status + ')');
         }
     };
     
-    xhr.onerror = function() {
-        console.warn('Error loading ' + filePath);
-    };
+    xhr.onerror = function() {};
     
     try {
         xhr.open('GET', filePath, true);
         xhr.send();
-    } catch (e) {
-        console.warn('Error loading ' + filePath + ':', e.message);
-    }
+    } catch (e) {}
 }
 
 // Insert component into page
 function insertComponent(content, tagName, isHeader) {
-    if (!content || content.trim() === '') {
-        console.warn('Empty content for ' + tagName);
-        return;
-    }
+    if (!content || content.trim() === '') return;
     
     const element = createElementFromHTML(content);
-    
-    if (!element) {
-        console.warn('Could not parse ' + tagName + ' content');
-        return;
-    }
+    if (!element) return;
     
     // Find and replace comment placeholder
     let inserted = false;
@@ -144,6 +118,10 @@ function insertComponent(content, tagName, isHeader) {
     } else {
         setTimeout(() => {
             updateFooterYear();
+            // Initialize contact modal after footer is loaded
+            if (typeof initContactModal === 'function') {
+                initContactModal();
+            }
         }, 50);
     }
 }
@@ -157,22 +135,29 @@ function createElementFromHTML(htmlString) {
     return fragment;
 }
 
+/**
+ * Normalize a pathname for consistent comparison by removing trailing slashes and index.html
+ * @param {string} pathname - The pathname to normalize
+ * @returns {string} The normalized pathname, or '/' for the root path
+ */
+function normalizePathname(pathname) {
+    return pathname.replace(/\/index\.html$/, '').replace(/\/$/, '') || '/';
+}
+
 // Set active navigation link based on current page
 function setActiveNavLink() {
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    // Normalize pathname: remove trailing slashes and index.html
+    let pathname = normalizePathname(window.location.pathname);
     const navLinks = document.querySelectorAll('.nav-menu a');
     
-    if (navLinks.length === 0) {
-        console.warn('No nav links found');
-        return;
-    }
+    if (navLinks.length === 0) return;
     
     navLinks.forEach(link => {
-        const href = link.getAttribute('href');
-        // Check if the link matches the current page
-        if (href === currentPage || 
-            (currentPage === '' && href === 'index.html') ||
-            (currentPage === '/' && href === 'index.html')) {
+        // Normalize the link's pathname as well
+        let linkPathname = normalizePathname(link.pathname);
+        
+        // Check if the normalized pathnames match
+        if (linkPathname === pathname) {
             link.classList.add('active');
             link.setAttribute('aria-current', 'page');
         } else {

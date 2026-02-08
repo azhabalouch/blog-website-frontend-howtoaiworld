@@ -1,17 +1,4 @@
 // Blog display functionality
-// RSS Feed Generation
-async function generateRSSFeed() {
-    await fetchBlogData();
-    const posts = getRecentPosts(20); // Limit to 20 most recent
-    let items = '';
-    posts.forEach(post => {
-        items += `\n    <item>\n      <title>${escapeHtml(post.title)}</title>\n      <link>https://www.howtoaiworld.com/pages/blog-post.html?id=${post.id}</link>\n      <description>${escapeHtml(post.excerpt || post.content || '')}</description>\n      <pubDate>${(new Date(post.date)).toUTCString()}</pubDate>\n      <guid>https://www.howtoaiworld.com/pages/blog-post.html?id=${post.id}</guid>\n    </item>`;
-    });
-    const rss = `<?xml version="1.0" encoding="UTF-8" ?>\n<rss version="2.0">\n  <channel>\n    <title>HowToAiWorld Blog</title>\n    <link>https://www.howtoaiworld.com/</link>\n    <description>Latest blogs and updates from HowToAiWorld</description>\n    <language>en-us</language>${items}\n  </channel>\n</rss>`;
-    // This would require server-side write access in production
-    // For static sites, you must run this script locally and upload rss.xml
-    return rss;
-}
 // This script loads and displays blogs from remote JSON
 
 const BLOG_DATA_URL = 'https://azhabalouch.github.io/blogs-data-api/api.json';
@@ -61,12 +48,7 @@ async function fetchBlogData() {
             }
         }
         
-        const response = await fetch(BLOG_DATA_URL, {
-            cache: 'no-cache',
-            headers: {
-                'Accept': 'application/json'
-            }
-        });
+        const response = await fetch(BLOG_DATA_URL);
         if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to fetch blog data`);
         
         const data = await response.json();
@@ -94,7 +76,6 @@ async function fetchBlogData() {
         initializeLazyLoading();
         return true;
     } catch (error) {
-        //console.error('Error fetching blog data:', error);
         cachedPosts = [];
         postsWithParsedDates = [];
         dataLoaded = false;
@@ -105,12 +86,6 @@ async function fetchBlogData() {
 // Get blog posts
 function getBlogPosts() {
     return cachedPosts;
-}
-
-// Update blog stats (read-only now - stats come from remote)
-function updateBlogStats(postId) {
-    // Stats are managed remotely, no local updates
-    //console.log(`Viewing post: ${postId}`);
 }
 
 // Get recent posts
@@ -192,7 +167,8 @@ function escapeHtml(text) {
 function createArticleHTML(post, isExcerpt = true) {
     if (!post || !post.id) return '';
     const content = isExcerpt ? post.excerpt : post.content;
-    const readMoreLink = isExcerpt ? `<span class="read-more">Read More →</span>` : '';
+    const readMoreLink = isExcerpt ? `<span class="read-more">Continue Reading →</span>` : '';
+    const readingTime = calculateReadingTime(post.content || post.excerpt);
     
     // Featured image HTML with lazy loading
     const featuredImageHtml = isExcerpt && post.featured_image ? 
@@ -205,13 +181,15 @@ function createArticleHTML(post, isExcerpt = true) {
     
     return `
         <article class="blog-article" data-post-id="${post.id}">
-            <a href="/pages/blog-post.html?id=${post.id}" class="article-card-link">
+            <a href="/pages/blog-post/?id=${post.id}" class="article-card-link">
                 <h3 class="article-title">${escapeHtml(post.title)}</h3>
                 <div class="article-meta">
                     <span class="author">By ${escapeHtml(post.author)}</span>
-                    <span class="separator">|</span>
+                    <span class="separator">•</span>
                     <time datetime="${formatDateTime(post.parsedDate || post.date)}">${formatDate(post.parsedDate || post.date)}</time>
-                    <span class="separator">|</span>
+                    <span class="separator">•</span>
+                    <span class="reading-time">${readingTime}</span>
+                    <span class="separator">•</span>
                     <span class="category-tag">${escapeHtml(post.category)}</span>
                 </div>
                 ${featuredImageHtml}
@@ -222,6 +200,16 @@ function createArticleHTML(post, isExcerpt = true) {
             </a>
         </article>
     `;
+}
+
+// Calculate reading time based on word count
+function calculateReadingTime(content) {
+    if (!content) return '1 min read';
+    const wordsPerMinute = 200;
+    const text = content.replace(/<[^>]*>/g, ''); // Remove HTML tags
+    const wordCount = text.trim().split(/\s+/).length;
+    const minutes = Math.ceil(wordCount / wordsPerMinute);
+    return `${minutes} min read`;
 }
 
 // Load homepage blogs - Show featured (3 most recent) and all other recent blogs with pagination
@@ -235,7 +223,7 @@ function loadHomepageBlogs(page = 1) {
     if (posts.length === 0) {
         mainArticles.innerHTML = `
             <article class="featured-article">
-                <h2 class="article-title">Welcome to HowToAiWorld</h2>
+                <h2 class="article-title">Welcome to Howtoaiworld</h2>
                 <div class="article-meta">
                     <span class="author">By Editorial Team</span>
                     <span class="separator">|</span>
@@ -256,72 +244,29 @@ function loadHomepageBlogs(page = 1) {
     let html = '';
     
     if (currentPage === 1) {
-        // Page 1: Show 3 featured + 4 recent blogs
-        const featuredPosts = getFeaturedPosts(3);
-        const displayedIds = new Set();
+        // Page 1: Show 7 recent blogs (no featured section to avoid duplication)
+        html += '<h2 class="section-title">Latest Articles</h2>';
         
-        // Featured Section (3 most recent posts)
-        if (featuredPosts.length > 0) {
-            html += '<h2 class="section-title">Featured Posts</h2>';
-            featuredPosts.forEach((post, index) => {
-                displayedIds.add(post.id);
-                const badge = '<div class="featured-badge">Featured</div>';
-                const featuredImageHtml = post.featured_image ? 
-                    `<div class="article-featured-image">
-                        <img data-src="${post.featured_image}" 
-                             alt="${escapeHtml(post.title)}" 
-                             class="lazy-image" 
-                             loading="lazy" />
-                    </div>` : '';
-                html += `
-                    <article class="blog-article">
-                        <a href="/pages/blog-post.html?id=${post.id}" class="article-card-link">
-                            ${badge}
-                            <h3 class="article-title">${escapeHtml(post.title)}</h3>
-                            <div class="article-meta">
-                                <span class="author">By ${escapeHtml(post.author)}</span>
-                                <span class="separator">|</span>
-                                <time datetime="${formatDateTime(post.parsedDate || post.date)}">${formatDate(post.parsedDate || post.date)}</time>
-                                <span class="separator">|</span>
-                                <span class="category-tag" data-category="${escapeHtml(post.category)}">${escapeHtml(post.category)}</span>
-                            </div>
-                            ${featuredImageHtml}
-                            <div class="article-content">
-                                ${post.excerpt}
-                            </div>
-                            <span class="read-more">Read More →</span>
-                        </a>
-                    </article>
-                `;
-                if (index < featuredPosts.length - 1) html += '<div class="article-divider"></div>';
-            });
-            html += '<div class="article-divider"></div>';
-        }
-        
-        // Recent Blogs Section - Show 4 posts, excluding featured
-        const uniqueRecent = recentPosts.filter(p => !displayedIds.has(p.id)).slice(0, 4);
-        if (uniqueRecent.length > 0) {
-            html += '<h2 class="section-title" style="color: #c41e3a;">📰 Recent Blogs</h2>';
-            uniqueRecent.forEach((post, index) => {
+        const postsToDisplay = recentPosts.slice(0, postsPerPage);
+        if (postsToDisplay.length > 0) {
+            postsToDisplay.forEach((post, index) => {
                 html += createArticleHTML(post, true);
-                if (index < uniqueRecent.length - 1) html += '<div class="article-divider"></div>';
+                if (index < postsToDisplay.length - 1) html += '<div class="article-divider"></div>';
             });
         }
         
-        // Calculate total pages: first page has 7 (3 featured + 4 recent), rest have 7 each
-        const remainingPosts = recentPosts.length - 7; // Total posts minus page 1
-        const totalPages = remainingPosts > 0 ? 1 + Math.ceil(remainingPosts / postsPerPage) : 1;
+        // Calculate total pages: all pages show 7 posts
+        const totalPages = Math.ceil(recentPosts.length / postsPerPage);
         
         mainArticles.innerHTML = html;
         updatePaginationControls(currentPage, totalPages);
         
     } else {
         // Page 2+: Show 7 recent blogs
-        // Skip the first 7 posts (3 featured + 4 recent from page 1)
-        const skipCount = 7 + ((currentPage - 2) * postsPerPage);
+        const skipCount = (currentPage - 1) * postsPerPage;
         const postsToDisplay = recentPosts.slice(skipCount, skipCount + postsPerPage);
         
-        html += '<h2 class="section-title">📰 Recent Posts</h2>';
+        html += '<h2 class="section-title">Latest Articles</h2>';
         
         if (postsToDisplay.length > 0) {
             postsToDisplay.forEach((post, index) => {
@@ -331,8 +276,7 @@ function loadHomepageBlogs(page = 1) {
         }
         
         // Calculate total pages
-        const remainingPosts = recentPosts.length - 7;
-        const totalPages = remainingPosts > 0 ? 1 + Math.ceil(remainingPosts / postsPerPage) : 1;
+        const totalPages = Math.ceil(recentPosts.length / postsPerPage);
         
         mainArticles.innerHTML = html;
         updatePaginationControls(currentPage, totalPages);
@@ -400,69 +344,65 @@ function hidePagination() {
     }
 }
 
-// Load recent blogs page
-function loadRecentBlogsPage() {
-    const mainArticles = document.querySelector('.main-articles');
-    if (!mainArticles || !mainArticles.querySelector('h2')?.textContent.includes('Recent Blog Posts')) return;
-    
-    const posts = getRecentPosts(20);
-    
-    let html = '<h2 class="article-title">Recent Blog Posts</h2>';
-    
-    posts.forEach((post, index) => {
-        html += createArticleHTML(post, true);
-        if (index < posts.length - 1) html += '<div class="article-divider"></div>';
-    });
-    
-    if (posts.length === 0) {
-        html += '<p>No blog posts available yet. Check back soon!</p>';
-    }
-    
-    mainArticles.innerHTML = html;
-}
-
 // Load featured blogs page - show 3 most recent blogs
 function loadFeaturedBlogsPage() {
     const mainArticles = document.querySelector('.main-articles');
     if (!mainArticles) return;
     
+    // Check if data loaded successfully
+    if (!dataLoaded || cachedPosts.length === 0) {
+        mainArticles.innerHTML = `
+            <div class="error-message" style="text-align: center; padding: 60px 20px;">
+                <h2 style="color: #d32f2f; margin-bottom: 16px;">⚠️ Error Loading Blogs</h2>
+                <p style="font-size: 16px; color: #666; margin-bottom: 20px;">An error occurred while loading the featured articles. Please try refreshing the page.</p>
+                <button onclick="window.location.reload()" style="padding: 12px 24px; background: #2196F3; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">Refresh Page</button>
+            </div>
+        `;
+        return;
+    }
+    
     const posts = getFeaturedPosts(3);
     
-    let html = `
-        <h2 class="article-title">Featured Articles</h2>
-        <p class="subtitle">Our latest 3 most recent articles on HowToAiWorld.</p>
-    `;
-    
-    posts.forEach((post, index) => {
-        const badge = '<div class="featured-badge">⭐ Featured</div>';
-        const featuredImageHtml = post.featured_image ? 
-            `<div class="article-featured-image"><img src="${post.featured_image}" alt="${escapeHtml(post.title)}" /></div>` : '';
-        
-        html += `
-            <article class="blog-article">
-                <a href="/pages/blog-post.html?id=${post.id}" class="article-card-link">
-                    ${badge}
-                    <h3 class="article-title">${escapeHtml(post.title)}</h3>
-                    <div class="article-meta">
-                        <span class="author">By ${escapeHtml(post.author)}</span>
-                        <span class="separator">|</span>
-                        <time datetime="${formatDateTime(post.parsedDate || post.date)}">${formatDate(post.parsedDate || post.date)}</time>
-                        <span class="separator">|</span>
-                        <span>${escapeHtml(post.category)}</span>
-                    </div>
-                    ${featuredImageHtml}
-                    <div class="article-content">
-                        ${post.excerpt}
-                    </div>
-                    <span class="read-more">Read More →</span>
-                </a>
-            </article>
-        `;
-        if (index < posts.length - 1) html += '<div class="article-divider"></div>';
-    });
+    let html = '<h2 class="section-title">Featured Articles</h2>';
     
     if (posts.length === 0) {
-        html += '<p>No articles available yet. Check back soon!</p>';
+        html += '<p style="text-align: center; padding: 40px 20px; color: #666;">No featured articles available yet. Check back soon!</p>';
+    } else {
+        posts.forEach((post, index) => {
+            const readingTime = calculateReadingTime(post.content || post.excerpt);
+            
+            // Use lazy loading for images - consistent with homepage
+            const featuredImageHtml = post.featured_image ? 
+                `<div class="article-featured-image">
+                    <img data-src="${post.featured_image}" 
+                         alt="${escapeHtml(post.title)}" 
+                         class="lazy-image" 
+                         loading="lazy" />
+                </div>` : '';
+            
+            html += `
+                <article class="blog-article" data-post-id="${post.id}">
+                    <a href="/pages/blog-post/?id=${post.id}" class="article-card-link">
+                        <h3 class="article-title">${escapeHtml(post.title)}</h3>
+                        <div class="article-meta">
+                            <span class="author">By ${escapeHtml(post.author)}</span>
+                            <span class="separator">•</span>
+                            <time datetime="${formatDateTime(post.parsedDate || post.date)}">${formatDate(post.parsedDate || post.date)}</time>
+                            <span class="separator">•</span>
+                            <span class="reading-time">${readingTime}</span>
+                            <span class="separator">•</span>
+                            <span class="category-tag">${escapeHtml(post.category)}</span>
+                        </div>
+                        ${featuredImageHtml}
+                        <div class="article-content">
+                            ${post.excerpt}
+                        </div>
+                        <span class="read-more">Continue Reading →</span>
+                    </a>
+                </article>
+            `;
+            if (index < posts.length - 1) html += '<div class="article-divider"></div>';
+        });
     }
     
     mainArticles.innerHTML = html;
@@ -470,6 +410,10 @@ function loadFeaturedBlogsPage() {
     // Update sidebar
     updateCategoriesSidebar();
     updatePopularCategories();
+    updateFeaturedSidebar();
+    
+    // Apply lazy loading to images
+    observeLazyImages();
 }
 
 // Get all unique categories with counts
@@ -538,7 +482,7 @@ function updateFeaturedSidebar() {
     
     featuredList.innerHTML = featured.map((post, index) => `
         <li class="featured-item">
-            <a href="/pages/blog-post.html?id=${post.id}" class="featured-link">
+            <a href="/pages/blog-post/?id=${post.id}" class="featured-link">
                 <span class="featured-number">${index + 1}</span>
                 <div class="featured-content">
                     <h4 class="featured-title">${escapeHtml(post.title)}</h4>
@@ -597,27 +541,221 @@ function loadCategoryPage(category) {
     updatePopularCategories();
 }
 
+// Detect current page from URL path
+function detectCurrentPage() {
+    const path = window.location.pathname.replace(/\/index\.html$/, '/').replace(/\.html$/, '');
+    const segments = path.split('/').filter(Boolean);
+    // Return the last meaningful segment, or 'home' for root
+    if (segments.length === 0) return 'home';
+    return segments[segments.length - 1];
+}
+
+// Load individual blog post
+async function loadBlogPost() {
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const postId = urlParams.get('id');
+        
+        if (!postId) {
+            window.location.href = '/';
+            return;
+        }
+        
+        // Wait for blog data to load if not already loaded
+        if (!dataLoaded) {
+            const success = await fetchBlogData();
+            if (!success) {
+                document.getElementById('blog-post-container').innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px;">
+                        <h2 style="font-size: 32px; margin-bottom: 20px;">Error Loading Post</h2>
+                        <p style="font-size: 18px; color: #666; margin-bottom: 30px;">Unable to load blog data. Please try again later.</p>
+                        <a href="/" style="display: inline-block; padding: 15px 30px; background-color: #2c2c2c; color: #fff; text-decoration: none; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Go to Homepage</a>
+                    </div>
+                `;
+                return;
+            }
+        }
+        
+        const post = getPostById(postId);
+        
+        if (!post) {
+            document.getElementById('blog-post-container').innerHTML = `
+                <div style="text-align: center; padding: 60px 20px;">
+                    <h2 style="font-size: 32px; margin-bottom: 20px;">Post Not Found</h2>
+                    <p style="font-size: 18px; color: #666; margin-bottom: 30px;">Sorry, the article you're looking for doesn't exist.</p>
+                    <a href="/" style="display: inline-block; padding: 15px 30px; background-color: #2c2c2c; color: #fff; text-decoration: none; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Go to Homepage</a>
+                </div>
+            `;
+            return;
+        }
+        
+        // Update page title and meta
+        document.getElementById('page-title').textContent = `${post.title} - Howtoaiworld`;
+        document.querySelector('meta[name="description"]').setAttribute('content', post.excerpt);
+        
+        // Create article container
+        const article = document.createElement('article');
+        article.className = 'featured-article';
+    
+        // Featured image HTML
+        const featuredImageHtml = post.featured_image ? 
+            `<div class="article-featured-image" style="margin-bottom: 30px; text-align: center;"><img src="${post.featured_image}" alt="${escapeHtml(post.title)}" style="max-width: 100%; height: auto; border-radius: 8px;" /></div>` : '';
+        
+        // Build article HTML
+        article.innerHTML = `
+            <h1 class="article-title">${escapeHtml(post.title)}</h1>
+            <div class="article-meta">
+                <span class="author">By ${escapeHtml(post.author)}</span>
+                <span class="separator">|</span>
+                <time datetime="${formatDateTime(post.date)}">${formatDate(post.date)}</time>
+                <span class="separator">|</span>
+                <a href="/?category=${encodeURIComponent(post.category)}" style="color: #c41e3a; text-decoration: none; font-weight: bold;">${escapeHtml(post.category)}</a>
+            </div>
+            ${featuredImageHtml}
+            <div class="article-content">
+            </div>
+            <div style="margin-top: 40px; padding-top: 30px; border-top: 2px solid #ddd;">
+                <a href="/" class="back-to-posts-link">← Back to All Posts</a>
+            </div>
+        `;
+        
+        // Set content HTML separately to preserve formatting
+        const contentDiv = article.querySelector('.article-content');
+        let contentHtml = post.content;
+        
+        // Remove the first h1 tag from content to avoid duplication
+        if (contentHtml) {
+            contentHtml = contentHtml.replace(/<h1[^>]*>.*?<\/h1>/, '');
+        }
+        
+        // Handle content images
+        if (post.content_images && Array.isArray(post.content_images) && post.content_images.length > 0) {
+            if (post.content_images.length >= 1) {
+                const tempWrapper = document.createElement('div');
+                tempWrapper.innerHTML = contentHtml || '';
+                const paragraphs = tempWrapper.querySelectorAll('p');
+                if (paragraphs.length > 0) {
+                    const midIndex = Math.floor(paragraphs.length / 2);
+                    const imageMarkup = `<figure class="content-inline-image"><img src="${post.content_images[0]}" alt="${escapeHtml(post.title)} image 1"></figure>`;
+                    const imageContainer = document.createElement('div');
+                    imageContainer.innerHTML = imageMarkup;
+                    paragraphs[midIndex].insertAdjacentElement('afterend', imageContainer);
+                }
+                contentHtml = tempWrapper.innerHTML;
+            }
+        }
+        
+        contentDiv.innerHTML = contentHtml;
+        
+        // Add second image at the end if exists
+        if (post.content_images && Array.isArray(post.content_images) && post.content_images.length >= 2) {
+            const secondImageMarkup = `<figure class="content-inline-image"><img src="${post.content_images[1]}" alt="${escapeHtml(post.title)} image 2"></figure>`;
+            const secondImageDiv = document.createElement('div');
+            secondImageDiv.innerHTML = secondImageMarkup;
+            contentDiv.appendChild(secondImageDiv);
+        }
+        
+        // Add FAQ section if it exists
+        const faqItems = post.faq || post.FAQ;
+        if (faqItems && Array.isArray(faqItems) && faqItems.length > 0) {
+            const faqDiv = document.createElement('div');
+            faqDiv.className = 'article-faq';
+            
+            const faqList = faqItems.map((item, idx) => {
+                const q = escapeHtml(item.question || 'Question');
+                const a = escapeHtml(item.answer || '');
+                return `
+                    <div class="faq-item" data-index="${idx}">
+                        <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-${idx}">
+                            <span class="faq-question-text">${q}</span>
+                            <span class="faq-toggle" aria-hidden="true">+</span>
+                        </button>
+                        <div id="faq-answer-${idx}" class="faq-answer" hidden>
+                            <p>${a}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            faqDiv.innerHTML = `
+                <div class="faq-heading">
+                    <p class="faq-kicker">Need quick answers?</p>
+                    <h3>Frequently Asked Questions</h3>
+                </div>
+                <div class="faq-list">${faqList}</div>
+            `;
+            article.appendChild(faqDiv);
+            faqDiv.querySelectorAll('.faq-question').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const answerId = btn.getAttribute('aria-controls');
+                    const answer = faqDiv.querySelector(`#${answerId}`);
+                    const isOpen = btn.getAttribute('aria-expanded') === 'true';
+                    btn.setAttribute('aria-expanded', String(!isOpen));
+                    answer.hidden = isOpen;
+                    btn.parentElement.classList.toggle('open', !isOpen);
+                });
+            });
+        }
+        
+        // Replace container with article
+        document.getElementById('blog-post-container').innerHTML = '';
+        document.getElementById('blog-post-container').appendChild(article);
+        
+        // Load categories
+        updateCategoriesSidebar();
+        updatePopularCategories();
+        updateFeaturedSidebar();
+        
+    } catch (error) {
+        console.error('Error loading blog post:', error);
+        document.getElementById('blog-post-container').innerHTML = `
+            <div style="text-align: center; padding: 60px 20px;">
+                <h2 style="font-size: 32px; margin-bottom: 20px;">Error</h2>
+                <p style="font-size: 18px; color: #666; margin-bottom: 30px;">An error occurred while loading the post.</p>
+                <a href="/" style="display: inline-block; padding: 15px 30px; background-color: #2c2c2c; color: #fff; text-decoration: none; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Go to Homepage</a>
+            </div>
+        `;
+    }
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', async function() {
-    // Fetch blog data first
-    await fetchBlogData();
+    const success = await fetchBlogData();
     
-    const path = window.location.pathname;
-    const currentPage = path.split('/').pop().replace('.html', '') || path.split('\\').pop().replace('.html', '');
+    const page = detectCurrentPage();
     
-    // Check if we're on homepage (root or index)
-    if (currentPage === 'index' || currentPage === '' || path.endsWith('/') || path === '/') {
-        initializeSearch();
-        initializeNavSearch();
-        loadHomepageWithFilter();
-    } else if (currentPage === 'recent-blogs') {
-        loadRecentBlogsPage();
-    } else if (currentPage === 'featured') {
-        loadFeaturedBlogsPage();
-    } else if (currentPage === 'blog-post') {
-        loadBlogPost();
+    if (page === 'home') {
+        if (!success) {
+            showLoadingError('home');
+        } else {
+            initializeSearch();
+            initializeNavSearch();
+            loadHomepageWithFilter();
+        }
+    } else if (page === 'featured') {
+        if (!success) {
+            showLoadingError('featured');
+        } else {
+            loadFeaturedBlogsPage();
+        }
+    } else if (page === 'blog-post') {
+        // Load individual blog post
+        await loadBlogPost();
     }
 });
+
+// Show loading error with retry option
+function showLoadingError(pageType) {
+    const mainArticles = document.querySelector('.main-articles');
+    if (!mainArticles) return;
+    
+    mainArticles.innerHTML = `
+        <div class="error-message" style="text-align: center; padding: 60px 20px;">
+            <h2 style="color: #d32f2f; margin-bottom: 16px;">⚠️ Error Loading Blogs</h2>
+            <p style="font-size: 16px; color: #666; margin-bottom: 20px;">An error occurred while loading the blog data. Please check your internet connection and try again.</p>
+            <button onclick="window.location.reload()" style="padding: 12px 24px; background: #2196F3; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">Refresh Page</button>
+        </div>
+    `;
+}
 
 // Initialize navigation search panel
 function initializeNavSearch() {
