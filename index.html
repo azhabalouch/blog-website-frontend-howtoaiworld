@@ -1,37 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-     <!-- Cookiebot for Cookie Consent -->
-    <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="402f2129-fdd2-44e0-b450-f6d922daebf4" data-blockingmode="auto" type="text/javascript"></script>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Your trusted source for the latest news, trending stories, and insightful blog articles. Read quality content on various topics daily.">
-    <meta name="keywords" content="blog, news, articles, trending stories, latest updates, newspaper">
-    <meta name="author" content="HowToAiWorld">
-    <meta name="robots" content="index, follow">
+    <!-- Cookiebot for Cookie Consent -->
+    <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="402f2129-fdd2-44e0-b450-f6d922daebf4" data-blockingmode="auto" type="text/javascript" defer></script>
+    <meta name="description" content="Howtoaiworld - Your trusted source for AI news, tech articles, and expert insights. Discover the latest trends in artificial intelligence, machine learning, and technology innovation.">
+    <meta name="keywords" content="AI, artificial intelligence, machine learning, technology news, tech blog, AI tutorials, innovation, digital transformation">
+    <meta name="author" content="Howtoaiworld">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
     <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="general">
     
     <!-- Open Graph Meta Tags for Social Media -->
-    <meta property="og:title" content="HowToAiWorld - Your Daily News & Blog">
-    <meta property="og:description" content="Your trusted source for the latest news, trending stories, and insightful blog articles.">
+    <meta property="og:site_name" content="Howtoaiworld">
+    <meta property="og:title" content="Howtoaiworld - AI News, Tutorials & Insights">
+    <meta property="og:description" content="Discover the latest in AI, machine learning, and technology. Expert articles, tutorials, and insights on artificial intelligence and digital innovation.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://howtoaiworld.com">
     <meta property="og:image" content="https://howtoaiworld.com/og-image.jpg">
+    <meta property="og:locale" content="en_US">
     
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="HowToAiWorld - Your Daily News & Blog">
-    <meta name="twitter:description" content="Your trusted source for the latest news, trending stories, and insightful blog articles.">
+    <meta name="twitter:site" content="@howtoaiworld">
+    <meta name="twitter:title" content="Howtoaiworld - AI News, Tech Articles & Expert Insights">
+    <meta name="twitter:description" content="Discover the latest in AI, machine learning, and technology. Expert articles, tutorials, and insights on artificial intelligence.">
+    <meta name="twitter:image" content="https://howtoaiworld.com/og-image.jpg">
     
     <!-- Accessibility -->
     <meta name="theme-color" content="#2c2c2c">
     
-    <title>HowToAiWorld - Your Daily News & Blog</title>
+    <title>Howtoaiworld - AI News, Tutorials & Insights</title>
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="canonical" href="https://howtoaiworld.com">
     <link rel="preconnect" href="https://azhabalouch.github.io">
     <link rel="dns-prefetch" href="https://azhabalouch.github.io">
+
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Howtoaiworld",
+        "url": "https://howtoaiworld.com",
+        "description": "Your trusted source for AI news, tech articles, and expert insights on artificial intelligence and technology.",
+        "publisher": {
+            "@type": "Organization",
+            "name": "Howtoaiworld",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://howtoaiworld.com/logo.png"
+            }
+        },
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://howtoaiworld.com/?search={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
 
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-HWT034PQT2"></script>
@@ -43,21 +72,6 @@
         gtag('config', 'G-HWT034PQT2');
     </script>
 
-    <!-- Sender.net Email Marketing Integration -->
-    <script>
-        (function (s, e, n, d, er) {
-            s['Sender'] = er;
-            s[er] = s[er] || function () {
-            (s[er].q = s[er].q || []).push(arguments)
-            }, s[er].l = 1 * new Date();
-            var a = e.createElement(n),
-                m = e.getElementsByTagName(n)[0];
-            a.async = 1;
-            a.src = d;
-            m.parentNode.insertBefore(a, m)
-        })(window, document, 'script', 'https://cdn.sender.net/accounts_resources/universal.js', 'sender');
-        sender('6ec66dfe790619')
-    </script>
 </head>
 <body>
     <!-- Header will be loaded dynamically -->
@@ -88,7 +102,25 @@
 
     <!-- Footer will be loaded dynamically -->
 
-    <script src="assets/js/components.js"></script>
-    <script src="assets/js/blog-loader.js"></script>
+    <script src="assets/js/contact-modal.js" defer></script>
+    <script src="assets/js/components.js" defer></script>
+    <script src="assets/js/blog-loader.js" defer></script>
+    <!-- Sender.net Email Marketing (deferred) -->
+    <script>
+        window.addEventListener('load', function() {
+            (function (s, e, n, d, er) {
+                s['Sender'] = er;
+                s[er] = s[er] || function () {
+                (s[er].q = s[er].q || []).push(arguments)
+                }, s[er].l = 1 * new Date();
+                var a = e.createElement(n),
+                    m = e.getElementsByTagName(n)[0];
+                a.async = 1;
+                a.src = d;
+                m.parentNode.insertBefore(a, m)
+            })(window, document, 'script', 'https://cdn.sender.net/accounts_resources/universal.js', 'sender');
+            sender('6ec66dfe790619');
+        });
+    </script>
 </body>
 </html>

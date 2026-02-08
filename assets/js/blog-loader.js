@@ -1,17 +1,4 @@
 // Blog display functionality
-// RSS Feed Generation
-async function generateRSSFeed() {
-    await fetchBlogData();
-    const posts = getRecentPosts(20); // Limit to 20 most recent
-    let items = '';
-    posts.forEach(post => {
-        items += `\n    <item>\n      <title>${escapeHtml(post.title)}</title>\n      <link>https://www.howtoaiworld.com/pages/blog-post.html?id=${post.id}</link>\n      <description>${escapeHtml(post.excerpt || post.content || '')}</description>\n      <pubDate>${(new Date(post.date)).toUTCString()}</pubDate>\n      <guid>https://www.howtoaiworld.com/pages/blog-post.html?id=${post.id}</guid>\n    </item>`;
-    });
-    const rss = `<?xml version="1.0" encoding="UTF-8" ?>\n<rss version="2.0">\n  <channel>\n    <title>HowToAiWorld Blog</title>\n    <link>https://www.howtoaiworld.com/</link>\n    <description>Latest blogs and updates from HowToAiWorld</description>\n    <language>en-us</language>${items}\n  </channel>\n</rss>`;
-    // This would require server-side write access in production
-    // For static sites, you must run this script locally and upload rss.xml
-    return rss;
-}
 // This script loads and displays blogs from remote JSON
 
 const BLOG_DATA_URL = 'https://azhabalouch.github.io/blogs-data-api/api.json';
@@ -61,12 +48,7 @@ async function fetchBlogData() {
             }
         }
         
-        const response = await fetch(BLOG_DATA_URL, {
-            cache: 'no-cache',
-            headers: {
-                'Accept': 'application/json'
-            }
-        });
+        const response = await fetch(BLOG_DATA_URL);
         if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to fetch blog data`);
         
         const data = await response.json();
@@ -94,7 +76,6 @@ async function fetchBlogData() {
         initializeLazyLoading();
         return true;
     } catch (error) {
-        //console.error('Error fetching blog data:', error);
         cachedPosts = [];
         postsWithParsedDates = [];
         dataLoaded = false;
@@ -105,12 +86,6 @@ async function fetchBlogData() {
 // Get blog posts
 function getBlogPosts() {
     return cachedPosts;
-}
-
-// Update blog stats (read-only now - stats come from remote)
-function updateBlogStats(postId) {
-    // Stats are managed remotely, no local updates
-    //console.log(`Viewing post: ${postId}`);
 }
 
 // Get recent posts
@@ -205,7 +180,7 @@ function createArticleHTML(post, isExcerpt = true) {
     
     return `
         <article class="blog-article" data-post-id="${post.id}">
-            <a href="/pages/blog-post.html?id=${post.id}" class="article-card-link">
+            <a href="/pages/blog-post/?id=${post.id}" class="article-card-link">
                 <h3 class="article-title">${escapeHtml(post.title)}</h3>
                 <div class="article-meta">
                     <span class="author">By ${escapeHtml(post.author)}</span>
@@ -256,69 +231,26 @@ function loadHomepageBlogs(page = 1) {
     let html = '';
     
     if (currentPage === 1) {
-        // Page 1: Show 3 featured + 4 recent blogs
-        const featuredPosts = getFeaturedPosts(3);
-        const displayedIds = new Set();
+        // Page 1: Show 7 recent blogs (no featured section to avoid duplication)
+        html += '<h2 class="section-title">📰 Recent Posts</h2>';
         
-        // Featured Section (3 most recent posts)
-        if (featuredPosts.length > 0) {
-            html += '<h2 class="section-title">Featured Posts</h2>';
-            featuredPosts.forEach((post, index) => {
-                displayedIds.add(post.id);
-                const badge = '<div class="featured-badge">Featured</div>';
-                const featuredImageHtml = post.featured_image ? 
-                    `<div class="article-featured-image">
-                        <img data-src="${post.featured_image}" 
-                             alt="${escapeHtml(post.title)}" 
-                             class="lazy-image" 
-                             loading="lazy" />
-                    </div>` : '';
-                html += `
-                    <article class="blog-article">
-                        <a href="/pages/blog-post.html?id=${post.id}" class="article-card-link">
-                            ${badge}
-                            <h3 class="article-title">${escapeHtml(post.title)}</h3>
-                            <div class="article-meta">
-                                <span class="author">By ${escapeHtml(post.author)}</span>
-                                <span class="separator">|</span>
-                                <time datetime="${formatDateTime(post.parsedDate || post.date)}">${formatDate(post.parsedDate || post.date)}</time>
-                                <span class="separator">|</span>
-                                <span class="category-tag" data-category="${escapeHtml(post.category)}">${escapeHtml(post.category)}</span>
-                            </div>
-                            ${featuredImageHtml}
-                            <div class="article-content">
-                                ${post.excerpt}
-                            </div>
-                            <span class="read-more">Read More →</span>
-                        </a>
-                    </article>
-                `;
-                if (index < featuredPosts.length - 1) html += '<div class="article-divider"></div>';
-            });
-            html += '<div class="article-divider"></div>';
-        }
-        
-        // Recent Blogs Section - Show 4 posts, excluding featured
-        const uniqueRecent = recentPosts.filter(p => !displayedIds.has(p.id)).slice(0, 4);
-        if (uniqueRecent.length > 0) {
-            html += '<h2 class="section-title" style="color: #c41e3a;">📰 Recent Blogs</h2>';
-            uniqueRecent.forEach((post, index) => {
+        const postsToDisplay = recentPosts.slice(0, postsPerPage);
+        if (postsToDisplay.length > 0) {
+            postsToDisplay.forEach((post, index) => {
                 html += createArticleHTML(post, true);
-                if (index < uniqueRecent.length - 1) html += '<div class="article-divider"></div>';
+                if (index < postsToDisplay.length - 1) html += '<div class="article-divider"></div>';
             });
         }
         
-        // Calculate total pages: first page has 7 (3 featured + 4 recent), rest have 7 each
-        const remainingPosts = recentPosts.length - 7; // Total posts minus page 1
-        const totalPages = remainingPosts > 0 ? 1 + Math.ceil(remainingPosts / postsPerPage) : 1;
+        // Calculate total pages: all pages show 7 posts
+        const totalPages = Math.ceil(recentPosts.length / postsPerPage);
         
         mainArticles.innerHTML = html;
         updatePaginationControls(currentPage, totalPages);
         
     } else {
         // Page 2+: Show 7 recent blogs
-        // Skip the first 7 posts (3 featured + 4 recent from page 1)
-        const skipCount = 7 + ((currentPage - 2) * postsPerPage);
+        const skipCount = (currentPage - 1) * postsPerPage;
         const postsToDisplay = recentPosts.slice(skipCount, skipCount + postsPerPage);
         
         html += '<h2 class="section-title">📰 Recent Posts</h2>';
@@ -331,8 +263,7 @@ function loadHomepageBlogs(page = 1) {
         }
         
         // Calculate total pages
-        const remainingPosts = recentPosts.length - 7;
-        const totalPages = remainingPosts > 0 ? 1 + Math.ceil(remainingPosts / postsPerPage) : 1;
+        const totalPages = Math.ceil(recentPosts.length / postsPerPage);
         
         mainArticles.innerHTML = html;
         updatePaginationControls(currentPage, totalPages);
@@ -400,27 +331,6 @@ function hidePagination() {
     }
 }
 
-// Load recent blogs page
-function loadRecentBlogsPage() {
-    const mainArticles = document.querySelector('.main-articles');
-    if (!mainArticles || !mainArticles.querySelector('h2')?.textContent.includes('Recent Blog Posts')) return;
-    
-    const posts = getRecentPosts(20);
-    
-    let html = '<h2 class="article-title">Recent Blog Posts</h2>';
-    
-    posts.forEach((post, index) => {
-        html += createArticleHTML(post, true);
-        if (index < posts.length - 1) html += '<div class="article-divider"></div>';
-    });
-    
-    if (posts.length === 0) {
-        html += '<p>No blog posts available yet. Check back soon!</p>';
-    }
-    
-    mainArticles.innerHTML = html;
-}
-
 // Load featured blogs page - show 3 most recent blogs
 function loadFeaturedBlogsPage() {
     const mainArticles = document.querySelector('.main-articles');
@@ -429,8 +339,7 @@ function loadFeaturedBlogsPage() {
     const posts = getFeaturedPosts(3);
     
     let html = `
-        <h2 class="article-title">Featured Articles</h2>
-        <p class="subtitle">Our latest 3 most recent articles on HowToAiWorld.</p>
+        <h2 class="article-title">Featured Blogs</h2>
     `;
     
     posts.forEach((post, index) => {
@@ -440,7 +349,7 @@ function loadFeaturedBlogsPage() {
         
         html += `
             <article class="blog-article">
-                <a href="/pages/blog-post.html?id=${post.id}" class="article-card-link">
+                <a href="/pages/blog-post/?id=${post.id}" class="article-card-link">
                     ${badge}
                     <h3 class="article-title">${escapeHtml(post.title)}</h3>
                     <div class="article-meta">
@@ -538,7 +447,7 @@ function updateFeaturedSidebar() {
     
     featuredList.innerHTML = featured.map((post, index) => `
         <li class="featured-item">
-            <a href="/pages/blog-post.html?id=${post.id}" class="featured-link">
+            <a href="/pages/blog-post/?id=${post.id}" class="featured-link">
                 <span class="featured-number">${index + 1}</span>
                 <div class="featured-content">
                     <h4 class="featured-title">${escapeHtml(post.title)}</h4>
@@ -597,26 +506,29 @@ function loadCategoryPage(category) {
     updatePopularCategories();
 }
 
+// Detect current page from URL path
+function detectCurrentPage() {
+    const path = window.location.pathname.replace(/\/index\.html$/, '/').replace(/\.html$/, '');
+    const segments = path.split('/').filter(Boolean);
+    // Return the last meaningful segment, or 'home' for root
+    if (segments.length === 0) return 'home';
+    return segments[segments.length - 1];
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', async function() {
-    // Fetch blog data first
     await fetchBlogData();
     
-    const path = window.location.pathname;
-    const currentPage = path.split('/').pop().replace('.html', '') || path.split('\\').pop().replace('.html', '');
+    const page = detectCurrentPage();
     
-    // Check if we're on homepage (root or index)
-    if (currentPage === 'index' || currentPage === '' || path.endsWith('/') || path === '/') {
+    if (page === 'home') {
         initializeSearch();
         initializeNavSearch();
         loadHomepageWithFilter();
-    } else if (currentPage === 'recent-blogs') {
-        loadRecentBlogsPage();
-    } else if (currentPage === 'featured') {
+    } else if (page === 'featured') {
         loadFeaturedBlogsPage();
-    } else if (currentPage === 'blog-post') {
-        loadBlogPost();
     }
+    // blog-post pages handle their own loading via inline script
 });
 
 // Initialize navigation search panel

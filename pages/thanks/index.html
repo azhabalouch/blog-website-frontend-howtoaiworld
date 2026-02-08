@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-     <!-- Cookiebot for Cookie Consent -->
-    <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="402f2129-fdd2-44e0-b450-f6d922daebf4" data-blockingmode="auto" type="text/javascript"></script>
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Thank you for contacting HowToAiWorld. Your message has been submitted successfully.">
+    <!-- Cookiebot for Cookie Consent -->
+    <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="402f2129-fdd2-44e0-b450-f6d922daebf4" data-blockingmode="auto" type="text/javascript" defer></script>
+    <meta name="description" content="Thank you for contacting Howtoaiworld. Your message has been submitted successfully.">
     <meta name="robots" content="noindex, nofollow">
-    <title>Thank You - HowToAiWorld</title>
+    <title>Thank You - Howtoaiworld</title>
     <link rel="stylesheet" href="/assets/css/styles.css">
     <link rel="canonical" href="https://howtoaiworld.com/thanks">
 
@@ -22,21 +21,6 @@
         gtag('config', 'G-HWT034PQT2');
     </script>
 
-    <!-- Sender.net Email Marketing Integration -->
-    <script>
-        (function (s, e, n, d, er) {
-            s['Sender'] = er;
-            s[er] = s[er] || function () {
-            (s[er].q = s[er].q || []).push(arguments)
-            }, s[er].l = 1 * new Date();
-            var a = e.createElement(n),
-                m = e.getElementsByTagName(n)[0];
-            a.async = 1;
-            a.src = d;
-            m.parentNode.insertBefore(a, m)
-        })(window, document, 'script', 'https://cdn.sender.net/accounts_resources/universal.js', 'sender');
-        sender('6ec66dfe790619')
-    </script>
 </head>
 <body>
     <!-- Header will be loaded dynamically -->
@@ -63,6 +47,24 @@
 
     <!-- Footer will be loaded dynamically -->
 
-    <script src="/assets/js/components.js"></script>
+    <script src="/assets/js/contact-modal.js" defer></script>
+    <script src="/assets/js/components.js" defer></script>
+    <!-- Sender.net Email Marketing (deferred) -->
+    <script>
+        window.addEventListener('load', function() {
+            (function (s, e, n, d, er) {
+                s['Sender'] = er;
+                s[er] = s[er] || function () {
+                (s[er].q = s[er].q || []).push(arguments)
+                }, s[er].l = 1 * new Date();
+                var a = e.createElement(n),
+                    m = e.getElementsByTagName(n)[0];
+                a.async = 1;
+                a.src = d;
+                m.parentNode.insertBefore(a, m)
+            })(window, document, 'script', 'https://cdn.sender.net/accounts_resources/universal.js', 'sender');
+            sender('6ec66dfe790619');
+        });
+    </script>
 </body>
 </html>
