@@ -7,7 +7,9 @@ function loadComponents() {
 
     // Load sidebar components if sidebar-components div exists
     if (document.getElementById('sidebar-components')) {
-        const currentPage = window.location.pathname.replace(/^\/(pages|legal)\//, '').replace(/\.html$/, '').split('/').pop() || 'index';
+        // Normalize pathname: remove trailing slashes and index.html, then get the last segment
+        let pathname = normalizePathname(window.location.pathname);
+        const currentPage = pathname.replace(/^\/(pages|legal)\//, '').split('/').pop() || 'index';
         
         // Load specific components based on page
         if (currentPage === 'index' || currentPage === '' || currentPage === '/') {
@@ -133,19 +135,29 @@ function createElementFromHTML(htmlString) {
     return fragment;
 }
 
+/**
+ * Normalize a pathname for consistent comparison by removing trailing slashes and index.html
+ * @param {string} pathname - The pathname to normalize
+ * @returns {string} The normalized pathname, or '/' for the root path
+ */
+function normalizePathname(pathname) {
+    return pathname.replace(/\/index\.html$/, '').replace(/\/$/, '') || '/';
+}
+
 // Set active navigation link based on current page
 function setActiveNavLink() {
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    // Normalize pathname: remove trailing slashes and index.html
+    let pathname = normalizePathname(window.location.pathname);
     const navLinks = document.querySelectorAll('.nav-menu a');
     
     if (navLinks.length === 0) return;
     
     navLinks.forEach(link => {
-        const href = link.getAttribute('href');
-        // Check if the link matches the current page
-        if (href === currentPage || 
-            (currentPage === '' && href === 'index.html') ||
-            (currentPage === '/' && href === 'index.html')) {
+        // Normalize the link's pathname as well
+        let linkPathname = normalizePathname(link.pathname);
+        
+        // Check if the normalized pathnames match
+        if (linkPathname === pathname) {
             link.classList.add('active');
             link.setAttribute('aria-current', 'page');
         } else {

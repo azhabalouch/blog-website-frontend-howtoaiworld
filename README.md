@@ -36,7 +36,7 @@ A modern, responsive blog website focused on AI, machine learning, and technolog
 - **Pagination**: Shows 7 posts per page with navigation controls
 - **Search Functionality**: Real-time search across titles, content, and authors
 - **Category Filtering**: Filter posts by topic categories
-- **Featured Posts**: Highlights selected articles on the homepage
+- **Featured Posts**: Surfaces selected articles in the sidebar and on the dedicated Featured page
 - **Lazy Loading Images**: Improves performance by loading images as they appear in viewport
 
 ### User Experience

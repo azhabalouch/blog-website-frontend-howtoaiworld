@@ -40,11 +40,44 @@ function initContactModal() {
 
     // Form submission
     if (form) {
-        form.addEventListener('submit', function(e) {
+        const submitBtn = form.querySelector('button[type="submit"]');
+
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            alert('Thank you for your message! We\'ll get back to you soon.');
-            closeModal();
-            form.reset();
+
+            const formData = new FormData(form);
+            
+            // Read the action URL from the form
+            const action = form.action;
+            
+            const originalText = submitBtn.textContent;
+
+            submitBtn.textContent = "Sending...";
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch(action, {
+                    method: "POST",
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    closeModal();
+                    form.reset();
+                    // Redirect to thank you page on success
+                    window.location.href = '/pages/thanks/';
+                } else {
+                    alert("Error: " + (data.message || "Failed to send message"));
+                }
+
+            } catch (error) {
+                alert("Something went wrong. Please try again.");
+            } finally {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
         });
     }
 }
