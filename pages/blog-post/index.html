@@ -47,11 +47,10 @@
     <script>
         (function () {
             var canonicalLink = document.querySelector('link[rel="canonical"]');
-            if (!canonicalLink || !window || !window.location) {
-                return;
+            if (canonicalLink) {
+                var url = window.location.origin + window.location.pathname + window.location.search;
+                canonicalLink.setAttribute('href', url);
             }
-            var url = window.location.origin + window.location.pathname + window.location.search;
-            canonicalLink.setAttribute('href', url);
         })();
     </script>
 
