@@ -11,27 +11,39 @@ function loadComponents() {
         let pathname = normalizePathname(window.location.pathname);
         const currentPage = pathname.replace(/^\/(pages|legal)\//, '').split('/').pop() || 'index';
         
-        // Load specific components based on page
+        // Load specific components based on page - SEQUENTIALLY
         if (currentPage === 'index' || currentPage === '' || currentPage === '/') {
-            loadSidebarComponent('/components/sidebar-featured.html');
-            loadSidebarComponent('/components/sidebar-categories.html');
-            loadSidebarComponent('/components/sidebar-popular-categories.html');
-            loadSidebarComponent('/components/sidebar-newsletter.html');
+            // Load in order: Featured → Popular Categories → Categories → Newsletter
+            loadSidebarComponentsSequentially([
+                '/components/sidebar-featured.html',
+                '/components/sidebar-popular-categories.html',
+                '/components/sidebar-categories.html',
+                '/components/sidebar-newsletter.html'
+            ]);
         } else if (currentPage === 'contact') {
-            loadSidebarComponent('/components/sidebar-inquiry-message.html');
-            loadSidebarComponent('/components/sidebar-social.html');
+            loadSidebarComponentsSequentially([
+                '/components/sidebar-inquiry-message.html',
+                '/components/sidebar-social.html'
+            ]);
         } else if (currentPage === 'featured') {
-            loadSidebarComponent('/components/sidebar-categories.html');
-            loadSidebarComponent('/components/sidebar-popular-categories.html');
-            loadSidebarComponent('/components/sidebar-newsletter.html');
+            // Load in order: Popular Categories → Categories → Newsletter
+            loadSidebarComponentsSequentially([
+                '/components/sidebar-popular-categories.html',
+                '/components/sidebar-categories.html',
+                '/components/sidebar-newsletter.html'
+            ]);
         } else if (currentPage === 'about') {
             loadSidebarComponent('/components/sidebar-contact.html');
         } else if (currentPage === 'blog-post') {
-            loadSidebarComponent('/components/sidebar-categories.html');
-            loadSidebarComponent('/components/sidebar-newsletter.html');
+            loadSidebarComponentsSequentially([
+                '/components/sidebar-categories.html',
+                '/components/sidebar-newsletter.html'
+            ]);
         } else if (currentPage === 'thanks') {
-            loadSidebarComponent('/components/sidebar-contact.html');
-            loadSidebarComponent('/components/sidebar-social.html');
+            loadSidebarComponentsSequentially([
+                '/components/sidebar-contact.html',
+                '/components/sidebar-social.html'
+            ]);
         } else if (currentPage === 'privacy' || currentPage === 'terms' || currentPage === 'disclaimer') {
             loadSidebarComponent('/components/sidebar-legal.html');
         }
@@ -39,9 +51,21 @@ function loadComponents() {
     }
 }
 
-// Helper to load sidebar components
+// Helper to load sidebar components sequentially
+function loadSidebarComponentsSequentially(filePaths) {
+    if (!filePaths || filePaths.length === 0) return Promise.resolve();
+    
+    // Load components one by one in sequence
+    return filePaths.reduce(function(promise, filePath) {
+        return promise.then(function() {
+            return loadSidebarComponent(filePath);
+        });
+    }, Promise.resolve());
+}
+
+// Helper to load sidebar components - returns a promise
 function loadSidebarComponent(filePath) {
-    fetch(filePath)
+    return fetch(filePath)
         .then(function(response) {
             if (response.ok) return response.text();
             return '';
@@ -49,7 +73,13 @@ function loadSidebarComponent(filePath) {
         .then(function(html) {
             if (html) {
                 var sidebarDiv = document.getElementById('sidebar-components');
-                if (sidebarDiv) sidebarDiv.insertAdjacentHTML('beforeend', html);
+                if (sidebarDiv) {
+                    sidebarDiv.insertAdjacentHTML('beforeend', html);
+                    // Dispatch event after sidebar component is loaded
+                    document.dispatchEvent(new CustomEvent('sidebarComponentLoaded', {
+                        detail: { filePath: filePath }
+                    }));
+                }
             }
         })
         .catch(function() {});

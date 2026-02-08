@@ -449,10 +449,25 @@ function updateCategoriesSidebar() {
     categoriesList.innerHTML = html;
 }
 
+// Retry counters for sidebar updates
+let popularCategoriesRetries = 0;
+let featuredSidebarRetries = 0;
+const MAX_RETRIES = 20; // Max 2 seconds (20 * 100ms)
+
 // Update popular categories with counts
 function updatePopularCategories() {
     const popularList = document.getElementById('popular-categories');
-    if (!popularList) return;
+    if (!popularList) {
+        // Retry after a short delay if element doesn't exist yet
+        if (popularCategoriesRetries < MAX_RETRIES) {
+            popularCategoriesRetries++;
+            setTimeout(updatePopularCategories, 100);
+        }
+        return;
+    }
+    
+    // Reset retry counter
+    popularCategoriesRetries = 0;
     
     // Only show categories with 5 or more posts (truly popular)
     const MIN_POSTS_THRESHOLD = 5;
@@ -471,7 +486,17 @@ function updatePopularCategories() {
 // Update featured blogs sidebar
 function updateFeaturedSidebar() {
     const featuredList = document.getElementById('featured-blogs-list');
-    if (!featuredList) return;
+    if (!featuredList) {
+        // Retry after a short delay if element doesn't exist yet
+        if (featuredSidebarRetries < MAX_RETRIES) {
+            featuredSidebarRetries++;
+            setTimeout(updateFeaturedSidebar, 100);
+        }
+        return;
+    }
+    
+    // Reset retry counter
+    featuredSidebarRetries = 0;
     
     const featured = getFeaturedPosts(3); // Get top 3 featured posts
     
@@ -1024,3 +1049,27 @@ function updatePaginationControlsFiltered(page, totalPages) {
         }
     });
 }
+
+// Listen for sidebar component loaded events to populate them
+document.addEventListener('sidebarComponentLoaded', function(e) {
+    if (!dataLoaded) return;
+    
+    const filePath = e.detail.filePath;
+    
+    // Populate featured sidebar when it loads
+    if (filePath.includes('sidebar-featured.html')) {
+        featuredSidebarRetries = 0; // Reset counter
+        updateFeaturedSidebar();
+    }
+    
+    // Populate popular categories when it loads
+    if (filePath.includes('sidebar-popular-categories.html')) {
+        popularCategoriesRetries = 0; // Reset counter
+        updatePopularCategories();
+    }
+    
+    // Populate categories sidebar when it loads
+    if (filePath.includes('sidebar-categories.html')) {
+        updateCategoriesSidebar();
+    }
+});
