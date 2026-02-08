@@ -46,10 +46,9 @@ function initContactModal() {
             try {
                 const formData = new FormData(form);
                 const action = form.action;
-                const method = (form.method || 'POST').toUpperCase();
 
                 const response = await fetch(action, {
-                    method: method,
+                    method: 'POST',
                     body: formData
                 });
 
@@ -57,8 +56,7 @@ function initContactModal() {
                     throw new Error('Form submission failed with status ' + response.status);
                 }
 
-                // On successful submission, show feedback, close modal, reset form, and redirect
-                alert('Thank you for your message! We\'ll get back to you soon.');
+                // On successful submission, close modal, reset form, and redirect to thank you page
                 closeModal();
                 form.reset();
                 window.location.href = '/pages/thanks/';
