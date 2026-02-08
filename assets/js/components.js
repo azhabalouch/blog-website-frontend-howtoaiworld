@@ -135,7 +135,11 @@ function createElementFromHTML(htmlString) {
     return fragment;
 }
 
-// Helper function to normalize pathnames for consistent comparison
+/**
+ * Normalize a pathname for consistent comparison by removing trailing slashes and index.html
+ * @param {string} pathname - The pathname to normalize
+ * @returns {string} The normalized pathname, or '/' for the root path
+ */
 function normalizePathname(pathname) {
     return pathname.replace(/\/index\.html$/, '').replace(/\/$/, '') || '/';
 }
