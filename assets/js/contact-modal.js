@@ -8,17 +8,83 @@ function initContactModal() {
 
     if (!modal || !openBtn) return;
 
+    let lastFocusedElement = null;
+
     function openModal(e) {
         e.preventDefault();
+        
+        // Store the element that opened the modal
+        lastFocusedElement = document.activeElement;
+        
         modal.classList.add('active');
         modal.setAttribute('aria-hidden', 'false');
+        modal.setAttribute('aria-modal', 'true');
         document.body.style.overflow = 'hidden';
+        
+        // Focus the first input field after modal opens
+        const firstInput = modal.querySelector('input[type="text"], input[type="email"], textarea');
+        if (firstInput) {
+            // Small delay to ensure modal animation completes and element is visible
+            const MODAL_FOCUS_DELAY = 100;
+            setTimeout(() => firstInput.focus(), MODAL_FOCUS_DELAY);
+        }
+        
+        // Add focus trap
+        setupFocusTrap();
     }
 
     function closeModal() {
         modal.classList.remove('active');
         modal.setAttribute('aria-hidden', 'true');
+        modal.removeAttribute('aria-modal');
         document.body.style.overflow = '';
+        
+        // Remove focus trap
+        removeFocusTrap();
+        
+        // Restore focus to the element that opened the modal
+        if (lastFocusedElement) {
+            lastFocusedElement.focus();
+        }
+    }
+    
+    // Focus trap implementation
+    let focusTrapHandler = null;
+    
+    function setupFocusTrap() {
+        focusTrapHandler = function(e) {
+            if (e.key === 'Tab' && modal.classList.contains('active')) {
+                const focusableElements = modal.querySelectorAll(
+                    'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex="0"]'
+                );
+                const focusableArray = Array.from(focusableElements);
+                const firstFocusable = focusableArray[0];
+                const lastFocusable = focusableArray[focusableArray.length - 1];
+                
+                if (e.shiftKey) {
+                    // Shift + Tab
+                    if (document.activeElement === firstFocusable) {
+                        e.preventDefault();
+                        lastFocusable.focus();
+                    }
+                } else {
+                    // Tab
+                    if (document.activeElement === lastFocusable) {
+                        e.preventDefault();
+                        firstFocusable.focus();
+                    }
+                }
+            }
+        };
+        
+        document.addEventListener('keydown', focusTrapHandler);
+    }
+    
+    function removeFocusTrap() {
+        if (focusTrapHandler) {
+            document.removeEventListener('keydown', focusTrapHandler);
+            focusTrapHandler = null;
+        }
     }
 
     openBtn.addEventListener('click', openModal);
