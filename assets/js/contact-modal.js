@@ -52,6 +52,11 @@ function initContactModal() {
     let focusTrapHandler = null;
     
     function setupFocusTrap() {
+        // Guard: only add listener if not already installed
+        if (focusTrapHandler) {
+            return;
+        }
+        
         focusTrapHandler = function(e) {
             if (e.key === 'Tab' && modal.classList.contains('active')) {
                 const focusableElements = modal.querySelectorAll(
