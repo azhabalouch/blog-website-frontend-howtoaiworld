@@ -1,9 +1,10 @@
 User-agent: *
 Allow: /
-Disallow: /components/
-Disallow: /blog-post/
 Disallow: /admin/
 Disallow: /login/
+
+User-agent: Mediapartners-Google
+Allow: /
 
 Crawl-delay: 1
 

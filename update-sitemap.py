@@ -76,7 +76,8 @@ def parse_post_date(date_text):
             except ValueError:
                 return today
 
-    for fmt in ('%Y-%m-%d', '%Y/%m/%d', '%B %d, %Y', '%b %d, %Y'):
+    for fmt in ('%Y-%m-%d', '%Y/%m/%d', '%m/%d/%Y', '%m-%d-%Y', '%B %d, %Y',
+                '%b %d, %Y'):
         try:
             return datetime.strptime(date_value, fmt).strftime('%Y-%m-%d')
         except ValueError:
@@ -101,17 +102,28 @@ def fetch_blog_posts():
 
 
 def remove_dynamic_blog_entries(root, namespace):
-    """Remove previously generated dynamic blog slug URLs."""
-    dynamic_prefix = f'{BASE_URL}/blog-post.html?title='
+    """Remove previously generated dynamic post URLs."""
+    dynamic_prefix = f'{BASE_URL}/posts/'
+    legacy_prefix = f'{BASE_URL}/blog-post.html?title='
     for url_node in list(root.findall('ns:url', namespace)):
         loc_node = url_node.find('ns:loc', namespace)
-        if loc_node is not None and (loc_node.text
-                                     or '').startswith(dynamic_prefix):
+        loc_text = (loc_node.text or '') if loc_node is not None else ''
+        if loc_text.startswith(dynamic_prefix) or loc_text.startswith(
+                legacy_prefix):
+            root.remove(url_node)
+
+
+def remove_legacy_template_entry(root, namespace):
+    """Remove legacy blog-post.html template URL from sitemap."""
+    legacy_template = f'{BASE_URL}/blog-post.html'
+    for url_node in list(root.findall('ns:url', namespace)):
+        loc_node = url_node.find('ns:loc', namespace)
+        if loc_node is not None and (loc_node.text or '') == legacy_template:
             root.remove(url_node)
 
 
 def add_dynamic_blog_entries(root, namespace):
-    """Add one sitemap entry per post using title slug URL format."""
+    """Add one sitemap entry per post using static /posts/<slug>.html URLs."""
     posts = fetch_blog_posts()
     if not posts:
         return 0
@@ -123,7 +135,7 @@ def add_dynamic_blog_entries(root, namespace):
         if not slug:
             continue
 
-        post_url = f'{BASE_URL}/blog-post.html?title={slug}'
+        post_url = f'{BASE_URL}/posts/{slug}.html'
         lastmod = parse_post_date(
             post.get('date') if isinstance(post, dict) else None)
 
@@ -175,44 +187,47 @@ def update_sitemap(changed_files):
     # Filter for HTML files only
     html_files = [f for f in changed_files if f.endswith('.html')]
 
-    if not html_files:
-        print("No HTML files were changed. Sitemap not updated.")
-        return False
-
-    print(f"Changed HTML files: {', '.join(html_files)}")
+    if html_files:
+        print(f"Changed HTML files: {', '.join(html_files)}")
+    else:
+        print("No HTML files were changed. Refreshing dynamic post URLs only.")
 
     updated_count = 0
 
     # Update lastmod for each changed file
-    for url in root.findall('ns:url', namespace):
-        loc = url.find('ns:loc', namespace)
-        lastmod = url.find('ns:lastmod', namespace)
+    if html_files:
+        for url in root.findall('ns:url', namespace):
+            loc = url.find('ns:loc', namespace)
+            lastmod = url.find('ns:lastmod', namespace)
 
-        if loc is not None and lastmod is not None:
-            url_path = loc.text.replace('https://howtoaiworld.com/', '')
+            if loc is not None and lastmod is not None:
+                url_path = loc.text.replace('https://howtoaiworld.com/', '')
 
-            # Check if this URL matches any changed file
-            for changed_file in html_files:
-                # Extract filename without path and extension
-                file_name = changed_file.replace('pages/', '').replace(
-                    'legal/', '').replace('.html', '')
+                # Check if this URL matches any changed file
+                for changed_file in html_files:
+                    # Extract filename without path and extension
+                    file_name = changed_file.replace('pages/', '').replace(
+                        'legal/', '').replace('.html', '')
 
-                # Handle index page (root /)
-                if (changed_file == 'index.html' and url_path == ''):
-                    old_date = lastmod.text
-                    lastmod.text = today
-                    updated_count += 1
-                    print(f"✓ Updated {url_path or '/'}: {old_date} → {today}")
-                    break
-                # Handle pages in folders
-                elif url_path.endswith(file_name):
-                    old_date = lastmod.text
-                    lastmod.text = today
-                    updated_count += 1
-                    print(f"✓ Updated {url_path}: {old_date} → {today}")
-                    break
+                    # Handle index page (root /)
+                    if (changed_file == 'index.html' and url_path == ''):
+                        old_date = lastmod.text
+                        lastmod.text = today
+                        updated_count += 1
+                        print(
+                            f"✓ Updated {url_path or '/'}: {old_date} → {today}"
+                        )
+                        break
+                    # Handle pages in folders
+                    elif url_path.endswith(file_name):
+                        old_date = lastmod.text
+                        lastmod.text = today
+                        updated_count += 1
+                        print(f"✓ Updated {url_path}: {old_date} → {today}")
+                        break
 
     remove_dynamic_blog_entries(root, namespace)
+    remove_legacy_template_entry(root, namespace)
     dynamic_added_count = add_dynamic_blog_entries(root, namespace)
 
     if updated_count > 0 or dynamic_added_count > 0:
@@ -225,7 +240,7 @@ def update_sitemap(changed_files):
         print(f"✅ Added {dynamic_added_count} dynamic blog entries")
         return True
     else:
-        print("\n⚠️  No matching URLs found in sitemap for changed files")
+        print("\n⚠️  No changes were required in sitemap.xml")
         return False
 
 

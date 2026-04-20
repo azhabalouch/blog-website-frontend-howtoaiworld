@@ -70,9 +70,50 @@ function buildComponentPath(fileName) {
     return SITE_BASE_PATH + 'components/' + fileName;
 }
 
+function normalizeRelativeUrl(url) {
+    if (!url) return url;
+
+    const trimmed = url.trim();
+    if (!trimmed) return trimmed;
+
+    if (
+        trimmed.startsWith('#') ||
+        trimmed.startsWith('/') ||
+        trimmed.startsWith('//') ||
+        trimmed.startsWith('mailto:') ||
+        trimmed.startsWith('tel:') ||
+        trimmed.startsWith('javascript:') ||
+        trimmed.startsWith('data:') ||
+        /^[a-z][a-z0-9+.-]*:/i.test(trimmed)
+    ) {
+        return trimmed;
+    }
+
+    if (SITE_BASE_PATH && trimmed.startsWith(SITE_BASE_PATH)) {
+        return trimmed;
+    }
+
+    return SITE_BASE_PATH + trimmed;
+}
+
+function normalizeElementPaths(rootNode) {
+    if (!rootNode || !rootNode.querySelectorAll) return;
+
+    rootNode.querySelectorAll('[href], [src], [action]').forEach((el) => {
+        ['href', 'src', 'action'].forEach((attr) => {
+            if (!el.hasAttribute(attr)) return;
+            const current = el.getAttribute(attr);
+            el.setAttribute(attr, normalizeRelativeUrl(current));
+        });
+    });
+}
+
 // Derive a stable page key from the current path regardless of folder layout or .html extension
 function getCurrentPageKey(pathname) {
     const normalizedPath = normalizePathname(pathname).replace(/^\/(pages|legal)\//, '');
+    if (normalizedPath.startsWith('/posts/')) {
+        return 'blog-post';
+    }
     const lastSegment = normalizedPath.split('/').pop() || 'index';
 
     return lastSegment.replace(/\.html$/, '') || 'index';
@@ -101,7 +142,10 @@ function loadSidebarComponent(filePath) {
             if (html) {
                 var sidebarDiv = document.getElementById('sidebar-components');
                 if (sidebarDiv) {
-                    sidebarDiv.insertAdjacentHTML('beforeend', html);
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    normalizeElementPaths(temp);
+                    sidebarDiv.insertAdjacentHTML('beforeend', temp.innerHTML);
                     // Dispatch event after sidebar component is loaded
                     document.dispatchEvent(new CustomEvent('sidebarComponentLoaded', {
                         detail: { filePath: filePath }
@@ -136,6 +180,7 @@ function insertComponent(content, tagName, isHeader) {
     
     const element = createElementFromHTML(content);
     if (!element) return;
+    normalizeElementPaths(element);
     
     // Find and replace comment placeholder
     let inserted = false;

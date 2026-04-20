@@ -2,6 +2,7 @@
 // This script loads and displays blogs from remote JSON
 
 const BLOG_DATA_URL = 'https://azhabalouch.github.io/blogs-data-api/api.json';
+const BLOG_SITE_BASE_PATH = getBlogSiteBasePath();
 
 let cachedPosts = [];
 let dataLoaded = false;
@@ -18,6 +19,22 @@ let currentCategoryFilter = '';
 
 // Lazy loading state
 let intersectionObserver = null;
+
+function getBlogSiteBasePath() {
+    const script = document.querySelector('script[src*="assets/js/blog-loader.js"]');
+    if (!script) return '';
+
+    const src = script.getAttribute('src') || '';
+    const marker = 'assets/js/blog-loader.js';
+    const markerIndex = src.indexOf(marker);
+    if (markerIndex === -1) return '';
+
+    return src.slice(0, markerIndex);
+}
+
+function buildInternalUrl(path) {
+    return `${BLOG_SITE_BASE_PATH}${path}`;
+}
 
 // Trigger sidebar updates if elements exist
 function triggerSidebarUpdates() {
@@ -147,7 +164,7 @@ function getPostBySlug(slug) {
 
 // Build SEO-friendly article URL
 function buildPostUrl(post) {
-    return `blog-post.html?title=${encodeURIComponent(getPostSlug(post))}`;
+    return buildInternalUrl(`posts/${getPostSlug(post)}.html`);
 }
 
 // Parse date from various formats (handles "MM//DD//YYYY" format from API)
@@ -640,13 +657,13 @@ function updateCategoriesSidebar() {
     const categories = getCategoriesWithCounts();
     
     if (categories.length === 0) {
-        categoriesList.innerHTML = '<li><a href="index.html">All Posts</a></li>';
+        categoriesList.innerHTML = `<li><a href="${buildInternalUrl('index.html')}">All Posts</a></li>`;
         return;
     }
     
-    let html = '<li><a href="index.html">All Posts</a></li>';
+    let html = `<li><a href="${buildInternalUrl('index.html')}">All Posts</a></li>`;
     categories.forEach(cat => {
-        html += `<li><a href="index.html?category=${encodeURIComponent(cat.name)}">${escapeHtml(cat.name)} (${cat.count})</a></li>`;
+        html += `<li><a href="${buildInternalUrl(`index.html?category=${encodeURIComponent(cat.name)}`)}">${escapeHtml(cat.name)} (${cat.count})</a></li>`;
     });
     
     categoriesList.innerHTML = html;
@@ -668,7 +685,7 @@ function updatePopularCategories() {
         return;
     }
     
-    popularList.innerHTML = categories.map(cat => `<li class="category-item"><a href="index.html?category=${encodeURIComponent(cat.name)}" class="category-link"><span>${escapeHtml(cat.name)}</span><span class="count">${cat.count}</span></a></li>`).join('');
+    popularList.innerHTML = categories.map(cat => `<li class="category-item"><a href="${buildInternalUrl(`index.html?category=${encodeURIComponent(cat.name)}`)}" class="category-link"><span>${escapeHtml(cat.name)}</span><span class="count">${cat.count}</span></a></li>`).join('');
 }
 
 // Update featured blogs sidebar
@@ -728,7 +745,7 @@ function loadCategoryPage(category) {
     const posts = getPostsByCategory(category);
     
     let html = `<h2 class="section-title">📂 ${escapeHtml(category)} (${posts.length} posts)</h2>`;
-    html += `<p class="back-link"><a href="index.html">← Back to all posts</a></p>`;
+    html += `<p class="back-link"><a href="${buildInternalUrl('index.html')}">← Back to all posts</a></p>`;
     
     if (posts.length === 0) {
         html += '<p>No posts found in this category.</p>';
@@ -746,6 +763,9 @@ function loadCategoryPage(category) {
 // Detect current page from URL path
 function detectCurrentPage() {
     const pathname = window.location.pathname;
+    if (pathname.includes('/posts/')) {
+        return 'post';
+    }
     const lastSegment = pathname.split('/').pop() || '';
 
     // Handle both root and GitHub Pages subpath roots
@@ -765,7 +785,7 @@ async function loadBlogPost() {
         let post = null;
         
         if (!postSlug && !postId) {
-            window.location.href = 'index.html';
+            window.location.href = buildInternalUrl('index.html');
             return;
         }
         
@@ -777,7 +797,7 @@ async function loadBlogPost() {
                     <div style="text-align: center; padding: 60px 20px;">
                         <h2 style="font-size: 32px; margin-bottom: 20px;">Error Loading Post</h2>
                         <p style="font-size: 18px; color: #666; margin-bottom: 30px;">Unable to load blog data. Please try again later.</p>
-                        <a href="index.html" style="display: inline-block; padding: 15px 30px; background-color: #2c2c2c; color: #fff; text-decoration: none; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Go to Homepage</a>
+                        <a href="${buildInternalUrl('index.html')}" style="display: inline-block; padding: 15px 30px; background-color: #2c2c2c; color: #fff; text-decoration: none; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Go to Homepage</a>
                     </div>
                 `;
                 return;
@@ -797,18 +817,16 @@ async function loadBlogPost() {
                 <div style="text-align: center; padding: 60px 20px;">
                     <h2 style="font-size: 32px; margin-bottom: 20px;">Post Not Found</h2>
                     <p style="font-size: 18px; color: #666; margin-bottom: 30px;">Sorry, the article you're looking for doesn't exist.</p>
-                    <a href="index.html" style="display: inline-block; padding: 15px 30px; background-color: #2c2c2c; color: #fff; text-decoration: none; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Go to Homepage</a>
+                    <a href="${buildInternalUrl('index.html')}" style="display: inline-block; padding: 15px 30px; background-color: #2c2c2c; color: #fff; text-decoration: none; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Go to Homepage</a>
                 </div>
             `;
             return;
         }
 
-        // Keep legacy id links functional while consolidating to one canonical URL.
+        // Legacy query URL support: redirect to the static post URL.
         const canonicalPath = buildPostUrl(post);
-        const currentPath = `blog-post.html${window.location.search || ''}`;
-        if (currentPath !== canonicalPath) {
-            window.history.replaceState({}, '', canonicalPath);
-        }
+        window.location.replace(canonicalPath);
+        return;
         
         // Update page-level SEO metadata and structured data.
         updatePostSeo(post);
@@ -829,13 +847,13 @@ async function loadBlogPost() {
                 <span class="separator">|</span>
                 <time datetime="${formatDateTime(post.date)}">${formatDate(post.date)}</time>
                 <span class="separator">|</span>
-                <a href="index.html?category=${encodeURIComponent(post.category)}" style="color: #c41e3a; text-decoration: none; font-weight: bold;">${escapeHtml(post.category)}</a>
+                <a href="${buildInternalUrl(`index.html?category=${encodeURIComponent(post.category)}`)}" style="color: #c41e3a; text-decoration: none; font-weight: bold;">${escapeHtml(post.category)}</a>
             </div>
             ${featuredImageHtml}
             <div class="article-content">
             </div>
             <div style="margin-top: 40px; padding-top: 30px; border-top: 2px solid #ddd;">
-                <a href="index.html" class="back-to-posts-link">← Back to All Posts</a>
+                <a href="${buildInternalUrl('index.html')}" class="back-to-posts-link">← Back to All Posts</a>
             </div>
         `;
         
@@ -928,7 +946,7 @@ async function loadBlogPost() {
             <div style="text-align: center; padding: 60px 20px;">
                 <h2 style="font-size: 32px; margin-bottom: 20px;">Error</h2>
                 <p style="font-size: 18px; color: #666; margin-bottom: 30px;">An error occurred while loading the post.</p>
-                <a href="index.html" style="display: inline-block; padding: 15px 30px; background-color: #2c2c2c; color: #fff; text-decoration: none; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Go to Homepage</a>
+                <a href="${buildInternalUrl('index.html')}" style="display: inline-block; padding: 15px 30px; background-color: #2c2c2c; color: #fff; text-decoration: none; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Go to Homepage</a>
             </div>
         `;
     }
@@ -956,6 +974,10 @@ document.addEventListener('DOMContentLoaded', async function() {
     } else if (page === 'blog-post') {
         // Load individual blog post
         await loadBlogPost();
+    } else if (page === 'post') {
+        // Static post pages already contain article HTML.
+        // Data fetch above is only used to hydrate sidebar widgets.
+        return;
     }
 });
 
