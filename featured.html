@@ -32,31 +32,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="64x64" href="../../assets/images/icons8-favicon-64.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="../../assets/images/icons8-favicon-96.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="../../assets/images/icons8-favicon-64.png">
-    <link rel="shortcut icon" href="../../assets/images/icons8-favicon-64.png">
-    <meta name="description" content="Read the full article on Howtoaiworld - Expert insights on AI, technology, and innovation.">
-    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
-    <meta name="author" content="Howtoaiworld">
-    <meta property="og:site_name" content="Howtoaiworld">
-    <meta property="og:type" content="article">
-    <meta name="twitter:card" content="summary_large_image">
-    <title id="page-title">Blog Post - Howtoaiworld</title>
+    <link rel="icon" type="image/png" sizes="64x64" href="./assets/images/icons8-favicon-64.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="./assets/images/icons8-favicon-96.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./assets/images/icons8-favicon-64.png">
+    <link rel="shortcut icon" href="./assets/images/icons8-favicon-64.png">
+    <meta name="description" content="Discover our featured articles - our hand-picked selection of the best content on Howtoaiworld.">
+    <meta name="robots" content="index, follow">
+    <title>Featured Articles - Howtoaiworld</title>
     <link rel="stylesheet" href="/assets/css/styles.css">
-    <link rel="canonical" href="https://howtoaiworld.com/pages/blog-post/">
-    <link rel="preconnect" href="https://azhabalouch.github.io">
-    <link rel="dns-prefetch" href="https://azhabalouch.github.io">
-    <script>
-        (function () {
-            var canonicalLink = document.querySelector('link[rel="canonical"]');
-            if (canonicalLink) {
-                var url = window.location.origin + window.location.pathname + window.location.search;
-                canonicalLink.setAttribute('href', url);
-            }
-        })();
-    </script>
-
+    <link rel="canonical" href="https://howtoaiworld.com/featured.html">
 
 </head>
 <body>
@@ -67,19 +51,25 @@
      
     <!-- Header will be loaded dynamically -->
 
-    <main class="main-content" id="main-content" role="main" aria-label="Main content">
+    <main class="main-content">
         <div class="container">
             <div class="content-grid">
-                <section class="main-articles" id="blog-post-container">
-                    <!-- Blog post will be loaded here -->
-                    <div style="text-align: center; padding: 60px 20px;">
-                        <p style="font-size: 18px; color: #666;">Loading article...</p>
-                    </div>
+                <!-- Main Articles Section -->
+                <section class="main-articles" aria-label="Featured Articles">
+                    <!-- Dynamic featured content will be loaded here by blog-loader.js -->
                 </section>
 
-                <aside class="sidebar">
+                <!-- Sidebar -->
+                <aside class="sidebar" role="complementary">
                     <div id="sidebar-components"></div>
                 </aside>
+            </div>
+            
+            <!-- Pagination Controls (hidden for featured page) -->
+            <div id="pagination-controls" class="pagination-controls" style="display: none;">
+                <button id="prev-page" class="pagination-btn" aria-label="Previous page">← Previous</button>
+                <span id="page-info" class="page-info"></span>
+                <button id="next-page" class="pagination-btn" aria-label="Next page">Next →</button>
             </div>
         </div>
     </main>

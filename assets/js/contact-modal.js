@@ -138,7 +138,7 @@ function initContactModal() {
                     closeModal();
                     form.reset();
                     // Redirect to thank you page on success
-                    window.location.href = '/pages/thanks/';
+                    window.location.href = '/thanks.html';
                 } else {
                     alert("Error: " + (data.message || "Failed to send message"));
                 }

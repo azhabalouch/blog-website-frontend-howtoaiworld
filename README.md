@@ -104,25 +104,17 @@ blog-website-frontend-howtoaiworld/
 │   ├── sidebar-popular-categories.html # Popular category chips
 │   └── sidebar-social.html             # Social media links
 │
-├── pages/                      # Website pages
-│   ├── about/
-│   │   └── index.html         # About page (SEO-friendly URL)
-│   ├── blog-post/
-│   │   └── index.html         # Individual blog post template
-│   ├── contact/
-│   │   └── index.html         # Contact page (SEO-friendly URL)
-│   ├── featured/
-│   │   └── index.html         # Featured articles page
-│   └── thanks/
-│       └── index.html         # Thank you page after form submission
+|   # Website pages
+├── about.html         # About page (SEO-friendly URL)
+├── blog-post.html     # Individual blog post template
+├── contact.html       # Contact page (SEO-friendly URL)
+├── featured.html      # Featured articles page
+├── thanks.html        # Thank you page after form submission
 │
-└── legal/                      # Legal documentation pages
-    ├── disclaimer/
-    │   └── index.html        # Disclaimer (SEO-friendly URL)
-    ├── privacy/
-    │   └── index.html        # Privacy policy (SEO-friendly URL)
-    └── terms/
-        └── index.html        # Terms (SEO-friendly URL)
+|   # Legal documentation pages
+└── disclaimer.html        # Disclaimer (SEO-friendly URL)
+└── privacy.html        # Privacy policy (SEO-friendly URL)
+└── terms.html        # Terms (SEO-friendly URL)
 ```
 
 ---
@@ -306,7 +298,7 @@ Replace `data-cbid="402f2129-fdd2-44e0-b450-f6d922daebf4"` with your Cookiebot I
 **Purpose**: Custom error page shown when a URL is not found  
 **Features**: User-friendly message with navigation back to homepage
 
-#### `pages/blog-post/index.html`
+#### `blog-post.html`
 **Purpose**: Template for displaying individual blog articles  
 **Functionality**:
 - Reads URL parameters (`?id=slug`) to identify which post to load
@@ -480,7 +472,7 @@ Run this script whenever you modify HTML pages to keep sitemap dates accurate fo
 **Structure**:
 ```xml
 <url>
-    <loc>https://howtoaiworld.com/pages/about</loc>
+    <loc>https://howtoaiworld.com/about</loc>
     <lastmod>2026-02-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -574,15 +566,15 @@ A: This project prioritizes:
 A: You need to add the post to the remote JSON API file. The frontend automatically fetches and displays new posts without any code changes.
 
 **Q: Can I add more pages?**  
-A: Yes! Create a new HTML file in the `pages/` directory, and the component system will automatically load the header and footer. Just add your page to the sitemap and navigation menu.
+A: Yes! Create a new HTML file in the root directory, and the component system will automatically load the header and footer. Just add your page to the sitemap and navigation menu.
 
 **Q: How does the search work?**  
 A: Search is client-side. It filters the cached blog posts by matching your search term against the title, description, and content fields. Results update in real-time as you type.
 
 **Q: What URL structure does the site use?**  
 A: The site uses SEO-friendly directory-based URLs with `index.html` files:
-- `howtoaiworld.com/pages/about/` → `/pages/about/index.html`
-- `howtoaiworld.com/legal/privacy/` → `/legal/privacy/index.html`
+- `howtoaiworld.com/about.html` → `/about.htmlindex.html`
+- `howtoaiworld.com/privacy.html` → `/privacy.htmlindex.html`
 
 This provides cleaner URLs without file extensions.
 

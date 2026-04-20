@@ -7,9 +7,8 @@ function loadComponents() {
 
     // Load sidebar components if sidebar-components div exists
     if (document.getElementById('sidebar-components')) {
-        // Normalize pathname: remove trailing slashes and index.html, then get the last segment
-        let pathname = normalizePathname(window.location.pathname);
-        const currentPage = pathname.replace(/^\/(pages|legal)\//, '').split('/').pop() || 'index';
+        // Normalize pathname so both nested pages and top-level .html files map to the same page key
+        const currentPage = getCurrentPageKey(window.location.pathname);
         
         // Load specific components based on page - SEQUENTIALLY
         if (currentPage === 'index' || currentPage === '' || currentPage === '/') {
@@ -49,6 +48,14 @@ function loadComponents() {
         }
         // Add more conditions for other pages as needed
     }
+}
+
+// Derive a stable page key from the current path regardless of folder layout or .html extension
+function getCurrentPageKey(pathname) {
+    const normalizedPath = normalizePathname(pathname).replace(/^\/(pages|legal)\//, '');
+    const lastSegment = normalizedPath.split('/').pop() || 'index';
+
+    return lastSegment.replace(/\.html$/, '') || 'index';
 }
 
 // Helper to load sidebar components sequentially

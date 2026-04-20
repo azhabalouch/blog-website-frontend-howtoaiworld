@@ -21,7 +21,7 @@ form.addEventListener('submit', async (e) => {
         const data = await response.json();
 
         if (response.ok) {
-            window.location.href = "/pages/thanks";
+            window.location.href = "/thanks.html";
             form.reset();
         } else {
             alert("Error: " + data.message);

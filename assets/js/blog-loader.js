@@ -206,7 +206,7 @@ function createArticleHTML(post, isExcerpt = true) {
     
     return `
         <article class="blog-article" data-post-id="${post.id}">
-            <a href="/pages/blog-post/?id=${post.id}" class="article-card-link">
+            <a href="/blog-post.html?id=${post.id}" class="article-card-link">
                 <h3 class="article-title">${escapeHtml(post.title)}</h3>
                 <div class="article-meta">
                     <span class="author">By ${escapeHtml(post.author)}</span>
@@ -404,7 +404,7 @@ function loadFeaturedBlogsPage() {
             
             html += `
                 <article class="blog-article" data-post-id="${post.id}">
-                    <a href="/pages/blog-post/?id=${post.id}" class="article-card-link">
+                    <a href="/blog-post.html?id=${post.id}" class="article-card-link">
                         <h3 class="article-title">${escapeHtml(post.title)}</h3>
                         <div class="article-meta">
                             <span class="author">By ${escapeHtml(post.author)}</span>
@@ -501,7 +501,7 @@ function updateFeaturedSidebar() {
     
     featuredList.innerHTML = featured.map((post, index) => `
         <li class="featured-item">
-            <a href="/pages/blog-post/?id=${post.id}" class="featured-link">
+            <a href="/blog-post.html?id=${post.id}" class="featured-link">
                 <span class="featured-number">${index + 1}</span>
                 <div class="featured-content">
                     <h4 class="featured-title">${escapeHtml(post.title)}</h4>

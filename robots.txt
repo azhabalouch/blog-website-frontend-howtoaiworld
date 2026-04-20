@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /components/
-Disallow: /pages/blog-post
+Disallow: /blog-post/
 Disallow: /admin/
 Disallow: /login/
 
