@@ -516,8 +516,7 @@ Run this script whenever you modify HTML pages to keep sitemap dates accurate fo
 10. **Fast Load Times**: Optimized images and minimal JavaScript
 
 ### Performance Optimizations
-
-1. **Session Caching**: Reduces API calls by caching for 5 minutes
+1. **Vanilla JavaScript**: No framework overhead, smaller bundle size
 2. **Lazy Loading**: Images load only when needed (near viewport)
 3. **Pagination**: Loads 7 posts at a time instead of all posts
 4. **Minification Ready**: Code can be minified for production
