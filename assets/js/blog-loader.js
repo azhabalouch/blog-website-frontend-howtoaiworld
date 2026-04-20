@@ -120,6 +120,36 @@ function getPostById(id) {
     return cachedPosts.find(post => post.id == id) || null;
 }
 
+// Create SEO-friendly slug from a post title
+function slugifyTitle(title) {
+    if (!title) return '';
+    return String(title)
+        .toLowerCase()
+        .normalize('NFKD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9\s-]/g, '')
+        .trim()
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
+}
+
+// Get stable post slug based on title or predefined slug field
+function getPostSlug(post) {
+    if (!post) return '';
+    return slugifyTitle(post.slug || post.title || String(post.id || ''));
+}
+
+// Get post by title slug
+function getPostBySlug(slug) {
+    if (!slug || cachedPosts.length === 0) return null;
+    return cachedPosts.find(post => getPostSlug(post) === slug) || null;
+}
+
+// Build SEO-friendly article URL
+function buildPostUrl(post) {
+    return `blog-post.html?title=${encodeURIComponent(getPostSlug(post))}`;
+}
+
 // Parse date from various formats (handles "MM//DD//YYYY" format from API)
 function parseDate(dateString) {
     if (dateString instanceof Date) return dateString;
@@ -173,6 +203,175 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// Remove HTML markup for metadata snippets
+function stripHtmlTags(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.innerHTML = text;
+    return (div.textContent || div.innerText || '').trim();
+}
+
+// Build concise meta description from excerpt/content
+function getSeoDescription(post, maxLength = 155) {
+    const sourceText = stripHtmlTags(post.excerpt || post.content || 'Read this article on Howtoaiworld.');
+    if (sourceText.length <= maxLength) return sourceText;
+    return `${sourceText.slice(0, maxLength - 1).trim()}...`;
+}
+
+function upsertMetaTag({ selector, attributes }) {
+    let tag = document.querySelector(selector);
+    if (!tag) {
+        tag = document.createElement('meta');
+        document.head.appendChild(tag);
+    }
+
+    Object.keys(attributes).forEach((key) => {
+        tag.setAttribute(key, attributes[key]);
+    });
+}
+
+function setCanonicalUrl(url) {
+    let canonicalTag = document.querySelector('link[rel="canonical"]');
+    if (!canonicalTag) {
+        canonicalTag = document.createElement('link');
+        canonicalTag.setAttribute('rel', 'canonical');
+        document.head.appendChild(canonicalTag);
+    }
+    canonicalTag.setAttribute('href', url);
+}
+
+function setStructuredData(scriptId, payload) {
+    let schemaTag = document.getElementById(scriptId);
+    if (!schemaTag) {
+        schemaTag = document.createElement('script');
+        schemaTag.type = 'application/ld+json';
+        schemaTag.id = scriptId;
+        document.head.appendChild(schemaTag);
+    }
+    schemaTag.textContent = JSON.stringify(payload);
+}
+
+function updatePostSeo(post) {
+    if (!post) return;
+
+    const siteOrigin = 'https://howtoaiworld.com';
+    const postUrl = `${siteOrigin}/${buildPostUrl(post)}`;
+    const imageUrl = post.featured_image || `${siteOrigin}/og-image.jpg`;
+    const seoDescription = getSeoDescription(post);
+    const publishedDate = formatDateTime(post.parsedDate || post.date);
+    const postTitle = `${post.title} | Howtoaiworld`;
+
+    document.title = postTitle;
+
+    upsertMetaTag({
+        selector: 'meta[name="description"]',
+        attributes: { name: 'description', content: seoDescription }
+    });
+
+    upsertMetaTag({
+        selector: 'meta[name="robots"]',
+        attributes: { name: 'robots', content: 'index, follow, max-snippet:-1, max-image-preview:large' }
+    });
+
+    upsertMetaTag({
+        selector: 'meta[property="og:type"]',
+        attributes: { property: 'og:type', content: 'article' }
+    });
+    upsertMetaTag({
+        selector: 'meta[property="og:title"]',
+        attributes: { property: 'og:title', content: postTitle }
+    });
+    upsertMetaTag({
+        selector: 'meta[property="og:description"]',
+        attributes: { property: 'og:description', content: seoDescription }
+    });
+    upsertMetaTag({
+        selector: 'meta[property="og:url"]',
+        attributes: { property: 'og:url', content: postUrl }
+    });
+    upsertMetaTag({
+        selector: 'meta[property="og:image"]',
+        attributes: { property: 'og:image', content: imageUrl }
+    });
+
+    upsertMetaTag({
+        selector: 'meta[name="twitter:card"]',
+        attributes: { name: 'twitter:card', content: 'summary_large_image' }
+    });
+    upsertMetaTag({
+        selector: 'meta[name="twitter:title"]',
+        attributes: { name: 'twitter:title', content: postTitle }
+    });
+    upsertMetaTag({
+        selector: 'meta[name="twitter:description"]',
+        attributes: { name: 'twitter:description', content: seoDescription }
+    });
+    upsertMetaTag({
+        selector: 'meta[name="twitter:image"]',
+        attributes: { name: 'twitter:image', content: imageUrl }
+    });
+
+    upsertMetaTag({
+        selector: 'meta[property="article:published_time"]',
+        attributes: { property: 'article:published_time', content: publishedDate }
+    });
+
+    setCanonicalUrl(postUrl);
+
+    const articleSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'BlogPosting',
+        headline: post.title,
+        description: seoDescription,
+        image: [imageUrl],
+        datePublished: publishedDate,
+        dateModified: publishedDate,
+        author: {
+            '@type': 'Person',
+            name: post.author || 'Howtoaiworld Editorial Team'
+        },
+        publisher: {
+            '@type': 'Organization',
+            name: 'Howtoaiworld',
+            logo: {
+                '@type': 'ImageObject',
+                url: `${siteOrigin}/assets/images/icons8-favicon-96.png`
+            }
+        },
+        mainEntityOfPage: {
+            '@type': 'WebPage',
+            '@id': postUrl
+        }
+    };
+
+    setStructuredData('post-structured-data', articleSchema);
+
+    const faqItems = post.faq || post.FAQ;
+    if (faqItems && Array.isArray(faqItems) && faqItems.length > 0) {
+        const faqSchema = {
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: faqItems
+                .filter(item => item && item.question && item.answer)
+                .map(item => ({
+                    '@type': 'Question',
+                    name: stripHtmlTags(item.question),
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: stripHtmlTags(item.answer)
+                    }
+                }))
+        };
+
+        setStructuredData('post-faq-structured-data', faqSchema);
+    } else {
+        const faqSchemaTag = document.getElementById('post-faq-structured-data');
+        if (faqSchemaTag) {
+            faqSchemaTag.remove();
+        }
+    }
+}
+
 // Create blog article HTML with lazy loading for images
 function createArticleHTML(post, isExcerpt = true) {
     if (!post || !post.id) return '';
@@ -191,7 +390,7 @@ function createArticleHTML(post, isExcerpt = true) {
     
     return `
         <article class="blog-article" data-post-id="${post.id}">
-            <a href="blog-post.html?id=${post.id}" class="article-card-link">
+            <a href="${buildPostUrl(post)}" class="article-card-link">
                 <h3 class="article-title">${escapeHtml(post.title)}</h3>
                 <div class="article-meta">
                     <span class="author">By ${escapeHtml(post.author)}</span>
@@ -389,7 +588,7 @@ function loadFeaturedBlogsPage() {
             
             html += `
                 <article class="blog-article" data-post-id="${post.id}">
-                    <a href="blog-post.html?id=${post.id}" class="article-card-link">
+                    <a href="${buildPostUrl(post)}" class="article-card-link">
                         <h3 class="article-title">${escapeHtml(post.title)}</h3>
                         <div class="article-meta">
                             <span class="author">By ${escapeHtml(post.author)}</span>
@@ -486,7 +685,7 @@ function updateFeaturedSidebar() {
     
     featuredList.innerHTML = featured.map((post, index) => `
         <li class="featured-item">
-            <a href="blog-post.html?id=${post.id}" class="featured-link">
+            <a href="${buildPostUrl(post)}" class="featured-link">
                 <span class="featured-number">${index + 1}</span>
                 <div class="featured-content">
                     <h4 class="featured-title">${escapeHtml(post.title)}</h4>
@@ -561,9 +760,11 @@ function detectCurrentPage() {
 async function loadBlogPost() {
     try {
         const urlParams = new URLSearchParams(window.location.search);
+        const postSlug = slugifyTitle(urlParams.get('title') || urlParams.get('slug'));
         const postId = urlParams.get('id');
+        let post = null;
         
-        if (!postId) {
+        if (!postSlug && !postId) {
             window.location.href = 'index.html';
             return;
         }
@@ -583,7 +784,13 @@ async function loadBlogPost() {
             }
         }
         
-        const post = getPostById(postId);
+        if (postSlug) {
+            post = getPostBySlug(postSlug);
+        }
+
+        if (!post && postId) {
+            post = getPostById(postId);
+        }
         
         if (!post) {
             document.getElementById('blog-post-container').innerHTML = `
@@ -595,10 +802,16 @@ async function loadBlogPost() {
             `;
             return;
         }
+
+        // Keep legacy id links functional while consolidating to one canonical URL.
+        const canonicalPath = buildPostUrl(post);
+        const currentPath = `blog-post.html${window.location.search || ''}`;
+        if (currentPath !== canonicalPath) {
+            window.history.replaceState({}, '', canonicalPath);
+        }
         
-        // Update page title and meta
-        document.getElementById('page-title').textContent = `${post.title} - Howtoaiworld`;
-        document.querySelector('meta[name="description"]').setAttribute('content', post.excerpt);
+        // Update page-level SEO metadata and structured data.
+        updatePostSeo(post);
         
         // Create article container
         const article = document.createElement('article');
