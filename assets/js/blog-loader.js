@@ -36,40 +36,34 @@ function triggerSidebarUpdates() {
     });
 }
 
+function applyBlogData(data) {
+    // Handle both array format and object with blogs property
+    if (Array.isArray(data)) {
+        cachedPosts = data;
+    } else if (data && data.blogs && Array.isArray(data.blogs)) {
+        cachedPosts = data.blogs;
+    } else {
+        cachedPosts = [];
+    }
+
+    // Pre-parse and cache dates for better performance
+    postsWithParsedDates = cachedPosts.map(post => ({
+        ...post,
+        parsedDate: parseDate(post.date)
+    }));
+
+    dataLoaded = true;
+    initializeLazyLoading();
+    triggerSidebarUpdates();
+}
+
 // Fetch blog data from remote URL with caching
 async function fetchBlogData() {
+    // Keep cache only as fallback; always try network first so new items appear immediately
+    const cachedData = sessionStorage.getItem('blogData');
+
     try {
-        // Check if data is cached in sessionStorage
-        const cachedData = sessionStorage.getItem('blogData');
-        const cacheTime = sessionStorage.getItem('blogDataTime');
-        const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-        
-        if (cachedData && cacheTime) {
-            const age = Date.now() - parseInt(cacheTime);
-            if (age < CACHE_DURATION) {
-                const data = JSON.parse(cachedData);
-                if (Array.isArray(data)) {
-                    cachedPosts = data;
-                } else if (data.blogs && Array.isArray(data.blogs)) {
-                    cachedPosts = data.blogs;
-                }
-                
-                postsWithParsedDates = cachedPosts.map(post => ({
-                    ...post,
-                    parsedDate: parseDate(post.date)
-                }));
-                
-                dataLoaded = true;
-                initializeLazyLoading();
-                
-                // Trigger sidebar updates in case they loaded before data
-                triggerSidebarUpdates();
-                
-                return true;
-            }
-        }
-        
-        const response = await fetch(BLOG_DATA_URL);
+        const response = await fetch(BLOG_DATA_URL, { cache: 'no-store' });
         if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to fetch blog data`);
         
         const data = await response.json();
@@ -77,30 +71,21 @@ async function fetchBlogData() {
         // Cache the data
         sessionStorage.setItem('blogData', JSON.stringify(data));
         sessionStorage.setItem('blogDataTime', Date.now().toString());
-        
-        // Handle both array format and object with blogs property
-        if (Array.isArray(data)) {
-            cachedPosts = data;
-        } else if (data.blogs && Array.isArray(data.blogs)) {
-            cachedPosts = data.blogs;
-        } else {
-            cachedPosts = [];
-        }
-        
-        // Pre-parse and cache dates for better performance
-        postsWithParsedDates = cachedPosts.map(post => ({
-            ...post,
-            parsedDate: parseDate(post.date)
-        }));
-        
-        dataLoaded = true;
-        initializeLazyLoading();
-        
-        // Trigger sidebar updates in case they loaded before data
-        triggerSidebarUpdates();
+        applyBlogData(data);
         
         return true;
     } catch (error) {
+        // Fallback to cached data if network is unavailable
+        if (cachedData) {
+            try {
+                const parsedCachedData = JSON.parse(cachedData);
+                applyBlogData(parsedCachedData);
+                return true;
+            } catch (cacheError) {
+                // Ignore invalid cache and continue to hard failure
+            }
+        }
+
         cachedPosts = [];
         postsWithParsedDates = [];
         dataLoaded = false;
@@ -206,7 +191,7 @@ function createArticleHTML(post, isExcerpt = true) {
     
     return `
         <article class="blog-article" data-post-id="${post.id}">
-            <a href="/blog-post.html?id=${post.id}" class="article-card-link">
+            <a href="blog-post.html?id=${post.id}" class="article-card-link">
                 <h3 class="article-title">${escapeHtml(post.title)}</h3>
                 <div class="article-meta">
                     <span class="author">By ${escapeHtml(post.author)}</span>
@@ -404,7 +389,7 @@ function loadFeaturedBlogsPage() {
             
             html += `
                 <article class="blog-article" data-post-id="${post.id}">
-                    <a href="/blog-post.html?id=${post.id}" class="article-card-link">
+                    <a href="blog-post.html?id=${post.id}" class="article-card-link">
                         <h3 class="article-title">${escapeHtml(post.title)}</h3>
                         <div class="article-meta">
                             <span class="author">By ${escapeHtml(post.author)}</span>
@@ -456,13 +441,13 @@ function updateCategoriesSidebar() {
     const categories = getCategoriesWithCounts();
     
     if (categories.length === 0) {
-        categoriesList.innerHTML = '<li><a href="/">All Posts</a></li>';
+        categoriesList.innerHTML = '<li><a href="index.html">All Posts</a></li>';
         return;
     }
     
-    let html = '<li><a href="/">All Posts</a></li>';
+    let html = '<li><a href="index.html">All Posts</a></li>';
     categories.forEach(cat => {
-        html += `<li><a href="/?category=${encodeURIComponent(cat.name)}">${escapeHtml(cat.name)} (${cat.count})</a></li>`;
+        html += `<li><a href="index.html?category=${encodeURIComponent(cat.name)}">${escapeHtml(cat.name)} (${cat.count})</a></li>`;
     });
     
     categoriesList.innerHTML = html;
@@ -484,7 +469,7 @@ function updatePopularCategories() {
         return;
     }
     
-    popularList.innerHTML = categories.map(cat => `<li class="category-item"><a href="/?category=${encodeURIComponent(cat.name)}" class="category-link"><span>${escapeHtml(cat.name)}</span><span class="count">${cat.count}</span></a></li>`).join('');
+    popularList.innerHTML = categories.map(cat => `<li class="category-item"><a href="index.html?category=${encodeURIComponent(cat.name)}" class="category-link"><span>${escapeHtml(cat.name)}</span><span class="count">${cat.count}</span></a></li>`).join('');
 }
 
 // Update featured blogs sidebar
@@ -501,7 +486,7 @@ function updateFeaturedSidebar() {
     
     featuredList.innerHTML = featured.map((post, index) => `
         <li class="featured-item">
-            <a href="/blog-post.html?id=${post.id}" class="featured-link">
+            <a href="blog-post.html?id=${post.id}" class="featured-link">
                 <span class="featured-number">${index + 1}</span>
                 <div class="featured-content">
                     <h4 class="featured-title">${escapeHtml(post.title)}</h4>
@@ -544,7 +529,7 @@ function loadCategoryPage(category) {
     const posts = getPostsByCategory(category);
     
     let html = `<h2 class="section-title">📂 ${escapeHtml(category)} (${posts.length} posts)</h2>`;
-    html += `<p class="back-link"><a href="/">← Back to all posts</a></p>`;
+    html += `<p class="back-link"><a href="index.html">← Back to all posts</a></p>`;
     
     if (posts.length === 0) {
         html += '<p>No posts found in this category.</p>';
@@ -561,11 +546,15 @@ function loadCategoryPage(category) {
 
 // Detect current page from URL path
 function detectCurrentPage() {
-    const path = window.location.pathname.replace(/\/index\.html$/, '/').replace(/\.html$/, '');
-    const segments = path.split('/').filter(Boolean);
-    // Return the last meaningful segment, or 'home' for root
-    if (segments.length === 0) return 'home';
-    return segments[segments.length - 1];
+    const pathname = window.location.pathname;
+    const lastSegment = pathname.split('/').pop() || '';
+
+    // Handle both root and GitHub Pages subpath roots
+    if (!lastSegment || lastSegment === 'index.html' || !lastSegment.includes('.')) {
+        return 'home';
+    }
+
+    return lastSegment.replace(/\.html$/, '');
 }
 
 // Load individual blog post
@@ -575,7 +564,7 @@ async function loadBlogPost() {
         const postId = urlParams.get('id');
         
         if (!postId) {
-            window.location.href = '/';
+            window.location.href = 'index.html';
             return;
         }
         
@@ -587,7 +576,7 @@ async function loadBlogPost() {
                     <div style="text-align: center; padding: 60px 20px;">
                         <h2 style="font-size: 32px; margin-bottom: 20px;">Error Loading Post</h2>
                         <p style="font-size: 18px; color: #666; margin-bottom: 30px;">Unable to load blog data. Please try again later.</p>
-                        <a href="/" style="display: inline-block; padding: 15px 30px; background-color: #2c2c2c; color: #fff; text-decoration: none; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Go to Homepage</a>
+                        <a href="index.html" style="display: inline-block; padding: 15px 30px; background-color: #2c2c2c; color: #fff; text-decoration: none; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Go to Homepage</a>
                     </div>
                 `;
                 return;
@@ -601,7 +590,7 @@ async function loadBlogPost() {
                 <div style="text-align: center; padding: 60px 20px;">
                     <h2 style="font-size: 32px; margin-bottom: 20px;">Post Not Found</h2>
                     <p style="font-size: 18px; color: #666; margin-bottom: 30px;">Sorry, the article you're looking for doesn't exist.</p>
-                    <a href="/" style="display: inline-block; padding: 15px 30px; background-color: #2c2c2c; color: #fff; text-decoration: none; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Go to Homepage</a>
+                    <a href="index.html" style="display: inline-block; padding: 15px 30px; background-color: #2c2c2c; color: #fff; text-decoration: none; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Go to Homepage</a>
                 </div>
             `;
             return;
@@ -627,13 +616,13 @@ async function loadBlogPost() {
                 <span class="separator">|</span>
                 <time datetime="${formatDateTime(post.date)}">${formatDate(post.date)}</time>
                 <span class="separator">|</span>
-                <a href="/?category=${encodeURIComponent(post.category)}" style="color: #c41e3a; text-decoration: none; font-weight: bold;">${escapeHtml(post.category)}</a>
+                <a href="index.html?category=${encodeURIComponent(post.category)}" style="color: #c41e3a; text-decoration: none; font-weight: bold;">${escapeHtml(post.category)}</a>
             </div>
             ${featuredImageHtml}
             <div class="article-content">
             </div>
             <div style="margin-top: 40px; padding-top: 30px; border-top: 2px solid #ddd;">
-                <a href="/" class="back-to-posts-link">← Back to All Posts</a>
+                <a href="index.html" class="back-to-posts-link">← Back to All Posts</a>
             </div>
         `;
         
@@ -726,7 +715,7 @@ async function loadBlogPost() {
             <div style="text-align: center; padding: 60px 20px;">
                 <h2 style="font-size: 32px; margin-bottom: 20px;">Error</h2>
                 <p style="font-size: 18px; color: #666; margin-bottom: 30px;">An error occurred while loading the post.</p>
-                <a href="/" style="display: inline-block; padding: 15px 30px; background-color: #2c2c2c; color: #fff; text-decoration: none; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Go to Homepage</a>
+                <a href="index.html" style="display: inline-block; padding: 15px 30px; background-color: #2c2c2c; color: #fff; text-decoration: none; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Go to Homepage</a>
             </div>
         `;
     }
