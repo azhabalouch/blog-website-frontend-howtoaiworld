@@ -1,9 +1,11 @@
 // Load dynamic components (nav and footer) from separate files
+const SITE_BASE_PATH = getSiteBasePath();
+
 function loadComponents() {
     // Load navigation
-    loadComponent('/components/nav.html', 'header', true);
+    loadComponent(buildComponentPath('nav.html'), 'header', true);
     // Load footer  
-    loadComponent('/components/footer.html', 'footer', false);
+    loadComponent(buildComponentPath('footer.html'), 'footer', false);
 
     // Load sidebar components if sidebar-components div exists
     if (document.getElementById('sidebar-components')) {
@@ -14,40 +16,58 @@ function loadComponents() {
         if (currentPage === 'index' || currentPage === '' || currentPage === '/') {
             // Load in order: Featured → Popular Categories → Categories → Newsletter
             loadSidebarComponentsSequentially([
-                '/components/sidebar-featured.html',
-                '/components/sidebar-popular-categories.html',
-                '/components/sidebar-categories.html',
-                '/components/sidebar-newsletter.html'
+                buildComponentPath('sidebar-featured.html'),
+                buildComponentPath('sidebar-popular-categories.html'),
+                buildComponentPath('sidebar-categories.html'),
+                buildComponentPath('sidebar-newsletter.html')
             ]);
         } else if (currentPage === 'contact') {
             loadSidebarComponentsSequentially([
-                '/components/sidebar-inquiry-message.html',
-                '/components/sidebar-social.html'
+                buildComponentPath('sidebar-inquiry-message.html'),
+                buildComponentPath('sidebar-social.html')
             ]);
         } else if (currentPage === 'featured') {
             // Load in order: Popular Categories → Categories → Newsletter
             loadSidebarComponentsSequentially([
-                '/components/sidebar-popular-categories.html',
-                '/components/sidebar-categories.html',
-                '/components/sidebar-newsletter.html'
+                buildComponentPath('sidebar-popular-categories.html'),
+                buildComponentPath('sidebar-categories.html'),
+                buildComponentPath('sidebar-newsletter.html')
             ]);
         } else if (currentPage === 'about') {
-            loadSidebarComponent('/components/sidebar-contact.html');
+            loadSidebarComponent(buildComponentPath('sidebar-contact.html'));
         } else if (currentPage === 'blog-post') {
             loadSidebarComponentsSequentially([
-                '/components/sidebar-categories.html',
-                '/components/sidebar-newsletter.html'
+                buildComponentPath('sidebar-categories.html'),
+                buildComponentPath('sidebar-newsletter.html')
             ]);
         } else if (currentPage === 'thanks') {
             loadSidebarComponentsSequentially([
-                '/components/sidebar-contact.html',
-                '/components/sidebar-social.html'
+                buildComponentPath('sidebar-contact.html'),
+                buildComponentPath('sidebar-social.html')
             ]);
         } else if (currentPage === 'privacy' || currentPage === 'terms' || currentPage === 'disclaimer') {
-            loadSidebarComponent('/components/sidebar-legal.html');
+            loadSidebarComponent(buildComponentPath('sidebar-legal.html'));
         }
         // Add more conditions for other pages as needed
     }
+}
+
+function getSiteBasePath() {
+    const script = document.querySelector('script[src*="assets/js/components.js"]');
+    if (!script) return '/';
+
+    const src = script.getAttribute('src') || '';
+    const marker = 'assets/js/components.js';
+    const markerIndex = src.indexOf(marker);
+
+    if (markerIndex === -1) return '/';
+
+    const basePath = src.slice(0, markerIndex);
+    return basePath === '' ? '' : basePath;
+}
+
+function buildComponentPath(fileName) {
+    return SITE_BASE_PATH + 'components/' + fileName;
 }
 
 // Derive a stable page key from the current path regardless of folder layout or .html extension
