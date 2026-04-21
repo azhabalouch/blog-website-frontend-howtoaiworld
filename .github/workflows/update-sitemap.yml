@@ -5,9 +5,9 @@ on:
     branches:
       - main
       - master
-  workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'  # Runs daily at midnight UTC
+    - cron: '0 0 * * *' # Runs automatically every day at midnight (UTC)
+  workflow_dispatch: # Allows you to manually trigger the update from the GitHub Actions UI
 
 permissions:
   contents: write
@@ -29,13 +29,12 @@ jobs:
       
       - name: Update sitemap.xml
         run: |
-          python generate-static-post-pages.py
           python update-sitemap.py
 
       - name: Check if sitemap was modified
         id: check-changes
         run: |
-          if git diff --quiet sitemap.xml posts/; then
+          if git diff --quiet sitemap.xml; then
             echo "sitemap_changed=false" >> $GITHUB_OUTPUT
             echo "No changes to sitemap.xml"
           else
@@ -48,6 +47,6 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add sitemap.xml posts/
-          git commit -m "Auto-update sitemap and static posts [skip ci]"
+          git add sitemap.xml
+          git commit -m "Auto-update sitemap [skip ci]"
           git push origin main

@@ -103,13 +103,14 @@ def fetch_blog_posts():
 
 def remove_dynamic_blog_entries(root, namespace):
     """Remove previously generated dynamic post URLs."""
-    dynamic_prefix = f'{BASE_URL}/posts/'
-    legacy_prefix = f'{BASE_URL}/blog-post.html?title='
+    dynamic_prefix = f'{BASE_URL}/blog-post.html?post='
+    legacy_prefix = f'{BASE_URL}/posts/'
+    older_legacy_prefix = f'{BASE_URL}/blog-post.html?title='
     for url_node in list(root.findall('ns:url', namespace)):
         loc_node = url_node.find('ns:loc', namespace)
         loc_text = (loc_node.text or '') if loc_node is not None else ''
         if loc_text.startswith(dynamic_prefix) or loc_text.startswith(
-                legacy_prefix):
+                legacy_prefix) or loc_text.startswith(older_legacy_prefix):
             root.remove(url_node)
 
 
@@ -123,7 +124,7 @@ def remove_legacy_template_entry(root, namespace):
 
 
 def add_dynamic_blog_entries(root, namespace):
-    """Add one sitemap entry per post using static /posts/<slug>.html URLs."""
+    """Add one sitemap entry per post using static blog-post.html?post=<slug> URLs."""
     posts = fetch_blog_posts()
     if not posts:
         return 0
@@ -135,7 +136,7 @@ def add_dynamic_blog_entries(root, namespace):
         if not slug:
             continue
 
-        post_url = f'{BASE_URL}/posts/{slug}.html'
+        post_url = f'{BASE_URL}/blog-post.html?post={slug}'
         lastmod = parse_post_date(
             post.get('date') if isinstance(post, dict) else None)
 
@@ -259,10 +260,11 @@ def main():
         changed_files = get_changed_files_from_commit()
 
     if not changed_files:
-        print("No changed files detected.")
-        sys.exit(0)
-
-    print(f"Detected files: {', '.join(changed_files)}")
+        print(
+            "No static HTML file changes detected. Proceeding to sync dynamic blog URLs from API..."
+        )
+    else:
+        print(f"Detected files: {', '.join(changed_files)}")
 
     success = update_sitemap(changed_files)
 

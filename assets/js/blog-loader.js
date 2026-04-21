@@ -164,7 +164,7 @@ function getPostBySlug(slug) {
 
 // Build SEO-friendly article URL
 function buildPostUrl(post) {
-    return buildInternalUrl(`posts/${getPostSlug(post)}.html`);
+    return buildInternalUrl(`blog-post.html?post=${getPostSlug(post)}`);
 }
 
 // Parse date from various formats (handles "MM//DD//YYYY" format from API)
@@ -780,7 +780,7 @@ function detectCurrentPage() {
 async function loadBlogPost() {
     try {
         const urlParams = new URLSearchParams(window.location.search);
-        const postSlug = slugifyTitle(urlParams.get('title') || urlParams.get('slug'));
+        const postSlug = slugifyTitle(urlParams.get('post') || urlParams.get('title') || urlParams.get('slug'));
         const postId = urlParams.get('id');
         let post = null;
         
@@ -823,11 +823,6 @@ async function loadBlogPost() {
             return;
         }
 
-        // Legacy query URL support: redirect to the static post URL.
-        const canonicalPath = buildPostUrl(post);
-        window.location.replace(canonicalPath);
-        return;
-        
         // Update page-level SEO metadata and structured data.
         updatePostSeo(post);
         
