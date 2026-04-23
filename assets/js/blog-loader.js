@@ -267,12 +267,25 @@ function sanitizeImageSource(imageSrc) {
     return '';
 }
 
-function getContentImageMarkup(post, imageSrc, imageIndex) {
+function getFeaturedImageMarkup(post) {
+    const safeImageSrc = sanitizeImageSource(post.featured_image);
+    if (!safeImageSrc) return '';
+
+    const captions = getImageCaptions(post);
+    const caption = captions[0] || '';
+    const safeTitle = stripHtmlTags(post.title || 'Blog image');
+    const altText = caption || safeTitle;
+    const figcaptionHtml = caption ? `<figcaption>${escapeHtml(caption)}</figcaption>` : '';
+
+    return `<figure class="article-featured-image" style="margin-bottom: 30px; text-align: center;"><img src="${safeImageSrc}" alt="${escapeHtml(altText)}" style="max-width: 100%; height: auto; border-radius: 8px;" />${figcaptionHtml}</figure>`;
+}
+
+function getContentImageMarkup(post, imageSrc, imageIndex, captionOffset = 0) {
     const safeImageSrc = sanitizeImageSource(imageSrc);
     if (!safeImageSrc) return '';
 
     const captions = getImageCaptions(post);
-    const caption = captions[imageIndex] || '';
+    const caption = captions[imageIndex + captionOffset] || '';
     const safeTitle = stripHtmlTags(post.title || 'Blog image');
     const fallbackAlt = `${safeTitle} image ${imageIndex + 1}`;
     const altText = caption || fallbackAlt;
@@ -884,8 +897,8 @@ async function loadBlogPost() {
         article.className = 'featured-article';
     
         // Featured image HTML
-        const featuredImageHtml = post.featured_image ? 
-            `<div class="article-featured-image" style="margin-bottom: 30px; text-align: center;"><img src="${post.featured_image}" alt="${escapeHtml(post.title)}" style="max-width: 100%; height: auto; border-radius: 8px;" /></div>` : '';
+        const featuredImageHtml = getFeaturedImageMarkup(post);
+        const contentCaptionOffset = featuredImageHtml ? 1 : 0;
         
         // Build article HTML
         article.innerHTML = `
@@ -922,7 +935,7 @@ async function loadBlogPost() {
                 const paragraphs = tempWrapper.querySelectorAll('p');
                 if (paragraphs.length > 0) {
                     const midIndex = Math.floor(paragraphs.length / 2);
-                    const imageMarkup = getContentImageMarkup(post, post.content_images[0], 0);
+                    const imageMarkup = getContentImageMarkup(post, post.content_images[0], 0, contentCaptionOffset);
                     const imageContainer = document.createElement('div');
                     imageContainer.innerHTML = imageMarkup;
                     paragraphs[midIndex].insertAdjacentElement('afterend', imageContainer);
@@ -935,7 +948,7 @@ async function loadBlogPost() {
         
         // Add second image at the end if exists
         if (post.content_images && Array.isArray(post.content_images) && post.content_images.length >= 2) {
-            const secondImageMarkup = getContentImageMarkup(post, post.content_images[1], 1);
+            const secondImageMarkup = getContentImageMarkup(post, post.content_images[1], 1, contentCaptionOffset);
             const secondImageDiv = document.createElement('div');
             secondImageDiv.innerHTML = secondImageMarkup;
             contentDiv.appendChild(secondImageDiv);
