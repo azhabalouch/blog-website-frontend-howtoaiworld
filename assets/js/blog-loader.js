@@ -249,14 +249,35 @@ function getImageCaptions(post) {
     return [];
 }
 
+function sanitizeImageSource(imageSrc) {
+    if (!imageSrc) return '';
+
+    const source = String(imageSrc).trim();
+    if (!source) return '';
+
+    try {
+        const normalized = new URL(source, window.location.href);
+        if (normalized.protocol === 'http:' || normalized.protocol === 'https:') {
+            return escapeHtml(normalized.href);
+        }
+    } catch (e) {
+        return '';
+    }
+
+    return '';
+}
+
 function getContentImageMarkup(post, imageSrc, imageIndex) {
+    const safeImageSrc = sanitizeImageSource(imageSrc);
+    if (!safeImageSrc) return '';
+
     const captions = getImageCaptions(post);
     const caption = captions[imageIndex] || '';
     const fallbackAlt = `${post.title || 'Blog image'} image ${imageIndex + 1}`;
     const altText = caption || fallbackAlt;
     const figcaptionHtml = caption ? `<figcaption>${escapeHtml(caption)}</figcaption>` : '';
 
-    return `<figure class="content-inline-image"><img src="${imageSrc}" alt="${escapeHtml(altText)}">${figcaptionHtml}</figure>`;
+    return `<figure class="content-inline-image"><img src="${safeImageSrc}" alt="${escapeHtml(altText)}">${figcaptionHtml}</figure>`;
 }
 
 // Build concise meta description from excerpt/content
