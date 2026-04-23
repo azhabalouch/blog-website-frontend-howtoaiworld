@@ -275,9 +275,16 @@ function getFeaturedImageMarkup(post) {
     const caption = captions[0] || '';
     const safeTitle = stripHtmlTags(post.title || 'Blog image');
     const altText = caption || safeTitle;
-    const figcaptionHtml = caption ? `<figcaption>${escapeHtml(caption)}</figcaption>` : '';
+    const figcaptionHtml = caption ? `<figcaption class="image-caption">${escapeHtml(caption)}</figcaption>` : '';
 
-    return `<figure class="article-featured-image" style="margin-bottom: 30px; text-align: center;"><img src="${safeImageSrc}" alt="${escapeHtml(altText)}" style="max-width: 100%; height: auto; border-radius: 8px;" />${figcaptionHtml}</figure>`;
+    return `
+        <figure class="article-featured-media">
+            <div class="article-featured-image">
+                <img src="${safeImageSrc}" alt="${escapeHtml(altText)}" />
+            </div>
+            ${figcaptionHtml}
+        </figure>
+    `;
 }
 
 function getContentImageMarkup(post, imageSrc, imageIndex, captionOffset = 0) {
@@ -289,7 +296,7 @@ function getContentImageMarkup(post, imageSrc, imageIndex, captionOffset = 0) {
     const safeTitle = stripHtmlTags(post.title || 'Blog image');
     const fallbackAlt = `${safeTitle} image ${imageIndex + 1}`;
     const altText = caption || fallbackAlt;
-    const figcaptionHtml = caption ? `<figcaption>${escapeHtml(caption)}</figcaption>` : '';
+    const figcaptionHtml = caption ? `<figcaption class="image-caption">${escapeHtml(caption)}</figcaption>` : '';
 
     return `<figure class="content-inline-image"><img src="${safeImageSrc}" alt="${escapeHtml(altText)}">${figcaptionHtml}</figure>`;
 }
