@@ -74,35 +74,18 @@ function applyBlogData(data) {
     triggerSidebarUpdates();
 }
 
-// Fetch blog data from remote URL with caching
+// Fetch blog data from remote URL
 async function fetchBlogData() {
-    // Keep cache only as fallback; always try network first so new items appear immediately
-    const cachedData = sessionStorage.getItem('blogData');
-
     try {
         const response = await fetch(BLOG_DATA_URL, { cache: 'no-store' });
         if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to fetch blog data`);
         
         const data = await response.json();
-        
-        // Cache the data
-        sessionStorage.setItem('blogData', JSON.stringify(data));
-        sessionStorage.setItem('blogDataTime', Date.now().toString());
         applyBlogData(data);
         
         return true;
     } catch (error) {
-        // Fallback to cached data if network is unavailable
-        if (cachedData) {
-            try {
-                const parsedCachedData = JSON.parse(cachedData);
-                applyBlogData(parsedCachedData);
-                return true;
-            } catch (cacheError) {
-                // Ignore invalid cache and continue to hard failure
-            }
-        }
-
+        console.error('Error fetching blog data:', error);
         cachedPosts = [];
         postsWithParsedDates = [];
         dataLoaded = false;
