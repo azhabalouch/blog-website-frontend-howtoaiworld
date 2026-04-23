@@ -546,6 +546,23 @@ body {
     margin: 20px auto;
 }
 
+.content-inline-image {
+    margin: 26px 0;
+}
+
+.content-inline-image img {
+    margin: 0 auto 10px;
+}
+
+.content-inline-image figcaption {
+    margin-top: 0;
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.5;
+    font-style: italic;
+}
+
 /* Featured Image Styles */
 .article-featured-image {
     margin-bottom: 24px;
