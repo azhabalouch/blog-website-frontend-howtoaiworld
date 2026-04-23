@@ -278,7 +278,7 @@ function getContentImageMarkup(post, imageSrc, imageIndex) {
     const altText = caption || fallbackAlt;
     const figcaptionHtml = caption ? `<figcaption>${escapeHtml(caption)}</figcaption>` : '';
 
-    return `<figure class="content-inline-image"><img src="${escapeHtml(safeImageSrc)}" alt="${escapeHtml(altText)}">${figcaptionHtml}</figure>`;
+    return `<figure class="content-inline-image"><img src="${safeImageSrc}" alt="${escapeHtml(altText)}">${figcaptionHtml}</figure>`;
 }
 
 // Build concise meta description from excerpt/content
