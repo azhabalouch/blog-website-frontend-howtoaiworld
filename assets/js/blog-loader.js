@@ -228,6 +228,37 @@ function stripHtmlTags(text) {
     return (div.textContent || div.innerText || '').trim();
 }
 
+function getImageCaptions(post) {
+    if (!post || !post.captions) return [];
+
+    if (Array.isArray(post.captions)) {
+        return post.captions
+            .map(caption => stripHtmlTags(caption))
+            .map(caption => caption.trim())
+            .filter(Boolean);
+    }
+
+    if (typeof post.captions === 'string') {
+        return post.captions
+            .split(/\r?\n+/)
+            .map(caption => stripHtmlTags(caption))
+            .map(caption => caption.trim())
+            .filter(Boolean);
+    }
+
+    return [];
+}
+
+function getContentImageMarkup(post, imageSrc, imageIndex) {
+    const captions = getImageCaptions(post);
+    const caption = captions[imageIndex] || '';
+    const fallbackAlt = `${post.title || 'Blog image'} image ${imageIndex + 1}`;
+    const altText = caption || fallbackAlt;
+    const figcaptionHtml = caption ? `<figcaption>${escapeHtml(caption)}</figcaption>` : '';
+
+    return `<figure class="content-inline-image"><img src="${imageSrc}" alt="${escapeHtml(altText)}">${figcaptionHtml}</figure>`;
+}
+
 // Build concise meta description from excerpt/content
 function getSeoDescription(post, maxLength = 155) {
     const sourceText = stripHtmlTags(post.excerpt || post.content || 'Read this article on Howtoaiworld.');
@@ -869,7 +900,7 @@ async function loadBlogPost() {
                 const paragraphs = tempWrapper.querySelectorAll('p');
                 if (paragraphs.length > 0) {
                     const midIndex = Math.floor(paragraphs.length / 2);
-                    const imageMarkup = `<figure class="content-inline-image"><img src="${post.content_images[0]}" alt="${escapeHtml(post.title)} image 1"></figure>`;
+                    const imageMarkup = getContentImageMarkup(post, post.content_images[0], 0);
                     const imageContainer = document.createElement('div');
                     imageContainer.innerHTML = imageMarkup;
                     paragraphs[midIndex].insertAdjacentElement('afterend', imageContainer);
@@ -882,7 +913,7 @@ async function loadBlogPost() {
         
         // Add second image at the end if exists
         if (post.content_images && Array.isArray(post.content_images) && post.content_images.length >= 2) {
-            const secondImageMarkup = `<figure class="content-inline-image"><img src="${post.content_images[1]}" alt="${escapeHtml(post.title)} image 2"></figure>`;
+            const secondImageMarkup = getContentImageMarkup(post, post.content_images[1], 1);
             const secondImageDiv = document.createElement('div');
             secondImageDiv.innerHTML = secondImageMarkup;
             contentDiv.appendChild(secondImageDiv);
