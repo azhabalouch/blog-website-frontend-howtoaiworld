@@ -550,8 +550,12 @@ body {
     margin: 26px 0;
 }
 
+.content-inline-image img {
+    margin: 0 auto 10px;
+}
+
 .content-inline-image figcaption {
-    margin-top: -8px;
+    margin-top: 0;
     text-align: center;
     color: #666;
     font-size: 14px;
