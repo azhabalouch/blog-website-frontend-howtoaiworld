@@ -341,6 +341,13 @@ function updatePostSeo(post) {
         attributes: { name: 'description', content: seoDescription }
     });
 
+    if (post.keywords && Array.isArray(post.keywords) && post.keywords.length > 0) {
+        upsertMetaTag({
+            selector: 'meta[name="keywords"]',
+            attributes: { name: 'keywords', content: post.keywords.join(', ') }
+        });
+    }
+
     upsertMetaTag({
         selector: 'meta[name="robots"]',
         attributes: { name: 'robots', content: 'index, follow, max-snippet:-1, max-image-preview:large' }
@@ -391,7 +398,8 @@ function updatePostSeo(post) {
 
     setCanonicalUrl(postUrl);
 
-    const articleSchema = {
+    // Use provided SEO schema if available, otherwise generate default
+    const articleSchema = (post.seo_schema && post.seo_schema.article) ? post.seo_schema.article : {
         '@context': 'https://schema.org',
         '@type': 'BlogPosting',
         headline: post.title,
@@ -420,7 +428,9 @@ function updatePostSeo(post) {
     setStructuredData('post-structured-data', articleSchema);
 
     const faqItems = post.faq || post.FAQ;
-    if (faqItems && Array.isArray(faqItems) && faqItems.length > 0) {
+    if (post.seo_schema && post.seo_schema.faq) {
+        setStructuredData('post-faq-structured-data', post.seo_schema.faq);
+    } else if (faqItems && Array.isArray(faqItems) && faqItems.length > 0) {
         const faqSchema = {
             '@context': 'https://schema.org',
             '@type': 'FAQPage',
@@ -890,6 +900,14 @@ async function loadBlogPost() {
         const featuredImageHtml = getFeaturedImageMarkup(post);
         const contentCaptionOffset = featuredImageHtml ? 1 : 0;
         
+        let keywordsHtml = '';
+        if (post.keywords && Array.isArray(post.keywords) && post.keywords.length > 0) {
+            const keywordsList = post.keywords.map(keyword => 
+                `<span style="display: inline-block; background-color: #f0f0f0; color: #333; padding: 4px 12px; margin-right: 8px; margin-top: 10px; border-radius: 16px; font-size: 13px; font-weight: 500;">${escapeHtml(keyword)}</span>`
+            ).join('');
+            keywordsHtml = `<div class="article-keywords" style="margin-bottom: 20px;">${keywordsList}</div>`;
+        }
+        
         // Build article HTML
         article.innerHTML = `
             <h1 class="article-title">${escapeHtml(post.title)}</h1>
@@ -900,6 +918,7 @@ async function loadBlogPost() {
                 <span class="separator">|</span>
                 <a href="${buildInternalUrl(`index.html?category=${encodeURIComponent(post.category)}`)}" style="color: #c41e3a; text-decoration: none; font-weight: bold;">${escapeHtml(post.category)}</a>
             </div>
+            ${keywordsHtml}
             ${featuredImageHtml}
             <div class="article-content">
             </div>
@@ -922,7 +941,8 @@ async function loadBlogPost() {
             if (post.content_images.length >= 1) {
                 const tempWrapper = document.createElement('div');
                 tempWrapper.innerHTML = contentHtml || '';
-                const paragraphs = tempWrapper.querySelectorAll('p');
+                // Filter out paragraphs that are inside tables to avoid breaking table layout
+                const paragraphs = Array.from(tempWrapper.querySelectorAll('p')).filter(p => !p.closest('table'));
                 if (paragraphs.length > 0) {
                     const midIndex = Math.floor(paragraphs.length / 2);
                     const imageMarkup = getContentImageMarkup(post, post.content_images[0], 0, contentCaptionOffset);
