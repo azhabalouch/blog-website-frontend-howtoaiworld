@@ -1,54 +1,91 @@
 #!/usr/bin/env python3
 """
-Sitemap Updater Script
-Updates lastmod dates in sitemap.xml for only the changed HTML files
-Automatically detects changed files from the latest GitHub commit on main
+Sitemap Generator Script
+Generates separate sitemaps for main pages, legal pages, and blog posts.
+Generates an index sitemap (sitemap.xml) combining the separate sitemaps.
 """
 
 import xml.etree.ElementTree as ET
+from xml.dom import minidom
 import sys
-from datetime import datetime
 import os
 import subprocess
 import json
 import re
 import unicodedata
+from datetime import datetime
 from urllib.request import urlopen
 
 BLOG_DATA_URL = 'https://azhabalouch.github.io/blogs-data-api/api.json'
 BASE_URL = 'https://howtoaiworld.com'
 
+MAIN_PAGES = [{
+    'path': 'index.html',
+    'url': '/',
+    'priority': '1.0',
+    'changefreq': 'daily'
+}, {
+    'path': 'featured.html',
+    'url': '/featured.html',
+    'priority': '0.8',
+    'changefreq': 'weekly'
+}, {
+    'path': 'about.html',
+    'url': '/about.html',
+    'priority': '0.7',
+    'changefreq': 'monthly'
+}, {
+    'path': 'contact.html',
+    'url': '/contact.html',
+    'priority': '0.7',
+    'changefreq': 'monthly'
+}]
 
-def get_changed_files_from_commit():
-    """
-    Get list of changed files from the latest commit on main branch
-    
-    Returns:
-        List of file paths that were changed in the latest commit
-    """
+LEGAL_PAGES = [{
+    'path': 'privacy.html',
+    'url': '/privacy.html',
+    'priority': '0.4',
+    'changefreq': 'yearly'
+}, {
+    'path': 'terms.html',
+    'url': '/terms.html',
+    'priority': '0.4',
+    'changefreq': 'yearly'
+}, {
+    'path': 'disclaimer.html',
+    'url': '/disclaimer.html',
+    'priority': '0.4',
+    'changefreq': 'yearly'
+}]
+
+
+def get_file_lastmod(filepath):
+    """Get the last modified date of a file from Git, fallback to filesystem time."""
     try:
-        # Get files changed in the latest commit
-        result = subprocess.run([
-            'git', 'diff-tree', '--no-commit-id', '--name-only', '-r', 'HEAD'
-        ],
-                                capture_output=True,
-                                text=True,
-                                check=True)
-        changed_files = result.stdout.strip().split('\n')
-        # Filter out empty strings
-        changed_files = [f for f in changed_files if f]
-        return changed_files
-    except subprocess.CalledProcessError as e:
-        print(f"Error getting changed files from git: {e}")
-        return []
-    except FileNotFoundError:
-        print("Error: git command not found")
-        return []
+        # Check git commit time
+        result = subprocess.run(
+            ['git', 'log', '-1', '--format=%cI', '--', filepath],
+            capture_output=True,
+            text=True,
+            check=True)
+        date_str = result.stdout.strip()
+        if date_str:
+            return date_str.split('T')[0]
+    except Exception:
+        pass
+
+    # Fallback to local file modified time
+    if os.path.exists(filepath):
+        return datetime.fromtimestamp(
+            os.path.getmtime(filepath)).strftime('%Y-%m-%d')
+    return datetime.now().strftime('%Y-%m-%d')
 
 
 def slugify_title(title):
     """Create URL-safe slug from post title."""
-    normalized = unicodedata.normalize('NFKD', str(title or ''))
+    if not title:
+        return ''
+    normalized = unicodedata.normalize('NFKD', str(title))
     ascii_text = normalized.encode('ascii', 'ignore').decode('ascii').lower()
     slug = re.sub(r'[^a-z0-9\s-]', '', ascii_text).strip()
     slug = re.sub(r'\s+', '-', slug)
@@ -64,22 +101,23 @@ def parse_post_date(date_text):
 
     date_value = str(date_text).strip()
 
-    # API commonly uses MM//DD//YYYY format.
     if '//' in date_value:
         parts = date_value.split('//')
         if len(parts) == 3:
             try:
-                month = int(parts[0])
-                day = int(parts[1])
-                year = int(parts[2])
+                # Assuming format MM//DD//YYYY
+                month, day, year = int(parts[0]), int(parts[1]), int(parts[2])
                 return datetime(year, month, day).strftime('%Y-%m-%d')
             except ValueError:
                 return today
 
     for fmt in ('%Y-%m-%d', '%Y/%m/%d', '%m/%d/%Y', '%m-%d-%Y', '%B %d, %Y',
-                '%b %d, %Y'):
+                '%b %d, %Y', '%Y-%m-%dT%H:%M:%SZ'):
         try:
-            return datetime.strptime(date_value, fmt).strftime('%Y-%m-%d')
+            date_str = date_value.split(
+                'T'
+            )[0] if 'T' in date_value and fmt == '%Y-%m-%d' else date_value
+            return datetime.strptime(date_str, fmt).strftime('%Y-%m-%d')
         except ValueError:
             continue
 
@@ -89,6 +127,12 @@ def parse_post_date(date_text):
 def fetch_blog_posts():
     """Fetch blog data and return list of posts."""
     try:
+        # Use locally built static data if available
+        if os.path.exists('assets/data/blogs.json'):
+            with open('assets/data/blogs.json', 'r', encoding='utf-8') as f:
+                return json.load(f)
+
+        # Fallback to API
         with urlopen(BLOG_DATA_URL, timeout=20) as response:
             payload = json.loads(response.read().decode('utf-8'))
             if isinstance(payload, dict) and isinstance(
@@ -101,178 +145,153 @@ def fetch_blog_posts():
     return []
 
 
-def remove_dynamic_blog_entries(root, namespace):
-    """Remove previously generated dynamic post URLs."""
-    dynamic_prefix = f'{BASE_URL}/blog-post.html?post='
-    legacy_prefix = f'{BASE_URL}/posts/'
-    older_legacy_prefix = f'{BASE_URL}/blog-post.html?title='
-    for url_node in list(root.findall('ns:url', namespace)):
-        loc_node = url_node.find('ns:loc', namespace)
-        loc_text = (loc_node.text or '') if loc_node is not None else ''
-        if loc_text.startswith(dynamic_prefix) or loc_text.startswith(
-                legacy_prefix) or loc_text.startswith(older_legacy_prefix):
-            root.remove(url_node)
+def create_urlset():
+    """Create a new XML urlset root element."""
+    ET.register_namespace('', 'http://www.sitemaps.org/schemas/sitemap/0.9')
+    root = ET.Element('urlset',
+                      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
+    return root
 
 
-def remove_legacy_template_entry(root, namespace):
-    """Remove legacy blog-post.html template URL from sitemap."""
-    legacy_template = f'{BASE_URL}/blog-post.html'
-    for url_node in list(root.findall('ns:url', namespace)):
-        loc_node = url_node.find('ns:loc', namespace)
-        if loc_node is not None and (loc_node.text or '') == legacy_template:
-            root.remove(url_node)
+def add_url_to_sitemap(root, loc_url, lastmod_date, changefreq_val,
+                       priority_val):
+    """Helper to append a URL node to the sitemap root."""
+    url_elem = ET.SubElement(root, 'url')
+
+    loc = ET.SubElement(url_elem, 'loc')
+    loc.text = loc_url
+
+    lastmod = ET.SubElement(url_elem, 'lastmod')
+    lastmod.text = lastmod_date
+
+    changefreq = ET.SubElement(url_elem, 'changefreq')
+    changefreq.text = changefreq_val
+
+    priority = ET.SubElement(url_elem, 'priority')
+    priority.text = str(priority_val)
 
 
-def add_dynamic_blog_entries(root, namespace):
-    """Add one sitemap entry per post using static blog-post.html?post=<slug> URLs."""
+def generate_static_sitemap(pages, filename):
+    """Generate a sitemap for a list of static pages."""
+    root = create_urlset()
+
+    for page in pages:
+        lastmod = get_file_lastmod(page['path'])
+        full_url = f"{BASE_URL}{page['url']}"
+        add_url_to_sitemap(root, full_url, lastmod, page['changefreq'],
+                           page['priority'])
+
+    xml_str = minidom.parseString(ET.tostring(root)).toprettyxml(indent="    ")
+
+    # Strip empty lines from minidom output
+    lines = [line for line in xml_str.split('\n') if line.strip()]
+    xml_str = '\n'.join(lines)
+
+    with open(filename, "w", encoding="utf-8") as f:
+        # Replace the minimal XML declaration with a standard one
+        f.write(
+            xml_str.replace('<?xml version="1.0" ?>',
+                            '<?xml version="1.0" encoding="UTF-8"?>'))
+
+    print(f"✅ Generated {filename} with {len(pages)} entries")
+    return datetime.now().strftime('%Y-%m-%d')
+
+
+def generate_blogs_sitemap():
+    """Generate sitemap-blogs.xml purely from the blog data."""
+    root = create_urlset()
     posts = fetch_blog_posts()
-    if not posts:
-        return 0
 
     added = 0
     for post in posts:
-        title = post.get('title') if isinstance(post, dict) else None
-        slug = slugify_title(title)
+        slug = post.get('slug') if isinstance(
+            post, dict) and post.get('slug') else None
+        if not slug:
+            title = post.get('title') if isinstance(post, dict) else None
+            if not title:
+                slug = str(post.get('id', ''))
+            else:
+                slug = slugify_title(title)
+
         if not slug:
             continue
 
-        post_url = f'{BASE_URL}/blog-post.html?post={slug}'
+        post_url = f"{BASE_URL}/blogs/{slug}/index.html"
         lastmod = parse_post_date(
             post.get('date') if isinstance(post, dict) else None)
 
-        url_elem = ET.SubElement(root, 'url')
-        loc_elem = ET.SubElement(url_elem, 'loc')
-        loc_elem.text = post_url
-
-        lastmod_elem = ET.SubElement(url_elem, 'lastmod')
-        lastmod_elem.text = lastmod
-
-        changefreq_elem = ET.SubElement(url_elem, 'changefreq')
-        changefreq_elem.text = 'monthly'
-
-        priority_elem = ET.SubElement(url_elem, 'priority')
-        priority_elem.text = '0.7'
+        add_url_to_sitemap(root, post_url, lastmod, 'monthly', '0.7')
         added += 1
 
-    return added
+    xml_str = minidom.parseString(ET.tostring(root)).toprettyxml(indent="    ")
+
+    # Strip empty lines from minidom output
+    lines = [line for line in xml_str.split('\n') if line.strip()]
+    xml_str = '\n'.join(lines)
+
+    with open("sitemap-blogs.xml", "w", encoding="utf-8") as f:
+        f.write(
+            xml_str.replace('<?xml version="1.0" ?>',
+                            '<?xml version="1.0" encoding="UTF-8"?>'))
+
+    print(f"✅ Generated sitemap-blogs.xml with {added} entries")
+    return datetime.now().strftime('%Y-%m-%d')
 
 
-def update_sitemap(changed_files):
-    """
-    Update sitemap.xml with new lastmod dates for changed files
-    
-    Args:
-        changed_files: List of file paths that were changed
-    """
-    sitemap_path = 'sitemap.xml'
-
-    if not os.path.exists(sitemap_path):
-        print(f"Error: {sitemap_path} not found")
-        return False
-
-    # Parse the sitemap XML
-    try:
-        tree = ET.parse(sitemap_path)
-        root = tree.getroot()
-    except Exception as e:
-        print(f"Error parsing sitemap: {e}")
-        return False
-
-    # Define XML namespace
-    namespace = {'ns': 'http://www.sitemaps.org/schemas/sitemap/0.9'}
+def generate_sitemap_index(sitemaps):
+    """Generate the root sitemap.xml pointing to all other sitemaps."""
     ET.register_namespace('', 'http://www.sitemaps.org/schemas/sitemap/0.9')
+    root = ET.Element('sitemapindex',
+                      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
 
-    # Get today's date in ISO format (YYYY-MM-DD)
-    today = datetime.now().strftime('%Y-%m-%d')
+    for sitemap_file, lastmod_date in sitemaps.items():
+        sitemap_elem = ET.SubElement(root, 'sitemap')
 
-    # Filter for HTML files only
-    html_files = [f for f in changed_files if f.endswith('.html')]
+        loc = ET.SubElement(sitemap_elem, 'loc')
+        loc.text = f"{BASE_URL}/{sitemap_file}"
 
-    if html_files:
-        print(f"Changed HTML files: {', '.join(html_files)}")
-    else:
-        print("No HTML files were changed. Refreshing dynamic post URLs only.")
+        lastmod = ET.SubElement(sitemap_elem, 'lastmod')
+        lastmod.text = lastmod_date
 
-    updated_count = 0
+    xml_str = minidom.parseString(ET.tostring(root)).toprettyxml(indent="    ")
 
-    # Update lastmod for each changed file
-    if html_files:
-        for url in root.findall('ns:url', namespace):
-            loc = url.find('ns:loc', namespace)
-            lastmod = url.find('ns:lastmod', namespace)
+    # Strip empty lines from minidom output
+    lines = [line for line in xml_str.split('\n') if line.strip()]
+    xml_str = '\n'.join(lines)
 
-            if loc is not None and lastmod is not None:
-                url_path = loc.text.replace('https://howtoaiworld.com/', '')
+    with open("sitemap.xml", "w", encoding="utf-8") as f:
+        f.write(
+            xml_str.replace('<?xml version="1.0" ?>',
+                            '<?xml version="1.0" encoding="UTF-8"?>'))
 
-                # Check if this URL matches any changed file
-                for changed_file in html_files:
-                    # Extract filename without path and extension
-                    file_name = changed_file.replace('pages/', '').replace(
-                        'legal/', '').replace('.html', '')
-
-                    # Handle index page (root /)
-                    if (changed_file == 'index.html' and url_path == ''):
-                        old_date = lastmod.text
-                        lastmod.text = today
-                        updated_count += 1
-                        print(
-                            f"✓ Updated {url_path or '/'}: {old_date} → {today}"
-                        )
-                        break
-                    # Handle pages in folders
-                    elif url_path.endswith(file_name):
-                        old_date = lastmod.text
-                        lastmod.text = today
-                        updated_count += 1
-                        print(f"✓ Updated {url_path}: {old_date} → {today}")
-                        break
-
-    remove_dynamic_blog_entries(root, namespace)
-    remove_legacy_template_entry(root, namespace)
-    dynamic_added_count = add_dynamic_blog_entries(root, namespace)
-
-    if updated_count > 0 or dynamic_added_count > 0:
-        # Write the updated sitemap back to file
-        ET.indent(tree, space='    ')
-        tree.write(sitemap_path, encoding='UTF-8', xml_declaration=True)
-        print(
-            f"\n✅ Successfully updated {updated_count} static entries in sitemap.xml"
-        )
-        print(f"✅ Added {dynamic_added_count} dynamic blog entries")
-        return True
-    else:
-        print("\n⚠️  No changes were required in sitemap.xml")
-        return False
+    print(
+        f"✅ Generated sitemap.xml index pointing to {len(sitemaps)} sub-sitemaps"
+    )
 
 
 def main():
-    """Main function to get changed files from latest commit and update sitemap"""
     print("=" * 60)
-    print("SITEMAP UPDATER")
+    print("SITEMAP REGENERATOR")
     print("=" * 60)
 
-    # Get changed files from command line args or from latest git commit
-    if len(sys.argv) > 1:
-        changed_files = sys.argv[1:]
-        print("Using files from command line arguments")
-    else:
-        print("Detecting changed files from latest git commit on main...")
-        changed_files = get_changed_files_from_commit()
+    sitemaps = {}
 
-    if not changed_files:
-        print(
-            "No static HTML file changes detected. Proceeding to sync dynamic blog URLs from API..."
-        )
-    else:
-        print(f"Detected files: {', '.join(changed_files)}")
+    # 1. Main Pages
+    sitemaps['sitemap-main.xml'] = generate_static_sitemap(
+        MAIN_PAGES, 'sitemap-main.xml')
 
-    success = update_sitemap(changed_files)
+    # 2. Legal Pages
+    sitemaps['sitemap-legal.xml'] = generate_static_sitemap(
+        LEGAL_PAGES, 'sitemap-legal.xml')
 
-    if success:
-        sys.exit(0)
-    else:
-        sys.exit(
-            0)  # Exit with 0 even if no changes to avoid failing the workflow
+    # 3. Blogs
+    sitemaps['sitemap-blogs.xml'] = generate_blogs_sitemap()
+
+    # 4. Master Index
+    generate_sitemap_index(sitemaps)
+
+    print("\nAll sitemaps successfully built!")
+    sys.exit(0)
 
 
 if __name__ == '__main__':

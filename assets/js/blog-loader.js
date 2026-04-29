@@ -1,8 +1,8 @@
 // Blog display functionality
-// This script loads and displays blogs from remote JSON
+// This script loads and displays blogs from local JSON for client-side search/filters
 
-const BLOG_DATA_URL = 'https://azhabalouch.github.io/blogs-data-api/api.json';
 const BLOG_SITE_BASE_PATH = getBlogSiteBasePath();
+const BLOG_DATA_URL = BLOG_SITE_BASE_PATH + 'assets/data/blogs.json';
 
 let cachedPosts = [];
 let dataLoaded = false;
@@ -71,7 +71,7 @@ function applyBlogData(data) {
 
     dataLoaded = true;
     initializeLazyLoading();
-    triggerSidebarUpdates();
+    // triggerSidebarUpdates removed since sidebars are static
 }
 
 // Fetch blog data from remote URL
@@ -147,7 +147,7 @@ function getPostBySlug(slug) {
 
 // Build SEO-friendly article URL
 function buildPostUrl(post) {
-    return buildInternalUrl(`blog-post.html?post=${getPostSlug(post)}`);
+    return buildInternalUrl(`blogs/${getPostSlug(post)}/`);
 }
 
 // Parse date from various formats (handles "MM//DD//YYYY" format from API)
@@ -201,258 +201,6 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
-}
-
-// Remove HTML markup for metadata snippets
-function stripHtmlTags(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.innerHTML = text;
-    return (div.textContent || div.innerText || '').trim();
-}
-
-function getImageCaptions(post) {
-    if (!post || !post.captions) return [];
-
-    if (Array.isArray(post.captions)) {
-        return post.captions
-            .map(caption => stripHtmlTags(caption))
-            .map(caption => caption.trim())
-            .filter(Boolean);
-    }
-
-    if (typeof post.captions === 'string') {
-        return post.captions
-            .split(/\r?\n+/)
-            .map(caption => stripHtmlTags(caption))
-            .map(caption => caption.trim())
-            .filter(Boolean);
-    }
-
-    return [];
-}
-
-function sanitizeImageSource(imageSrc) {
-    if (!imageSrc) return '';
-
-    const source = String(imageSrc).trim();
-    if (!source) return '';
-
-    try {
-        const normalized = new URL(source, window.location.href);
-        if (normalized.protocol === 'http:' || normalized.protocol === 'https:') {
-            return normalized.href;
-        }
-    } catch (e) {
-        return '';
-    }
-
-    return '';
-}
-
-function getFeaturedImageMarkup(post) {
-    const safeImageSrc = sanitizeImageSource(post.featured_image);
-    if (!safeImageSrc) return '';
-
-    const captions = getImageCaptions(post);
-    const caption = captions[0] || '';
-    const safeTitle = stripHtmlTags(post.title || 'Blog image');
-    const altText = caption || safeTitle;
-    const figcaptionHtml = caption ? `<figcaption class="image-caption">${escapeHtml(caption)}</figcaption>` : '';
-
-    return `
-        <figure class="article-featured-media">
-            <div class="article-featured-image">
-                <img src="${safeImageSrc}" alt="${escapeHtml(altText)}" />
-            </div>
-            ${figcaptionHtml}
-        </figure>
-    `;
-}
-
-function getContentImageMarkup(post, imageSrc, imageIndex, captionOffset = 0) {
-    const safeImageSrc = sanitizeImageSource(imageSrc);
-    if (!safeImageSrc) return '';
-
-    const captions = getImageCaptions(post);
-    const caption = captions[imageIndex + captionOffset] || '';
-    const safeTitle = stripHtmlTags(post.title || 'Blog image');
-    const fallbackAlt = `${safeTitle} image ${imageIndex + 1}`;
-    const altText = caption || fallbackAlt;
-    const figcaptionHtml = caption ? `<figcaption class="image-caption">${escapeHtml(caption)}</figcaption>` : '';
-
-    return `<figure class="content-inline-image"><img src="${safeImageSrc}" alt="${escapeHtml(altText)}">${figcaptionHtml}</figure>`;
-}
-
-// Build concise meta description from excerpt/content
-function getSeoDescription(post, maxLength = 155) {
-    const sourceText = stripHtmlTags(post.excerpt || post.content || 'Read this article on Howtoaiworld.');
-    if (sourceText.length <= maxLength) return sourceText;
-    return `${sourceText.slice(0, maxLength - 1).trim()}...`;
-}
-
-function upsertMetaTag({ selector, attributes }) {
-    let tag = document.querySelector(selector);
-    if (!tag) {
-        tag = document.createElement('meta');
-        document.head.appendChild(tag);
-    }
-
-    Object.keys(attributes).forEach((key) => {
-        tag.setAttribute(key, attributes[key]);
-    });
-}
-
-function setCanonicalUrl(url) {
-    let canonicalTag = document.querySelector('link[rel="canonical"]');
-    if (!canonicalTag) {
-        canonicalTag = document.createElement('link');
-        canonicalTag.setAttribute('rel', 'canonical');
-        document.head.appendChild(canonicalTag);
-    }
-    canonicalTag.setAttribute('href', url);
-}
-
-function setStructuredData(scriptId, payload) {
-    let schemaTag = document.getElementById(scriptId);
-    if (!schemaTag) {
-        schemaTag = document.createElement('script');
-        schemaTag.type = 'application/ld+json';
-        schemaTag.id = scriptId;
-        document.head.appendChild(schemaTag);
-    }
-    schemaTag.textContent = JSON.stringify(payload);
-}
-
-function updatePostSeo(post) {
-    if (!post) return;
-
-    const siteOrigin = 'https://howtoaiworld.com';
-    const postUrl = `${siteOrigin}/${buildPostUrl(post)}`;
-    const imageUrl = post.featured_image || `${siteOrigin}/og-image.jpg`;
-    const seoDescription = getSeoDescription(post);
-    const publishedDate = formatDateTime(post.parsedDate || post.date);
-    const postTitle = `${post.title} | Howtoaiworld`;
-
-    document.title = postTitle;
-
-    upsertMetaTag({
-        selector: 'meta[name="description"]',
-        attributes: { name: 'description', content: seoDescription }
-    });
-
-    if (post.keywords && Array.isArray(post.keywords) && post.keywords.length > 0) {
-        upsertMetaTag({
-            selector: 'meta[name="keywords"]',
-            attributes: { name: 'keywords', content: post.keywords.join(', ') }
-        });
-    }
-
-    upsertMetaTag({
-        selector: 'meta[name="robots"]',
-        attributes: { name: 'robots', content: 'index, follow, max-snippet:-1, max-image-preview:large' }
-    });
-
-    upsertMetaTag({
-        selector: 'meta[property="og:type"]',
-        attributes: { property: 'og:type', content: 'article' }
-    });
-    upsertMetaTag({
-        selector: 'meta[property="og:title"]',
-        attributes: { property: 'og:title', content: postTitle }
-    });
-    upsertMetaTag({
-        selector: 'meta[property="og:description"]',
-        attributes: { property: 'og:description', content: seoDescription }
-    });
-    upsertMetaTag({
-        selector: 'meta[property="og:url"]',
-        attributes: { property: 'og:url', content: postUrl }
-    });
-    upsertMetaTag({
-        selector: 'meta[property="og:image"]',
-        attributes: { property: 'og:image', content: imageUrl }
-    });
-
-    upsertMetaTag({
-        selector: 'meta[name="twitter:card"]',
-        attributes: { name: 'twitter:card', content: 'summary_large_image' }
-    });
-    upsertMetaTag({
-        selector: 'meta[name="twitter:title"]',
-        attributes: { name: 'twitter:title', content: postTitle }
-    });
-    upsertMetaTag({
-        selector: 'meta[name="twitter:description"]',
-        attributes: { name: 'twitter:description', content: seoDescription }
-    });
-    upsertMetaTag({
-        selector: 'meta[name="twitter:image"]',
-        attributes: { name: 'twitter:image', content: imageUrl }
-    });
-
-    upsertMetaTag({
-        selector: 'meta[property="article:published_time"]',
-        attributes: { property: 'article:published_time', content: publishedDate }
-    });
-
-    setCanonicalUrl(postUrl);
-
-    // Use provided SEO schema if available, otherwise generate default
-    const articleSchema = (post.seo_schema && post.seo_schema.article) ? post.seo_schema.article : {
-        '@context': 'https://schema.org',
-        '@type': 'BlogPosting',
-        headline: post.title,
-        description: seoDescription,
-        image: [imageUrl],
-        datePublished: publishedDate,
-        dateModified: publishedDate,
-        author: {
-            '@type': 'Person',
-            name: post.author || 'Howtoaiworld Editorial Team'
-        },
-        publisher: {
-            '@type': 'Organization',
-            name: 'Howtoaiworld',
-            logo: {
-                '@type': 'ImageObject',
-                url: `${siteOrigin}/assets/images/icons8-favicon-96.png`
-            }
-        },
-        mainEntityOfPage: {
-            '@type': 'WebPage',
-            '@id': postUrl
-        }
-    };
-
-    setStructuredData('post-structured-data', articleSchema);
-
-    const faqItems = post.faq || post.FAQ;
-    if (post.seo_schema && post.seo_schema.faq) {
-        setStructuredData('post-faq-structured-data', post.seo_schema.faq);
-    } else if (faqItems && Array.isArray(faqItems) && faqItems.length > 0) {
-        const faqSchema = {
-            '@context': 'https://schema.org',
-            '@type': 'FAQPage',
-            mainEntity: faqItems
-                .filter(item => item && item.question && item.answer)
-                .map(item => ({
-                    '@type': 'Question',
-                    name: stripHtmlTags(item.question),
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: stripHtmlTags(item.answer)
-                    }
-                }))
-        };
-
-        setStructuredData('post-faq-structured-data', faqSchema);
-    } else {
-        const faqSchemaTag = document.getElementById('post-faq-structured-data');
-        if (faqSchemaTag) {
-            faqSchemaTag.remove();
-        }
-    }
 }
 
 // Create blog article HTML with lazy loading for images
@@ -829,7 +577,7 @@ function loadCategoryPage(category) {
 // Detect current page from URL path
 function detectCurrentPage() {
     const pathname = window.location.pathname;
-    if (pathname.includes('/posts/')) {
+    if (pathname.includes('/posts/') || pathname.includes('/blogs/')) {
         return 'post';
     }
     const lastSegment = pathname.split('/').pop() || '';
@@ -842,187 +590,6 @@ function detectCurrentPage() {
     return lastSegment.replace(/\.html$/, '');
 }
 
-// Load individual blog post
-async function loadBlogPost() {
-    try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const postSlug = slugifyTitle(urlParams.get('post') || urlParams.get('title') || urlParams.get('slug'));
-        const postId = urlParams.get('id');
-        let post = null;
-        
-        if (!postSlug && !postId) {
-            window.location.href = buildInternalUrl('index.html');
-            return;
-        }
-        
-        // Wait for blog data to load if not already loaded
-        if (!dataLoaded) {
-            const success = await fetchBlogData();
-            if (!success) {
-                document.getElementById('blog-post-container').innerHTML = `
-                    <div style="text-align: center; padding: 60px 20px;">
-                        <h2 style="font-size: 32px; margin-bottom: 20px;">Error Loading Post</h2>
-                        <p style="font-size: 18px; color: #666; margin-bottom: 30px;">Unable to load blog data. Please try again later.</p>
-                        <a href="${buildInternalUrl('index.html')}" style="display: inline-block; padding: 15px 30px; background-color: #2c2c2c; color: #fff; text-decoration: none; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Go to Homepage</a>
-                    </div>
-                `;
-                return;
-            }
-        }
-        
-        if (postSlug) {
-            post = getPostBySlug(postSlug);
-        }
-
-        if (!post && postId) {
-            post = getPostById(postId);
-        }
-        
-        if (!post) {
-            document.getElementById('blog-post-container').innerHTML = `
-                <div style="text-align: center; padding: 60px 20px;">
-                    <h2 style="font-size: 32px; margin-bottom: 20px;">Post Not Found</h2>
-                    <p style="font-size: 18px; color: #666; margin-bottom: 30px;">Sorry, the article you're looking for doesn't exist.</p>
-                    <a href="${buildInternalUrl('index.html')}" style="display: inline-block; padding: 15px 30px; background-color: #2c2c2c; color: #fff; text-decoration: none; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Go to Homepage</a>
-                </div>
-            `;
-            return;
-        }
-
-        // Update page-level SEO metadata and structured data.
-        updatePostSeo(post);
-        
-        // Create article container
-        const article = document.createElement('article');
-        article.className = 'featured-article';
-    
-        // Featured image HTML
-        const featuredImageHtml = getFeaturedImageMarkup(post);
-        const contentCaptionOffset = featuredImageHtml ? 1 : 0;
-        
-        let keywordsHtml = '';
-        if (post.keywords && Array.isArray(post.keywords) && post.keywords.length > 0) {
-            const keywordsList = post.keywords.map(keyword => 
-                `<span style="display: inline-block; background-color: #f0f0f0; color: #333; padding: 4px 12px; margin-right: 8px; margin-top: 10px; border-radius: 16px; font-size: 13px; font-weight: 500;">${escapeHtml(keyword)}</span>`
-            ).join('');
-            keywordsHtml = `<div class="article-keywords" style="margin-bottom: 20px;">${keywordsList}</div>`;
-        }
-        
-        // Build article HTML
-        article.innerHTML = `
-            <h1 class="article-title">${escapeHtml(post.title)}</h1>
-            <div class="article-meta">
-                <span class="author">By ${escapeHtml(post.author)}</span>
-                <span class="separator">|</span>
-                <time datetime="${formatDateTime(post.date)}">${formatDate(post.date)}</time>
-                <span class="separator">|</span>
-                <a href="${buildInternalUrl(`index.html?category=${encodeURIComponent(post.category)}`)}" style="color: #c41e3a; text-decoration: none; font-weight: bold;">${escapeHtml(post.category)}</a>
-            </div>
-            ${keywordsHtml}
-            ${featuredImageHtml}
-            <div class="article-content">
-            </div>
-            <div style="margin-top: 40px; padding-top: 30px; border-top: 2px solid #ddd;">
-                <a href="${buildInternalUrl('index.html')}" class="back-to-posts-link">← Back to All Posts</a>
-            </div>
-        `;
-        
-        // Set content HTML separately to preserve formatting
-        const contentDiv = article.querySelector('.article-content');
-        let contentHtml = post.content;
-        
-        // Remove the first h1 tag from content to avoid duplication
-        if (contentHtml) {
-            contentHtml = contentHtml.replace(/<h1[^>]*>.*?<\/h1>/, '');
-        }
-        
-        // Handle content images
-        if (post.content_images && Array.isArray(post.content_images) && post.content_images.length > 0) {
-            if (post.content_images.length >= 1) {
-                const tempWrapper = document.createElement('div');
-                tempWrapper.innerHTML = contentHtml || '';
-                // Filter out paragraphs that are inside tables to avoid breaking table layout
-                const paragraphs = Array.from(tempWrapper.querySelectorAll('p')).filter(p => !p.closest('table'));
-                if (paragraphs.length > 0) {
-                    const midIndex = Math.floor(paragraphs.length / 2);
-                    const imageMarkup = getContentImageMarkup(post, post.content_images[0], 0, contentCaptionOffset);
-                    const imageContainer = document.createElement('div');
-                    imageContainer.innerHTML = imageMarkup;
-                    paragraphs[midIndex].insertAdjacentElement('afterend', imageContainer);
-                }
-                contentHtml = tempWrapper.innerHTML;
-            }
-        }
-        
-        contentDiv.innerHTML = contentHtml;
-        
-        // Add second image at the end if exists
-        if (post.content_images && Array.isArray(post.content_images) && post.content_images.length >= 2) {
-            const secondImageMarkup = getContentImageMarkup(post, post.content_images[1], 1, contentCaptionOffset);
-            const secondImageDiv = document.createElement('div');
-            secondImageDiv.innerHTML = secondImageMarkup;
-            contentDiv.appendChild(secondImageDiv);
-        }
-        
-        // Add FAQ section if it exists
-        const faqItems = post.faq || post.FAQ;
-        if (faqItems && Array.isArray(faqItems) && faqItems.length > 0) {
-            const faqDiv = document.createElement('div');
-            faqDiv.className = 'article-faq';
-            
-            const faqList = faqItems.map((item, idx) => {
-                const q = escapeHtml(item.question || 'Question');
-                const a = escapeHtml(item.answer || '');
-                return `
-                    <div class="faq-item" data-index="${idx}">
-                        <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-${idx}">
-                            <span class="faq-question-text">${q}</span>
-                            <span class="faq-toggle" aria-hidden="true">+</span>
-                        </button>
-                        <div id="faq-answer-${idx}" class="faq-answer" hidden>
-                            <p>${a}</p>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            faqDiv.innerHTML = `
-                <div class="faq-heading">
-                    <p class="faq-kicker">Need quick answers?</p>
-                    <h3>Frequently Asked Questions</h3>
-                </div>
-                <div class="faq-list">${faqList}</div>
-            `;
-            article.appendChild(faqDiv);
-            faqDiv.querySelectorAll('.faq-question').forEach((btn) => {
-                btn.addEventListener('click', () => {
-                    const answerId = btn.getAttribute('aria-controls');
-                    const answer = faqDiv.querySelector(`#${answerId}`);
-                    const isOpen = btn.getAttribute('aria-expanded') === 'true';
-                    btn.setAttribute('aria-expanded', String(!isOpen));
-                    answer.hidden = isOpen;
-                    btn.parentElement.classList.toggle('open', !isOpen);
-                });
-            });
-        }
-        
-        // Replace container with article
-        document.getElementById('blog-post-container').innerHTML = '';
-        document.getElementById('blog-post-container').appendChild(article);
-        
-        // Sidebar will be updated automatically via sidebarComponentLoaded events
-        
-    } catch (error) {
-        console.error('Error loading blog post:', error);
-        document.getElementById('blog-post-container').innerHTML = `
-            <div style="text-align: center; padding: 60px 20px;">
-                <h2 style="font-size: 32px; margin-bottom: 20px;">Error</h2>
-                <p style="font-size: 18px; color: #666; margin-bottom: 30px;">An error occurred while loading the post.</p>
-                <a href="${buildInternalUrl('index.html')}" style="display: inline-block; padding: 15px 30px; background-color: #2c2c2c; color: #fff; text-decoration: none; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Go to Homepage</a>
-            </div>
-        `;
-    }
-}
-
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', async function() {
     const success = await fetchBlogData();
@@ -1031,24 +598,31 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     if (page === 'home') {
         if (!success) {
-            showLoadingError('home');
+            // Already statically rendered, just continue
         } else {
             initializeSearch();
-            loadHomepageWithFilter();
+            const urlParams = new URLSearchParams(window.location.search);
+            const category = urlParams.get('category');
+            if (category) {
+                loadCategoryPage(category);
+            } else {
+                // Initial static render is already visible, attach pagination controls
+                const posts = getBlogPosts();
+                const totalPages = Math.ceil(posts.length / postsPerPage);
+                updatePaginationControls(1, totalPages);
+                observeLazyImages();
+            }
         }
     } else if (page === 'featured') {
-        if (!success) {
-            showLoadingError('featured');
-        } else {
-            loadFeaturedBlogsPage();
+        if (success) {
+            observeLazyImages();
         }
-    } else if (page === 'blog-post') {
-        // Load individual blog post
-        await loadBlogPost();
     } else if (page === 'post') {
         // Static post pages already contain article HTML.
-        // Data fetch above is only used to hydrate sidebar widgets.
-        return;
+        // Data fetch above is only used to hydrate optional dynamic widgets.
+        if (success) {
+            observeLazyImages();
+        }
     }
 });
 
