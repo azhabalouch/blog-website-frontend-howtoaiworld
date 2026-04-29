@@ -1,12 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /admin/
-Disallow: /login/
 
-User-agent: Mediapartners-Google
-Allow: /
-
-Crawl-delay: 1
-
-# Sitemap
 Sitemap: https://howtoaiworld.com/sitemap.xml
