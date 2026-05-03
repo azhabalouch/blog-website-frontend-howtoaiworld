@@ -1,26 +1,106 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Universal Bright Theme */
+  --background: #F9F8F6;
+  --foreground: #2D2C2A;
+  --primary: #E5A168;
+  
+  /* Typography System */
+  --font-heading: "Montserrat", sans-serif;
+  --font-body: "Geist", sans-serif;
+  
+  /* Premium Effects */
+  --shadow-premium: 0 4px 20px rgba(0, 0, 0, 0.05), 0 2px 8px rgba(0, 0, 0, 0.03);
+  --glow-premium: 0 0 15px rgba(229, 161, 104, 0.4);
+  --border-premium: 1px solid rgba(45, 44, 42, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Universal Dark Theme */
+    --background: #1A1A1A;
+    --foreground: #FFFFFF;
+    --primary: #0F766E;
+    
+    /* Adjusted Premium Effects */
+    --shadow-premium: 0 4px 20px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
+    --glow-premium: 0 0 15px rgba(15, 118, 110, 0.4);
+    --border-premium: 1px solid rgba(255, 255, 255, 0.1);
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary: var(--primary);
+  --font-sans: var(--font-body);
+  --font-heading: var(--font-heading);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Global Typography & Theme Application */
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+}
+
+h1 { 
+  font-size: 48px;
+}
+
+h2 { 
+  font-size: 32px;
+}
+
+h3 { 
+  font-size: 24px;
+}
+
+h4 { 
+  font-size: 20px;
+}
+
+/* Component Typography Mapping */
+nav a, button, .btn, .nav-link {
+  font-family: var(--font-body);
+  font-size: 16px;
+}
+
+small, caption, .sub-text, .caption {
+  font-family: var(--font-body);
+  font-size: 12px;
+}
+
+/* Premium Styling Classes */
+.premium-card {
+  background-color: var(--background);
+  border: var(--border-premium);
+  box-shadow: var(--shadow-premium);
+  border-radius: 12px;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.premium-card:hover {
+  box-shadow: var(--shadow-premium), var(--glow-premium);
+}
+
+.premium-button {
+  background-color: var(--primary);
+  color: #FFFFFF;
+  border: none;
+  box-shadow: var(--shadow-premium);
+  transition: box-shadow 0.3s ease;
+}
+
+.premium-button:hover {
+  box-shadow: var(--shadow-premium), var(--glow-premium);
 }

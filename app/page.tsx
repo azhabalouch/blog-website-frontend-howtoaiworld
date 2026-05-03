@@ -40,7 +40,7 @@ export default function Home() {
 
         {/* Recommended Articles */}
         <div className="space-y-4">
-          <h2 className="text-xl font-bold uppercase tracking-wider">Recommended Articles</h2>
+          <h2 className="text-xl font-bold uppercase tracking-wider">Recommended</h2>
           <div className="flex flex-col gap-4 h-[400px] justify-between">
             {recommendedBlogs.map((blog, idx) => (
               <Link key={idx} href={`/blogs/${generateSlug(blog.title)}`} className="flex gap-4 bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition">
