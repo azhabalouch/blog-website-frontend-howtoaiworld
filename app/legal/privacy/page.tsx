@@ -9,18 +9,18 @@ export default function PrivacyPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2">Privacy Policy</h1>
-        <div className="text-gray-500 mb-6">
+        <h1 className="text-4xl font-bold mb-2 text-gray-900 dark:text-white">Privacy Policy</h1>
+        <div className="text-muted mb-6">
           <time dateTime="2026-02-07">Effective Date: February 07, 2026</time>
         </div>
         <nav className="flex flex-wrap gap-4 border-b pb-4">
-          <Link href="/legal/privacy" className="text-blue-600 font-medium">Privacy Policy</Link>
-          <Link href="/legal/terms" className="text-gray-600 hover:text-blue-600">Terms of Service</Link>
-          <Link href="/legal/disclaimer" className="text-gray-600 hover:text-blue-600">Disclaimer</Link>
+          <Link href="/legal/privacy" className="text-primary font-medium">Privacy Policy</Link>
+          <Link href="/legal/terms" className="text-muted hover:text-primary">Terms of Service</Link>
+          <Link href="/legal/disclaimer" className="text-muted hover:text-primary">Disclaimer</Link>
         </nav>
       </div>
       
-      <div className="prose max-w-none prose-h3:text-2xl prose-h3:font-bold prose-h3:mt-8 prose-h3:mb-4">
+      <div className="prose dark:prose-invert max-w-none prose-h3:text-2xl prose-h3:font-bold prose-h3:mt-8 prose-h3:mb-4">
         <p>Welcome to Howtoaiworld (www.howtoaiworld.com). We are committed to protecting your personal information and your right to privacy. If you have any questions or concerns about this privacy notice or our practices with regards to your personal information, please contact us at howtoaiworld@gmail.com.</p>
         
         <p>This Privacy Policy governs the manner in which Howtoaiworld collects, uses, maintains, and discloses information collected from users (each, a "User") of the https://www.howtoaiworld.com website ("Site").</p>

@@ -9,18 +9,18 @@ export default function TermsPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2">Terms of Service</h1>
-        <div className="text-gray-500 mb-6">
+        <h1 className="text-4xl font-bold mb-2 text-gray-900 dark:text-white">Terms of Service</h1>
+        <div className="text-muted mb-6">
           <time dateTime="2026-02-07">Effective Date: February 07, 2026</time>
         </div>
         <nav className="flex flex-wrap gap-4 border-b pb-4">
-          <Link href="/legal/privacy" className="text-gray-600 hover:text-blue-600">Privacy Policy</Link>
-          <Link href="/legal/terms" className="text-blue-600 font-medium">Terms of Service</Link>
-          <Link href="/legal/disclaimer" className="text-gray-600 hover:text-blue-600">Disclaimer</Link>
+          <Link href="/legal/privacy" className="text-muted hover:text-primary">Privacy Policy</Link>
+          <Link href="/legal/terms" className="text-primary font-medium">Terms of Service</Link>
+          <Link href="/legal/disclaimer" className="text-muted hover:text-primary">Disclaimer</Link>
         </nav>
       </div>
       
-      <div className="prose max-w-none prose-h3:text-2xl prose-h3:font-bold prose-h3:mt-8 prose-h3:mb-4">
+      <div className="prose dark:prose-invert max-w-none prose-h3:text-2xl prose-h3:font-bold prose-h3:mt-8 prose-h3:mb-4">
         <p>Welcome to Howtoaiworld (www.howtoaiworld.com). By accessing this website, we assume you accept these terms and conditions. Do not continue to use Howtoaiworld if you do not agree to take all of the terms and conditions stated on this page.</p>
         
         <h3>1. Definitions</h3>
