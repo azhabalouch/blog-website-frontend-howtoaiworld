@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="grid gap-10 md:grid-cols-2 xl:grid-cols-4" aria-label="Footer navigation">
           <section className="space-y-4 xl:col-span-1">
             <div className="flex items-center gap-2.5">
-              <img className="w-9 h-8 rounded-full" src="/logo.jpg" alt="Howtoaiworld Logo"/>
+              {/* <img className="w-9 h-8 rounded-full" src="/logo.jpg" alt="Howtoaiworld Logo"/> */}
               <span className="font-bold text-xl tracking-tight leading-none text-foreground">
                 Howtoaiworld
               </span>
