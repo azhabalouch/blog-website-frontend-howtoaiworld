@@ -1,11 +1,19 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://howtoaiworld.com</loc><priority>1.0</priority><changefreq>daily</changefreq></url>
-  <url><loc>https://howtoaiworld.com/blogs</loc><priority>0.9</priority><changefreq>daily</changefreq></url>
-  <url><loc>https://howtoaiworld.com/about</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://howtoaiworld.com/contact</loc><priority>0.5</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://howtoaiworld.com/authors</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://howtoaiworld.com/legal/privacy</loc><priority>0.3</priority><changefreq>yearly</changefreq></url>
-  <url><loc>https://howtoaiworld.com/legal/terms</loc><priority>0.3</priority><changefreq>yearly</changefreq></url>
-  <url><loc>https://howtoaiworld.com/legal/disclaimer</loc><priority>0.3</priority><changefreq>yearly</changefreq></url>
-</urlset>
+<?xml version="1.0" ?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>https://howtoaiworld.com/sitemap-main.xml</loc>
+    <lastmod>2026-05-04</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://howtoaiworld.com/sitemap-legal.xml</loc>
+    <lastmod>2026-05-04</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://howtoaiworld.com/sitemap-blogs.xml</loc>
+    <lastmod>2026-05-04</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://howtoaiworld.com/sitemap-authors.xml</loc>
+    <lastmod>2026-05-04</lastmod>
+  </sitemap>
+</sitemapindex>

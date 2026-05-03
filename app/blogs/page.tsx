@@ -18,7 +18,7 @@ function BlogsContent() {
   const [selectedAuthor, setSelectedAuthor] = useState(searchParams.get('author') || '');
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'newest');
 
-  // Update URL when filters change
+  // Update URL when filters change (reset page to 1)
   useEffect(() => {
     const params = new URLSearchParams();
     if (searchQuery) params.set('q', searchQuery);
@@ -91,12 +91,26 @@ function BlogsContent() {
     setSortBy('newest');
   };
 
-  const [currentPage, setCurrentPage] = useState(1);
   const blogsPerPage = 9;
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, selectedCategory, selectedAuthor, sortBy]);
+  // Pagination from URL for SEO/crawlability
+  const currentPage = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
+
+  // Helper to build query string with current filters and page
+  const buildQueryString = (pageNum: number, overrides: Record<string, string> = {}) => {
+    const params = new URLSearchParams();
+    if (searchQuery) params.set('q', searchQuery);
+    if (selectedCategory) params.set('category', selectedCategory);
+    if (selectedAuthor) params.set('author', selectedAuthor);
+    if (sortBy !== 'newest') params.set('sort', sortBy);
+    if (pageNum > 1) params.set('page', pageNum.toString());
+    // Apply overrides
+    Object.entries(overrides).forEach(([key, value]) => {
+      if (value) params.set(key, value);
+      else params.delete(key);
+    });
+    return params.toString() ? `?${params.toString()}` : '';
+  };
 
   const indexOfLastBlog = currentPage * blogsPerPage;
   const indexOfFirstBlog = indexOfLastBlog - blogsPerPage;
@@ -291,23 +305,23 @@ function BlogsContent() {
 
           {totalPages > 1 && (
             <div className="flex justify-center items-center gap-2 mt-8">
-              <button 
-                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-                className="premium-button px-4 py-2 disabled:opacity-50"
+              <Link 
+                href={`/blogs${buildQueryString(currentPage - 1)}`}
+                aria-label="Previous page"
+                className={`premium-button px-4 py-2 ${currentPage === 1 ? 'pointer-events-none opacity-50' : ''}`}
               >
                 Previous
-              </button>
+              </Link>
               <span className="text-muted font-medium text-sm">
                 Page {currentPage} of {totalPages}
               </span>
-              <button 
-                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-                className="premium-button px-4 py-2 disabled:opacity-50"
+              <Link 
+                href={`/blogs${buildQueryString(currentPage + 1)}`}
+                aria-label="Next page"
+                className={`premium-button px-4 py-2 ${currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}`}
               >
                 Next
-              </button>
+              </Link>
             </div>
           )}
         </>
