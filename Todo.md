@@ -1,14 +1,6 @@
 # Task lists
 
-This needs to be completed by `Monday: May 4, 2026`. _(Try to not use AI as much as you can to avoid verbose coding)_
-
-### Design
-
-- [ ] Create pages wireframe.
-- [ ] Create pages low-fidelity design.
-- [ ] Create pages high-fidelity design.
-- [ ] Test the prototype - Get Feedback.
-- [ ] Add changes and finalise design.
+This needs to be completed by `Monday: May 4, 2026`.
 
 
 ### Code (Agile)
