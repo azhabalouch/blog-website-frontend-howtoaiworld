@@ -1,16 +1,27 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronRight, Share2, Link as LinkIcon, User } from "lucide-react";
-import cacheData from "../../../data/cache.json";
-
-function generateSlug(title: string) {
-  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-}
+import { Share2, Link as LinkIcon, User } from "lucide-react";
+import { getBlogBySlug, getBlogs, generateSlug } from "../../../lib/site-data";
 
 export async function generateStaticParams() {
-  return (cacheData.blogs || []).map((blog) => ({
+  return getBlogs().map((blog) => ({
     slug: generateSlug(blog.title),
   }));
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const resolvedParams = await params;
+  const blog = getBlogBySlug(resolvedParams.slug);
+
+  if (!blog) {
+    return { title: "Blog not found - Howtoaiworld" };
+  }
+
+  return {
+    title: `${blog.title} - Howtoaiworld`,
+    description: blog.excerpt,
+    keywords: blog.keywords,
+  };
 }
 
 export default async function SingleBlogPage({
@@ -19,7 +30,7 @@ export default async function SingleBlogPage({
   params: Promise<{ slug: string }>
 }) {
   const resolvedParams = await params;
-  const blog = cacheData.blogs.find(b => generateSlug(b.title) === resolvedParams.slug);
+  const blog = getBlogBySlug(resolvedParams.slug);
 
   if (!blog) {
     return <div className="max-w-4xl mx-auto py-20 text-center text-2xl font-bold">Blog not found</div>;
@@ -31,10 +42,11 @@ export default async function SingleBlogPage({
       <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-fuchsia-500 pt-16 pb-24 text-white">
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
-            <div className="flex items-center gap-2 text-sm font-medium text-indigo-100 mb-4">
-              <span>{blog.category.split('/')[0]?.trim()}</span>
-              <span className="w-1 h-1 rounded-full bg-indigo-200"></span>
-              <span>Content Marketing</span>
+            <div className="flex items-center gap-2 text-sm font-medium text-indigo-100 mb-4 flex-wrap">
+              <span>{blog.category?.split('/')[0]?.trim()}</span>
+              {blog.keywords?.slice(0, 2).map((keyword) => (
+                <span key={keyword} className="px-2 py-1 rounded-full bg-white/10 text-white">{keyword}</span>
+              ))}
             </div>
             <h1 className="text-4xl lg:text-5xl font-extrabold leading-tight mb-6">
               {blog.title}
@@ -45,7 +57,7 @@ export default async function SingleBlogPage({
                   <User className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <p>Written by: <span className="font-bold text-white">{blog.author}</span></p>
+                  <p>Written by: <Link href={`/authors/${generateSlug(blog.author)}`} className="font-bold text-white hover:underline">{blog.author}</Link></p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
@@ -56,12 +68,12 @@ export default async function SingleBlogPage({
             </div>
           </div>
           <div className="hidden lg:flex justify-end">
-            <div className="relative w-80 h-80">
+            <div className="relative w-80 h-80 rounded-3xl overflow-hidden shadow-2xl border border-white/20 bg-white/10">
               <Image 
-                src="https://placehold.co/400x400/transparent/white?text=AI+Icon" 
-                alt="AI Decorative Icon" 
+                src={blog.featured_image || "https://placehold.co/400x400/transparent/white?text=AI+Icon"} 
+                alt={blog.title}
                 fill 
-                className="object-contain"
+                className="object-cover"
               />
             </div>
           </div>
@@ -99,8 +111,26 @@ export default async function SingleBlogPage({
 
           {/* Main Content Area */}
           <main className="flex-1 prose prose-lg prose-blue max-w-none text-gray-700">
+            {blog.keywords && blog.keywords.length > 0 && (
+              <div className="not-prose mb-8 flex flex-wrap gap-2">
+                {blog.keywords.map((keyword) => (
+                  <span key={keyword} className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-sm font-semibold">{keyword}</span>
+                ))}
+              </div>
+            )}
+
+            {blog.content_images && blog.content_images.length > 0 && (
+              <div className="not-prose mb-10 grid grid-cols-1 md:grid-cols-2 gap-4">
+                {blog.content_images.map((image, idx) => (
+                  <div key={idx} className="relative h-64 rounded-2xl overflow-hidden shadow-sm">
+                    <Image src={image} alt={`${blog.title} image ${idx + 1}`} fill className="object-cover" />
+                  </div>
+                ))}
+              </div>
+            )}
+
             {/* If content is raw HTML, render it safely */}
-            <div dangerouslySetInnerHTML={{ __html: blog.content }} />
+            <div dangerouslySetInnerHTML={{ __html: blog.content || "" }} />
             
             {/* FAQ Section */}
             {blog.faq && blog.faq.length > 0 && (

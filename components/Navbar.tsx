@@ -1,23 +1,17 @@
 import Link from "next/link";
 import { Search, ChevronDown } from "lucide-react";
-import cacheData from "../data/cache.json";
+import { getCategories } from "../lib/site-data";
 
 export default function Navbar() {
-  // Extract unique categories dynamically
-  const categories = Array.from(new Set(
-    (cacheData.blogs || []).flatMap(blog => 
-      blog.category ? blog.category.split('/').map(c => c.trim()) : []
-    )
-  )).slice(0, 8); // Limit to top 8 for UI
+  const categories = getCategories().slice(0, 8);
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">G</div>
+          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">H</div>
           <span className="font-bold text-xl tracking-tight leading-none">
-            GLOBAL ENTERPRISE<br/>
-            <span className="font-normal text-sm text-gray-500">SOLUTIONS</span>
+            Howtoaiworld
           </span>
         </Link>
 
@@ -27,9 +21,9 @@ export default function Navbar() {
             Blogs <ChevronDown className="w-4 h-4 ml-1" />
             <div className="absolute top-full left-0 w-48 bg-white border border-gray-100 shadow-lg rounded-md opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all transform translate-y-2 group-hover:translate-y-0 flex flex-col z-50">
               <Link href="/blogs" className="px-4 py-2 hover:bg-gray-50 text-gray-800 hover:text-blue-600 font-bold border-b border-gray-100">All Blogs</Link>
-              {categories.map((cat, idx) => (
-                <Link key={idx} href={`/blogs?category=${encodeURIComponent(cat)}`} className="px-4 py-2 hover:bg-gray-50 text-gray-600 hover:text-blue-600">
-                  {cat}
+              {categories.map((cat) => (
+                <Link key={cat.slug} href={`/blogs?category=${encodeURIComponent(cat.name)}`} className="px-4 py-2 hover:bg-gray-50 text-gray-600 hover:text-blue-600">
+                  {cat.name}
                 </Link>
               ))}
             </div>

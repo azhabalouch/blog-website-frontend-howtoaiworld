@@ -1,12 +1,15 @@
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, Play, CheckCircle2, ShieldCheck, Cloud, BarChart2, Briefcase, Lock, Database } from "lucide-react";
-import cacheData from "../data/cache.json";
+import Link from "next/link";
+import { ChevronLeft, ChevronRight, CheckCircle2, ShieldCheck, Cloud, BarChart2, Briefcase, Lock, Database } from "lucide-react";
+import { getAuthors, getBlogs, getCategories, generateSlug } from "../lib/site-data";
 
 export default function Home() {
-  const blogs = cacheData.blogs || [];
+  const blogs = getBlogs();
   const featuredBlog = blogs[0];
   const recommendedBlogs = blogs.slice(1, 4);
   const latestBlogs = blogs.slice(4, 8);
+  const categories = getCategories().slice(0, 6);
+  const authors = getAuthors().slice(0, 3);
   
   return (
     <main className="max-w-7xl mx-auto px-4 py-8 space-y-12">
@@ -15,7 +18,7 @@ export default function Home() {
         {/* Featured Story */}
         <div className="lg:col-span-2 space-y-4">
           <h2 className="text-xl font-bold uppercase tracking-wider">Featured Stories</h2>
-          <div className="relative rounded-xl overflow-hidden shadow-lg h-[400px] group cursor-pointer">
+          <Link href={featuredBlog ? `/blogs/${generateSlug(featuredBlog.title)}` : "/blogs"} className="relative block rounded-xl overflow-hidden shadow-lg h-[400px] group cursor-pointer">
             {featuredBlog && (
               <>
                 <Image 
@@ -32,7 +35,7 @@ export default function Home() {
                 <button className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 p-2 rounded-full hover:bg-white/40"><ChevronRight className="w-6 h-6 text-white" /></button>
               </>
             )}
-          </div>
+          </Link>
         </div>
 
         {/* Recommended Articles */}
@@ -40,7 +43,7 @@ export default function Home() {
           <h2 className="text-xl font-bold uppercase tracking-wider">Recommended Articles</h2>
           <div className="flex flex-col gap-4 h-[400px] justify-between">
             {recommendedBlogs.map((blog, idx) => (
-              <div key={idx} className="flex gap-4 bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition">
+              <Link key={idx} href={`/blogs/${generateSlug(blog.title)}`} className="flex gap-4 bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition">
                 <div className="relative w-24 h-20 rounded-md overflow-hidden shrink-0">
                   <Image src={blog.featured_image || "https://placehold.co/100x100"} alt="Thumb" fill className="object-cover" />
                 </div>
@@ -51,7 +54,7 @@ export default function Home() {
                     <span>{blog.author}</span>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -62,7 +65,7 @@ export default function Home() {
         <h2 className="text-xl font-bold uppercase tracking-wider">Latest From Our Experts</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {latestBlogs.map((blog, idx) => (
-            <div key={idx} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition flex flex-col h-full">
+            <Link key={idx} href={`/blogs/${generateSlug(blog.title)}`} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition flex flex-col h-full">
               <div className="relative h-40">
                 <Image src={blog.featured_image || "https://placehold.co/300x200"} alt={blog.title} fill className="object-cover" />
               </div>
@@ -70,6 +73,13 @@ export default function Home() {
                 <span className="text-xs font-semibold text-blue-600 uppercase mb-2">{blog.category || "Category"}</span>
                 <h3 className="font-bold text-lg mb-2 leading-tight line-clamp-2">{blog.title}</h3>
                 <p className="text-sm text-gray-500 line-clamp-3 mb-4 flex-1">{blog.excerpt}</p>
+                {blog.keywords && blog.keywords.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {blog.keywords.slice(0, 3).map((keyword) => (
+                      <span key={keyword} className="text-[11px] font-semibold rounded-full bg-blue-50 text-blue-700 px-2 py-1">{keyword}</span>
+                    ))}
+                  </div>
+                )}
                 <div className="flex items-center gap-3 mt-auto">
                   <div className="w-8 h-8 rounded-full bg-gray-200 shrink-0" />
                   <div>
@@ -77,9 +87,8 @@ export default function Home() {
                     <div className="text-xs text-gray-500">{blog.date}</div>
                   </div>
                 </div>
-                <button className="w-full mt-4 py-2 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-50">Read More</button>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </section>
@@ -89,11 +98,11 @@ export default function Home() {
           <h2 className="text-xl font-bold uppercase tracking-wider">Latest Blogs</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {blogs.slice(0, 4).map((blog, idx) => (
-              <div key={idx} className="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition">
+                <Link key={idx} href={`/blogs/${generateSlug(blog.title)}`} className="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition block">
                 <h3 className="font-bold text-lg mb-2 line-clamp-1">{blog.title}</h3>
                 <p className="text-sm text-gray-500 mb-2 line-clamp-2">{blog.excerpt}</p>
                 <div className="text-xs text-blue-600 font-semibold uppercase">{blog.category || "Category"}</div>
-              </div>
+                </Link>
             ))}
           </div>
         </div>
@@ -101,24 +110,37 @@ export default function Home() {
         <div className="space-y-4">
           <h2 className="text-xl font-bold uppercase tracking-wider">Browse Categories</h2>
           <div className="grid grid-cols-2 gap-3">
-            {[
-              { name: 'AI & Automation', count: 14, icon: CheckCircle2 },
-              { name: 'Cybersecurity', count: 5, icon: ShieldCheck },
-              { name: 'Cloud Infrastructure', count: 0, icon: Cloud },
-              { name: 'Data Analytics', count: 1, icon: BarChart2 },
-              { name: 'Business', count: 4, icon: Briefcase },
-              { name: 'Security', count: 1, icon: Lock },
-              { name: 'Data Science', count: 7, icon: Database },
-            ].map(cat => (
-              <div key={cat.name} className="bg-white p-3 rounded-lg shadow-sm border border-gray-100 flex items-center gap-2 cursor-pointer hover:border-blue-300">
-                  <cat.icon className="w-4 h-4 text-blue-600" />
-                  <span className="text-sm font-medium flex-1">{cat.name}</span>
-                  <span className="text-xs text-gray-400">({cat.count})</span>
-              </div>
-            ))}
+              {categories.map((cat, idx) => {
+                const icons = [CheckCircle2, ShieldCheck, Cloud, BarChart2, Briefcase, Lock, Database];
+                const Icon = icons[idx % icons.length];
+
+                return (
+                  <Link key={cat.slug} href={`/blogs?category=${encodeURIComponent(cat.name)}`} className="bg-white p-3 rounded-lg shadow-sm border border-gray-100 flex items-center gap-2 cursor-pointer hover:border-blue-300">
+                      <Icon className="w-4 h-4 text-blue-600" />
+                      <span className="text-sm font-medium flex-1">{cat.name}</span>
+                      <span className="text-xs text-gray-400">({cat.count})</span>
+                  </Link>
+                );
+              })}
           </div>
         </div>
       </section>
+
+        <section className="space-y-4">
+          <h2 className="text-xl font-bold uppercase tracking-wider">Top Authors</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {authors.map((author) => (
+              <Link key={author.slug} href={`/authors/${author.slug}`} className="bg-white rounded-xl shadow-sm hover:shadow-md transition p-5 flex gap-4">
+                <div className="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center text-xl font-bold shrink-0">{author.initials}</div>
+                <div className="min-w-0">
+                  <h3 className="font-bold text-lg leading-tight">{author.name}</h3>
+                  <p className="text-sm text-gray-500 line-clamp-2">{author.bio}</p>
+                  <div className="text-xs font-semibold text-blue-600 mt-2">{author.postCount} posts</div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
     </main>
   )
 }

@@ -1,18 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import cacheData from "../../data/cache.json";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState, useEffect } from "react";
-
-function generateSlug(title: string) {
-  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-}
+import { getBlogs, generateSlug } from "../../lib/site-data";
 
 function BlogsContent() {
   const searchParams = useSearchParams();
-  const rawBlogs = cacheData.blogs || [];
+  const rawBlogs = getBlogs();
   
   const query = (searchParams.get('q') || '').toLowerCase();
   const category = (searchParams.get('category') || '').toLowerCase();
@@ -66,6 +62,13 @@ function BlogsContent() {
                     <span className="text-xs font-semibold text-blue-600 uppercase mb-2">{blog.category || "Category"}</span>
                     <h2 className="font-bold text-lg mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">{blog.title}</h2>
                     <p className="text-gray-600 text-sm line-clamp-3 mb-4">{blog.excerpt}</p>
+                    {blog.keywords && blog.keywords.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {blog.keywords.slice(0, 3).map((keyword) => (
+                          <span key={keyword} className="text-[11px] font-semibold rounded-full bg-blue-50 text-blue-700 px-2 py-1">{keyword}</span>
+                        ))}
+                      </div>
+                    )}
                     <div className="mt-auto flex items-center justify-between text-sm text-gray-500">
                       <span className="font-medium">{blog.author}</span>
                       <span>{blog.date}</span>
