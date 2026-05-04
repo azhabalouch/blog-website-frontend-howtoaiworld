@@ -39,7 +39,7 @@ export default function Navbar() {
         <nav className="hidden lg:flex items-center gap-6 font-medium text-sm text-muted">
           <Link href="/" className="hover:text-primary transition-colors">Home</Link>
           <div className="relative group flex items-center cursor-pointer hover:text-primary py-4 transition-colors">
-            Blogs <ChevronDown className="w-4 h-4 ml-1" />
+            <Link href="/blogs" className="hover:text-primary transition-colors">Blogs</Link> <ChevronDown className="w-4 h-4 ml-1" />
             <div className="absolute top-full left-0 w-48 bg-card-bg border border-card-border rounded-xl opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all transform translate-y-2 group-hover:translate-y-0 flex flex-col z-50" style={{ boxShadow: "var(--shadow-elevated)" }}>
               <Link href="/blogs" className="px-4 py-2.5 hover:bg-surface text-foreground hover:text-primary font-bold border-b border-card-border">All Blogs</Link>
               {categories.map((cat) => (

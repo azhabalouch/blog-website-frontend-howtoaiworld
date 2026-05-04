@@ -1,7 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Share2, Link as LinkIcon, User, BookOpen, Clock, Calendar } from "lucide-react";
+import Script from "next/script";
+import { User, Clock, Calendar } from "lucide-react";
 import { getBlogBySlug, getBlogs, getAuthorBySlug, generateSlug } from "../../../lib/site-data";
+import ShareSection from "../../../components/ShareSection";
+import TableOfContents from "../../../components/TableOfContents";
 
 export async function generateStaticParams() {
   return getBlogs().map((blog) => ({
@@ -17,10 +20,24 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     return { title: "Blog not found - Howtoaiworld" };
   }
 
+  const blogUrl = `https://howtoaiworld.com/blogs/${generateSlug(blog.title)}`;
+
   return {
     title: `${blog.title} - Howtoaiworld`,
     description: blog.excerpt,
     keywords: blog.keywords,
+    alternates: {
+      canonical: blogUrl,
+    },
+    openGraph: {
+      title: blog.title,
+      description: blog.excerpt,
+      url: blogUrl,
+      type: "article",
+      publishedTime: blog.date,
+      authors: [blog.author],
+      images: blog.featured_image ? [blog.featured_image] : undefined,
+    },
   };
 }
 
@@ -40,6 +57,129 @@ function extractHeadings(htmlContent: string): { id: string; text: string; level
   return headings;
 }
 
+// Keywords Section Component for Right Sidebar
+function KeywordsSection({ keywords }: { keywords: string[] }) {
+  if (!keywords || keywords.length === 0) return null;
+  return (
+    <div className="premium-card p-5">
+      <h4 className="font-bold text-sm text-foreground mb-4">Keywords</h4>
+      <div className="flex flex-wrap gap-2">
+        {keywords.map((keyword) => (
+          <span key={keyword} className="px-2.5 py-1 rounded-full bg-surface text-primary text-xs font-medium border border-primary/20">
+            {keyword}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Article Content with Interspersed Images
+function ArticleContentWithImages({ blog }: { blog: any }) {
+  const content = blog.content || '';
+  const contentImages = blog.content_images || [];
+  const captions = blog.captions?.split('\n') || [];
+
+  if (!content && contentImages.length === 0) {
+    return <p className="text-muted italic">No content available for this article.</p>;
+  }
+
+  // Split content into roughly equal parts to insert images
+  const contentParts: string[] = [];
+  if (contentImages.length > 0 && content) {
+    // Find paragraph or section breaks to split content
+    const paragraphs = content.split(/(<\/p>|<\/h[1-6]>|<\/div>)/);
+    const chunkSize = Math.ceil(paragraphs.length / (contentImages.length + 1));
+
+    for (let i = 0; i < paragraphs.length; i += chunkSize) {
+      const chunk = paragraphs.slice(i, i + chunkSize).join('');
+      if (chunk.trim()) {
+        contentParts.push(chunk);
+      }
+    }
+  } else if (content) {
+    contentParts.push(content);
+  }
+
+  // Add IDs to headings for TOC
+  const addHeadingIds = (html: string) => {
+    return html.replace(
+      /<h([1-6])([^>]*)>(.*?)<\/h\1>/gi,
+      (match, level, attrs, text) => {
+        const id = text.replace(/<[^>]*>/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        return `<h${level}${attrs} id="${id}">${text}</h${level}>`;
+      }
+    );
+  };
+
+  return (
+    <div className="article-content text-foreground leading-relaxed">
+      {contentParts.length > 0 ? (
+        contentParts.map((part, idx) => (
+          <div key={idx}>
+            <div
+              dangerouslySetInnerHTML={{ __html: addHeadingIds(part) }}
+              className="prose-content"
+            />
+            {idx < contentImages.length && (
+              <div className="content-image-wrapper my-8">
+                <figure>
+                  <Image
+                    src={contentImages[idx]}
+                    alt={captions[idx] || `${blog.title} image ${idx + 1}`}
+                    width={800}
+                    height={450}
+                    className="object-cover rounded-xl"
+                    loading={idx === 0 ? "eager" : "lazy"}
+                    sizes="(max-width: 768px) 100vw, 800px"
+                  />
+                  {captions[idx] && (
+                    <figcaption className="content-image-caption">
+                      {captions[idx]}
+                    </figcaption>
+                  )}
+                </figure>
+              </div>
+            )}
+          </div>
+        ))
+      ) : content ? (
+        <div
+          dangerouslySetInnerHTML={{ __html: addHeadingIds(content) }}
+          className="prose-content"
+        />
+      ) : null}
+
+      {/* Show remaining images if more images than content parts */}
+      {contentImages.length > contentParts.length && (
+        contentImages.slice(contentParts.length).map((image: string, idx: number) => {
+          const actualIdx = contentParts.length + idx;
+          return (
+            <div key={`extra-${actualIdx}`} className="content-image-wrapper my-8">
+              <figure>
+                <Image
+                  src={image}
+                  alt={captions[actualIdx] || `${blog.title} image ${actualIdx + 1}`}
+                  width={800}
+                  height={450}
+                  className="object-cover rounded-xl"
+                  loading="lazy"
+                  sizes="(max-width: 768px) 100vw, 800px"
+                />
+                {captions[actualIdx] && (
+                  <figcaption className="content-image-caption">
+                    {captions[actualIdx]}
+                  </figcaption>
+                )}
+              </figure>
+            </div>
+          );
+        })
+      )}
+    </div>
+  );
+}
+
 export default async function SingleBlogPage({
   params,
 }: {
@@ -55,7 +195,94 @@ export default async function SingleBlogPage({
   const author = getAuthorBySlug(generateSlug(blog.author));
   const headings = extractHeadings(blog.content || "");
 
+  // BlogPosting structured data
+  const blogPostingSchema = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": blog.title,
+    "description": blog.excerpt,
+    "url": `https://howtoaiworld.com/blogs/${generateSlug(blog.title)}`,
+    "datePublished": blog.date,
+    "author": {
+      "@type": "Person",
+      "name": blog.author,
+      "url": `https://howtoaiworld.com/authors/${generateSlug(blog.author)}`
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Howtoaiworld",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://howtoaiworld.com/logo.jpg"
+      }
+    },
+    "image": blog.featured_image,
+    "keywords": blog.keywords?.join(", "),
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://howtoaiworld.com/blogs/${generateSlug(blog.title)}`
+    }
+  };
+
+  // FAQ structured data if FAQ exists
+  const faqSchema = blog.faq && blog.faq.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": blog.faq.map((item) => ({
+      "@type": "Question",
+      "name": item.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": item.answer
+      }
+    }))
+  } : null;
+
+  // Breadcrumb structured data
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://howtoaiworld.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Blogs",
+        "item": "https://howtoaiworld.com/blogs"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": blog.title,
+        "item": `https://howtoaiworld.com/blogs/${generateSlug(blog.title)}`
+      }
+    ]
+  };
+
   return (
+    <>
+      <Script
+        id="blog-posting-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingSchema) }}
+      />
+      {faqSchema && (
+        <Script
+          id="faq-schema"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
+      )}
+      <Script
+        id="breadcrumb-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
     <article className="min-h-screen bg-background">
       {/* Hero Banner */}
       <div className="relative overflow-hidden pt-16 pb-12 md:pb-16 text-white" style={{ backgroundColor: "var(--primary)" }}>
@@ -68,18 +295,18 @@ export default async function SingleBlogPage({
               <span key={keyword} className="px-2.5 py-1 rounded-full bg-white/10 text-white/90">{keyword}</span>
             ))}
           </div>
-          
+
           {/* Title */}
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-extrabold leading-tight mb-6 max-w-4xl">
             {blog.title}
           </h1>
-          
+
           {/* Author & Meta */}
           <div className="flex flex-wrap items-center gap-4 md:gap-6 text-sm">
             <Link href={`/authors/${generateSlug(blog.author)}`} className="flex items-center gap-3 hover:opacity-90 transition">
               <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center overflow-hidden shrink-0 border border-white/30">
                 {author?.featuredImage ? (
-                  <Image src={author.featuredImage} alt={blog.author} width={40} height={40} className="object-cover w-full h-full" />
+                  <Image src={author.featuredImage} alt={blog.author} width={40} height={40} className="object-cover w-full h-full" loading="lazy" />
                 ) : (
                   <User className="w-5 h-5 text-white" />
                 )}
@@ -107,100 +334,34 @@ export default async function SingleBlogPage({
           
           {/* Left Sidebar - Table of Contents */}
           <aside className="hidden lg:block w-64 shrink-0 sticky top-24">
-            <div className="premium-card p-5">
-              <h3 className="font-bold text-base mb-4 text-foreground border-b border-card-border pb-3 flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-primary" />
-                Contents
-              </h3>
-              {headings.length > 0 ? (
-                <nav className="space-y-2 text-sm">
-                  {headings.map((heading, idx) => (
-                    <a 
-                      key={idx} 
-                      href={`#${heading.id}`}
-                      className={`block hover:text-primary transition-colors ${
-                        heading.level === 1 ? 'font-semibold text-foreground' : 
-                        heading.level === 2 ? 'font-medium text-muted pl-3' : 
-                        'text-muted/80 pl-5'
-                      }`}
-                      style={{ paddingLeft: heading.level > 1 ? `${(heading.level - 1) * 12}px` : '0' }}
-                    >
-                      {heading.text}
-                    </a>
-                  ))}
-                </nav>
-              ) : (
-                <p className="text-sm text-muted">No sections available</p>
-              )}
-            </div>
-            
-            <div className="mt-6">
-              <h4 className="font-bold text-sm text-foreground mb-3">Share Article</h4>
-              <div className="flex gap-2">
-                <button className="w-9 h-9 rounded-lg border border-card-border flex items-center justify-center text-muted hover:text-primary hover:border-primary hover:bg-surface transition-all">
-                   <Share2 className="w-4 h-4" />
-                </button>
-                <button className="w-9 h-9 rounded-lg border border-card-border flex items-center justify-center text-muted hover:text-primary hover:border-primary hover:bg-surface transition-all">
-                   <LinkIcon className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
+            <TableOfContents headings={headings} />
+
+            <ShareSection
+              title={blog.title}
+              excerpt={blog.excerpt}
+              url={`https://howtoaiworld.com/blogs/${generateSlug(blog.title)}`}
+            />
           </aside>
 
           {/* Main Content Area */}
           <main className="flex-1 min-w-0">
-            {/* Keywords */}
-            {blog.keywords && blog.keywords.length > 0 && (
-              <div className="mb-8 flex flex-wrap gap-2">
-                {blog.keywords.map((keyword) => (
-                  <span key={keyword} className="px-3 py-1.5 rounded-full bg-surface text-primary text-xs font-semibold border border-primary/20">{keyword}</span>
-                ))}
-              </div>
-            )}
-
-            {/* Featured Image if no content images */}
-            {(!blog.content_images || blog.content_images.length === 0) && blog.featured_image && (
-              <div className="mb-10 rounded-2xl overflow-hidden shadow-elevated">
-                <Image 
-                  src={blog.featured_image} 
+            {/* Featured Image */}
+            {blog.featured_image && (
+              <div className="mb-8 rounded-2xl overflow-hidden shadow-elevated">
+                <Image
+                  src={blog.featured_image}
                   alt={blog.title}
                   width={800}
                   height={450}
                   className="object-cover w-full h-auto"
+                  priority
+                  sizes="(max-width: 768px) 100vw, 800px"
                 />
               </div>
             )}
 
-            {/* Content Images */}
-            {blog.content_images && blog.content_images.length > 0 && (
-              <div className="mb-10 grid grid-cols-1 md:grid-cols-2 gap-4">
-                {blog.content_images.map((image, idx) => (
-                  <div key={idx} className="relative aspect-video rounded-xl overflow-hidden shadow-premium">
-                    <Image src={image} alt={`${blog.title} image ${idx + 1}`} fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Article Content - with ID anchors for TOC */}
-            <div className="article-content text-foreground leading-relaxed">
-              {blog.content ? (
-                <div 
-                  dangerouslySetInnerHTML={{ 
-                    __html: blog.content.replace(
-                      /<h([1-6])([^>]*)>(.*?)<\/h\1>/gi, 
-                      (match, level, attrs, text) => {
-                        const id = text.replace(/<[^>]*>/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-                        return `<h${level}${attrs} id="${id}">${text}</h${level}>`;
-                      }
-                    ) 
-                  }}
-                  className="prose-content"
-                />
-              ) : (
-                <p className="text-muted italic">No content available for this article.</p>
-              )}
-            </div>
+            {/* Article Content with Interspersed Images */}
+            <ArticleContentWithImages blog={blog} />
             
             {/* FAQ Section */}
             {blog.faq && blog.faq.length > 0 && (
@@ -223,14 +384,19 @@ export default async function SingleBlogPage({
             )}
           </main>
 
-          {/* Right Sidebar - Author Profile */}
+          {/* Right Sidebar - Keywords & Author Profile */}
           <aside className="w-full lg:w-72 shrink-0 sticky top-24 space-y-5">
+            {/* Keywords */}
+            {blog.keywords && blog.keywords.length > 0 && (
+              <KeywordsSection keywords={blog.keywords} />
+            )}
+
             {author && (
               <div className="premium-card p-6">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-14 h-14 rounded-full bg-primary text-white flex items-center justify-center text-xl font-bold overflow-hidden shadow-premium">
                     {author.featuredImage ? (
-                      <Image src={author.featuredImage} alt={author.name} width={56} height={56} className="object-cover w-full h-full" />
+                      <Image src={author.featuredImage} alt={author.name} width={56} height={56} className="object-cover w-full h-full" loading="lazy" />
                     ) : (
                       author.initials
                     )}
@@ -280,5 +446,6 @@ export default async function SingleBlogPage({
         </div>
       </div>
     </article>
+    </>
   );
 }

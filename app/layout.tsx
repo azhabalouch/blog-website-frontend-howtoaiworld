@@ -15,6 +15,9 @@ export const metadata: Metadata = {
   creator: "Howtoaiworld",
   publisher: "Howtoaiworld",
   metadataBase: new URL("https://howtoaiworld.com"),
+  alternates: {
+    canonical: "https://howtoaiworld.com",
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -39,6 +42,9 @@ export const metadata: Metadata = {
       "max-image-preview": "large",
       "max-snippet": -1,
     },
+  },
+  verification: {
+    google: "G-HWT034PQT2",
   },
 };
 
@@ -112,6 +118,12 @@ export default function RootLayout({
 
         <Script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8450943980358095" crossOrigin="anonymous" strategy="afterInteractive" />
         <meta name="google-adsense-account" content="ca-pub-8450943980358095" />
+        <link rel="alternate" type="application/rss+xml" title="Howtoaiworld RSS Feed" href="https://howtoaiworld.com/rss.xml" />
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
+        <link rel="preconnect" href="https://consent.cookiebot.com" />
+        <link rel="preconnect" href="https://cdn.sender.net" />
+        <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
+        <link rel="dns-prefetch" href="https://azhabalouch.github.io" />
 
         {/* Sender.net Newsletter Integration */}
         <Script id="sender-net-script" strategy="afterInteractive">

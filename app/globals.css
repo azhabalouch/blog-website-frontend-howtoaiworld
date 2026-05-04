@@ -194,6 +194,21 @@ a, button, input, textarea, img, [class*="hover:"], [class*="transition"] {
   font-size: 17px;
   line-height: 1.8;
   color: var(--foreground);
+  font-family: var(--font-body) !important;
+}
+
+/* Override any inline font-family from backend HTML */
+.article-content * {
+  font-family: inherit !important;
+}
+
+.article-content h1,
+.article-content h2,
+.article-content h3,
+.article-content h4,
+.article-content h5,
+.article-content h6 {
+  font-family: var(--font-heading) !important;
 }
 
 .article-content h1,
@@ -231,7 +246,8 @@ a, button, input, textarea, img, [class*="hover:"], [class*="transition"] {
 }
 
 .article-content p {
-  margin-bottom: 1.5em;
+  font-size: 18px;
+  margin-bottom: 2em;
   color: var(--foreground);
 }
 
@@ -280,10 +296,70 @@ a, button, input, textarea, img, [class*="hover:"], [class*="transition"] {
 
 .article-content img {
   max-width: 100%;
+  width: auto;
   height: auto;
   border-radius: 12px;
-  margin: 2em 0;
+  margin: 2em auto;
+  display: block;
   box-shadow: var(--shadow-elevated);
+}
+
+/* Figure and figcaption for images in article content */
+.article-content figure {
+  margin: 2.5rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.article-content figcaption {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--muted);
+  text-align: center;
+  font-style: italic;
+  max-width: 600px;
+}
+
+/* Content Images Grid - Centered with captions */
+.content-images-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin: 2.5rem 0;
+}
+
+.content-image-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.content-image-wrapper figure {
+  width: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.content-image-wrapper img {
+  width: 100%;
+  max-width: 800px;
+  height: auto;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: var(--shadow-elevated);
+}
+
+.content-image-caption {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--muted);
+  text-align: center;
+  font-style: italic;
+  max-width: 800px;
 }
 
 .article-content code {

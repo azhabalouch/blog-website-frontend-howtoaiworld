@@ -1,6 +1,52 @@
+import type { Metadata } from "next";
+import Script from "next/script";
+
+export const metadata: Metadata = {
+  title: "About Us - Howtoaiworld | Making AI Simple for Everyone",
+  description: "Learn about Howtoaiworld's mission to make Artificial Intelligence accessible. Meet our team of AI experts, writers, and developers dedicated to simplifying AI for everyone.",
+  keywords: ["about howtoaiworld", "AI education team", "AI experts", "AI mission", "artificial intelligence blog"],
+  openGraph: {
+    title: "About Howtoaiworld - Making AI Simple for Everyone",
+    description: "Meet the team behind Howtoaiworld. Our mission is to make AI accessible through practical guides and honest reviews.",
+    url: "https://howtoaiworld.com/about",
+    type: "website",
+  },
+  alternates: {
+    canonical: "https://howtoaiworld.com/about",
+  },
+};
+
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Howtoaiworld",
+  "url": "https://howtoaiworld.com",
+  "logo": "https://howtoaiworld.com/logo.jpg",
+  "description": "Making Artificial Intelligence Simple, Practical, and Accessible for Everyone",
+  "foundingDate": "2024",
+  "sameAs": [
+    "https://x.com/howtoaiworld",
+    "https://www.facebook.com/people/Howtoaiworld/61587792413577",
+    "https://www.instagram.com/howtoaiworld"
+  ],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "email": "contact@howtoaiworld.com",
+    "contactType": "customer support",
+    "areaServed": "Worldwide",
+    "availableLanguage": "English"
+  }
+};
+
 export default function AboutPage() {
     return (
-        <div className="max-w-7xl mx-auto px-4 py-12 space-y-8">
+        <>
+      <Script
+        id="organization-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+      />
+    <div className="max-w-7xl mx-auto px-4 py-12 space-y-8">
             <section className="text-center space-y-3">
                 <h1 className="text-4xl font-bold text-foreground">About Howtoaiworld</h1>
                 <p className="text-lg text-muted">Making Artificial Intelligence Simple, Practical, and Accessible for Everyone</p>
@@ -127,5 +173,6 @@ export default function AboutPage() {
                 <a href="/contact" className="inline-flex items-center justify-center rounded-md bg-primary px-5 py-3 font-semibold text-white hover:bg-primary-dark transition-colors">Contact Us</a>
             </section>
         </div>
+    </>
     );
 }

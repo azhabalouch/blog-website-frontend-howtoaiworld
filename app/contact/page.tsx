@@ -1,8 +1,52 @@
 import { Mail, MapPin, Clock, Send, Sparkles, MessageSquare, Users } from "lucide-react";
 import Link from "next/link";
+import type { Metadata } from "next";
+import Script from "next/script";
+
+export const metadata: Metadata = {
+  title: "Contact Us - Howtoaiworld | Get in Touch",
+  description: "Contact Howtoaiworld for AI-related questions, partnership inquiries, or content suggestions. We're here to help you navigate the world of artificial intelligence.",
+  keywords: ["contact howtoaiworld", "AI support", "AI questions", "partnership inquiry", "AI blog contact"],
+  openGraph: {
+    title: "Contact Howtoaiworld",
+    description: "Have questions about AI? Get in touch with our team of experts.",
+    url: "https://howtoaiworld.com/contact",
+    type: "website",
+  },
+  alternates: {
+    canonical: "https://howtoaiworld.com/contact",
+  },
+};
+
+const contactPageSchema = {
+  "@context": "https://schema.org",
+  "@type": "ContactPage",
+  "name": "Contact Howtoaiworld",
+  "description": "Contact us for AI-related questions and partnerships",
+  "url": "https://howtoaiworld.com/contact",
+  "mainEntity": {
+    "@type": "Organization",
+    "name": "Howtoaiworld",
+    "email": "contact@howtoaiworld.com",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "208-A, Basement Commercial Zone, Sector C, Chambelli Block",
+      "addressLocality": "Bahria Town",
+      "addressRegion": "Lahore",
+      "postalCode": "53720",
+      "addressCountry": "PK"
+    }
+  }
+};
 
 export default function ContactPage() {
   return (
+    <>
+      <Script
+        id="contact-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(contactPageSchema) }}
+      />
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="relative overflow-hidden pt-16 pb-12 md:pb-16" style={{ backgroundColor: "var(--primary)" }}>
@@ -203,5 +247,6 @@ export default function ContactPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import Script from "next/script";
 import { notFound } from "next/navigation";
 import { getAuthorBySlug, getAuthors, generateSlug } from "../../../lib/site-data";
 
@@ -16,8 +17,18 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 
   return {
-    title: `${author.name} - Howtoaiworld`,
+    title: `${author.name} - Howtoaiworld Author`,
     description: author.bio,
+    alternates: {
+      canonical: `https://howtoaiworld.com/authors/${author.slug}`,
+    },
+    openGraph: {
+      title: `${author.name} - Howtoaiworld Author`,
+      description: author.bio,
+      url: `https://howtoaiworld.com/authors/${author.slug}`,
+      type: "profile",
+      images: author.featuredImage ? [author.featuredImage] : undefined,
+    },
   };
 }
 
@@ -29,7 +40,59 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
     notFound();
   }
 
+  // Person structured data
+  const personSchema = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": author.name,
+    "url": `https://howtoaiworld.com/authors/${author.slug}`,
+    "description": author.bio,
+    "image": author.featuredImage,
+    "jobTitle": "AI Content Writer",
+    "worksFor": {
+      "@type": "Organization",
+      "name": "Howtoaiworld"
+    }
+  };
+
+  // Breadcrumb structured data
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://howtoaiworld.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Authors",
+        "item": "https://howtoaiworld.com/authors"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": author.name,
+        "item": `https://howtoaiworld.com/authors/${author.slug}`
+      }
+    ]
+  };
+
   return (
+    <>
+      <Script
+        id="person-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
+      />
+      <Script
+        id="breadcrumb-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
     <div className="max-w-5xl mx-auto px-4 py-12 space-y-8">
       <section className="premium-card p-8 grid grid-cols-1 md:grid-cols-[160px_1fr] gap-6 items-center">
         <div className="w-32 h-32 rounded-full overflow-hidden bg-primary text-white flex items-center justify-center text-4xl font-bold mx-auto md:mx-0 shadow-elevated">
@@ -71,5 +134,6 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
         </div>
       </section>
     </div>
+    </>
   );
 }

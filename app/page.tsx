@@ -1,15 +1,66 @@
 import Image from "next/image";
 import Link from "next/link";
+import Script from "next/script";
 import { CheckCircle2, ShieldCheck, Cloud, BarChart2, Briefcase, Lock, Database, ArrowRight, Mail, Sparkles, TrendingUp, BookOpen, Zap, Target, Award } from "lucide-react";
 import { getAuthors, getBlogs, getCategories, generateSlug } from "../lib/site-data";
 import FeaturedCarousel from "../components/FeaturedCarousel";
 
 export default function Home() {
   const blogs = getBlogs();
+
+  // WebSite structured data
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Howtoaiworld",
+    "url": "https://howtoaiworld.com",
+    "description": "Howtoaiworld makes Artificial Intelligence easy to understand. Practical guides, honest reviews, and step-by-step tutorials for everyone.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Howtoaiworld",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://howtoaiworld.com/logo.jpg"
+      }
+    },
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://howtoaiworld.com/blogs?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    }
+  };
+
+  // ItemList structured data for featured articles
+  const itemListSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "itemListElement": blogs.slice(0, 6).map((blog, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "BlogPosting",
+        "headline": blog.title,
+        "url": `https://howtoaiworld.com/blogs/${generateSlug(blog.title)}`,
+        "datePublished": blog.date,
+        "author": {
+          "@type": "Person",
+          "name": blog.author
+        },
+        "image": blog.featured_image
+      }
+    }))
+  };
   const heroBlog = blogs[0]; // One exclusive featured article for hero
   const featuredBlogs = blogs.slice(1, 4); // Different articles for Featured Stories carousel
   const recommendedBlogs = blogs.slice(4, 8);
-  const latestBlogs = blogs.slice(8, 12);
+  const latestBlogs = blogs.slice(8, 16);
+
+  // Get full counts for stats, then slice for display
+  const allCategories = getCategories();
+  const allAuthors = getAuthors();
   const categories = getCategories().slice(0, 6);
   const authors = getAuthors().slice(0, 3);
 
@@ -27,6 +78,17 @@ export default function Home() {
   const dynamicTopics = trendingTopics.length > 0 ? trendingTopics : categories.map(c => c.name).slice(0, 12);
 
   return (
+    <>
+      <Script
+        id="website-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+      />
+      <Script
+        id="item-list-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
+      />
     <main>
       {/* Hero Section - Exclusive Featured Article */}
       <section className="relative overflow-hidden">
@@ -68,8 +130,8 @@ export default function Home() {
                 {/* Stats */}
                 <div className="flex gap-8 pt-4 text-sm border-t border-white/10 mt-4">
                   <div><span className="text-xl font-bold text-primary">{blogs.length}+</span><br/><span className="text-white/50 text-xs">Articles</span></div>
-                  <div><span className="text-xl font-bold text-primary">{categories.length}</span><br/><span className="text-white/50 text-xs">Categories</span></div>
-                  <div><span className="text-xl font-bold text-primary">{authors.length}+</span><br/><span className="text-white/50 text-xs">Authors</span></div>
+                  <div><span className="text-xl font-bold text-primary">{allCategories.length}+</span><br/><span className="text-white/50 text-xs">Categories</span></div>
+                  <div><span className="text-xl font-bold text-primary">{allAuthors.length}+</span><br/><span className="text-white/50 text-xs">Authors</span></div>
                 </div>
               </div>
               {/* Right: Hero Image */}
@@ -341,5 +403,6 @@ export default function Home() {
         </section>
       </div>
     </main>
+    </>
   )
 }
