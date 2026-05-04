@@ -3,6 +3,7 @@ import cacheData from "../data/cache.json";
 export type BlogRecord = {   
   title: string;   
   author: string;   
+  slug?: string;
   category?: string;   
   date?: string;   
   excerpt?: string;   
@@ -35,7 +36,7 @@ export function getBlogs(): BlogRecord[] {
 }
 
 export function getBlogBySlug(slug: string) {   
-  return getBlogs().find((blog) => generateSlug(blog.title) === slug);
+  return getBlogs().find((blog) => (blog.slug || generateSlug(blog.title)) === slug);
 }
 
 export function getCategories() {   

@@ -4,14 +4,30 @@ import Link from "next/link";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, useMemo } from "react";
-import { getBlogs, getCategories, getAuthors, generateSlug } from "../../lib/site-data";
+import { generateSlug } from "../../lib/site-data";
 
-export default function BlogsContent() {
+type BlogListItem = {
+  title: string;
+  author: string;
+  excerpt?: string;
+  keywords?: string[];
+  category?: string;
+  date?: string;
+  featured_image?: string;
+  slug?: string;
+  [key: string]: unknown;
+};
+
+type BlogsContentProps = {
+  initialBlogs: BlogListItem[];
+  categories: { name: string; count: number; slug: string }[];
+  authors: { name: string; slug: string; postCount: number }[];
+};
+
+export default function BlogsContent({ initialBlogs, categories, authors }: BlogsContentProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const rawBlogs = getBlogs();
-  const categories = getCategories();
-  const authors = getAuthors();
+  const rawBlogs = initialBlogs;
   
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');

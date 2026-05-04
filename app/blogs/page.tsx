@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { Suspense } from "react";
 import BlogsContent from "./BlogsContent";
+import { getBlogs, getCategories, getAuthors } from "../../lib/site-data";
 
 export const metadata: Metadata = {
   title: "All Blogs - Howtoaiworld | AI Guides & Tutorials",
@@ -45,6 +46,19 @@ const collectionPageSchema = {
 };
 
 export default function BlogsPage() {
+  const rawBlogsList = getBlogs().map(blog => {
+    // Strip large fields like content, content_images, captions
+    const { content, faq, content_images, captions, ...rest } = blog;
+    return rest;
+  });
+
+  const categoriesList = getCategories();
+  const authorsList = getAuthors().map(author => ({
+    name: author.name,
+    slug: author.slug,
+    postCount: author.postCount
+  }));
+
   return (
     <>
       <Script
@@ -53,7 +67,11 @@ export default function BlogsPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionPageSchema) }}
       />
       <Suspense fallback={<div className="p-12 text-center">Loading blogs...</div>}>
-        <BlogsContent />
+        <BlogsContent 
+          initialBlogs={rawBlogsList} 
+          categories={categoriesList} 
+          authors={authorsList} 
+        />
       </Suspense>
     </>
   );
