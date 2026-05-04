@@ -78,7 +78,9 @@ function KeywordsSection({ keywords }: { keywords: string[] }) {
 function ArticleContentWithImages({ blog }: { blog: any }) {
   const content = blog.content || '';
   const contentImages = blog.content_images || [];
-  const captions = blog.captions?.split('\n') || [];
+  // First caption is for featured image, rest are for content images
+  const allCaptions = blog.captions?.split('\n') || [];
+  const captions = allCaptions.slice(1); // Skip first caption (featured image)
 
   if (!content && contentImages.length === 0) {
     return <p className="text-muted italic">No content available for this article.</p>;
@@ -122,23 +124,22 @@ function ArticleContentWithImages({ blog }: { blog: any }) {
               className="prose-content"
             />
             {idx < contentImages.length && (
-              <div className="content-image-wrapper my-8">
-                <figure>
+              <div className="mb-6 md:mb-8">
+                <div className="relative w-full aspect-[16/9] max-w-[800px] mx-auto rounded-2xl overflow-hidden shadow-elevated">
                   <Image
                     src={contentImages[idx]}
                     alt={captions[idx] || `${blog.title} image ${idx + 1}`}
-                    width={800}
-                    height={450}
-                    className="object-cover rounded-xl"
-                    loading={idx === 0 ? "eager" : "lazy"}
+                    fill
+                    className="object-cover"
+                    priority
                     sizes="(max-width: 768px) 100vw, 800px"
                   />
-                  {captions[idx] && (
-                    <figcaption className="content-image-caption">
-                      {captions[idx]}
-                    </figcaption>
-                  )}
-                </figure>
+                </div>
+                {captions[idx] && (
+                  <p className="text-center text-sm text-muted mt-3 italic">
+                    {captions[idx]}
+                  </p>
+                )}
               </div>
             )}
           </div>
@@ -155,19 +156,20 @@ function ArticleContentWithImages({ blog }: { blog: any }) {
         contentImages.slice(contentParts.length).map((image: string, idx: number) => {
           const actualIdx = contentParts.length + idx;
           return (
-            <div key={`extra-${actualIdx}`} className="content-image-wrapper my-8">
-              <figure>
-                <Image
-                  src={image}
-                  alt={captions[actualIdx] || `${blog.title} image ${actualIdx + 1}`}
-                  width={800}
-                  height={450}
-                  className="object-cover rounded-xl"
-                  loading="lazy"
-                  sizes="(max-width: 768px) 100vw, 800px"
-                />
+            <div key={`extra-${actualIdx}`} className="content-image-wrapper my-6 md:my-8">
+              <figure className="w-full">
+                <div className="relative w-full aspect-[16/9] max-w-[800px] mx-auto">
+                  <Image
+                    src={image}
+                    alt={captions[actualIdx] || `${blog.title} image ${actualIdx + 1}`}
+                    fill
+                    className="object-cover rounded-xl"
+                    loading="lazy"
+                    sizes="(max-width: 768px) 100vw, 800px"
+                  />
+                </div>
                 {captions[actualIdx] && (
-                  <figcaption className="content-image-caption">
+                  <figcaption className="content-image-caption mt-2 md:mt-3 px-2 md:px-0">
                     {captions[actualIdx]}
                   </figcaption>
                 )}
@@ -297,12 +299,12 @@ export default async function SingleBlogPage({
           </div>
 
           {/* Title */}
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-extrabold leading-tight mb-6 max-w-4xl">
+          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold leading-tight mb-4 sm:mb-6 max-w-4xl">
             {blog.title}
           </h1>
 
           {/* Author & Meta */}
-          <div className="flex flex-wrap items-center gap-4 md:gap-6 text-sm">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4 md:gap-6 text-sm">
             <Link href={`/authors/${generateSlug(blog.author)}`} className="flex items-center gap-3 hover:opacity-90 transition">
               <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center overflow-hidden shrink-0 border border-white/30">
                 {author?.featuredImage ? (
@@ -329,10 +331,10 @@ export default async function SingleBlogPage({
       </div>
 
       {/* Content Layout */}
-      <div className="max-w-7xl mx-auto px-4 py-10 md:py-14">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10 md:py-14">
         <div className="flex flex-col lg:flex-row gap-10 relative items-start">
           
-          {/* Left Sidebar - Table of Contents */}
+          {/* Left Sidebar - Table of Contents (desktop) */}
           <aside className="hidden lg:block w-64 shrink-0 sticky top-24">
             <TableOfContents headings={headings} />
 
@@ -343,20 +345,37 @@ export default async function SingleBlogPage({
             />
           </aside>
 
+          {/* Mobile TOC + Share (shown below hero on mobile) */}
+          <div className="lg:hidden space-y-4 mb-6">
+            <TableOfContents headings={headings} />
+            <ShareSection
+              title={blog.title}
+              excerpt={blog.excerpt}
+              url={`https://howtoaiworld.com/blogs/${generateSlug(blog.title)}`}
+            />
+          </div>
+
           {/* Main Content Area */}
           <main className="flex-1 min-w-0">
             {/* Featured Image */}
             {blog.featured_image && (
-              <div className="mb-8 rounded-2xl overflow-hidden shadow-elevated">
-                <Image
-                  src={blog.featured_image}
-                  alt={blog.title}
-                  width={800}
-                  height={450}
-                  className="object-cover w-full h-auto"
-                  priority
-                  sizes="(max-width: 768px) 100vw, 800px"
-                />
+              <div className="mb-6 md:mb-8">
+                <div className="relative w-full aspect-[16/9] max-w-[800px] mx-auto rounded-2xl overflow-hidden shadow-elevated">
+                  <Image
+                    src={blog.featured_image}
+                    alt={blog.title}
+                    fill
+                    className="object-cover"
+                    priority
+                    sizes="(max-width: 768px) 100vw, 800px"
+                  />
+                </div>
+                {/* Featured Image Caption - first caption from API */}
+                {blog.captions?.split('\n')[0] && (
+                  <p className="text-center text-sm text-muted mt-3 italic">
+                    {blog.captions.split('\n')[0]}
+                  </p>
+                )}
               </div>
             )}
 

@@ -4,6 +4,7 @@ import Script from "next/script";
 import { CheckCircle2, ShieldCheck, Cloud, BarChart2, Briefcase, Lock, Database, ArrowRight, Mail, Sparkles, TrendingUp, BookOpen, Zap, Target, Award } from "lucide-react";
 import { getAuthors, getBlogs, getCategories, generateSlug } from "../lib/site-data";
 import FeaturedCarousel from "../components/FeaturedCarousel";
+import NewsletterCTAClient from "../components/NewsletterCTAClient";
 
 export default function Home() {
   const blogs = getBlogs();
@@ -89,12 +90,12 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
       />
-    <main>
+    <div>
       {/* Hero Section - Exclusive Featured Article */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700" />
         <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_30%_50%,var(--primary),transparent_60%)]" />
-        <div className="relative max-w-7xl mx-auto px-4 py-12 md:py-16">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16">
           {heroBlog && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
               {/* Left: Text Content */}
@@ -128,7 +129,7 @@ export default function Home() {
                   </Link>
                 </div>
                 {/* Stats */}
-                <div className="flex gap-8 pt-4 text-sm border-t border-white/10 mt-4">
+                <div className="flex gap-6 sm:gap-8 pt-4 text-sm border-t border-white/10 mt-4">
                   <div><span className="text-xl font-bold text-primary">{blogs.length}+</span><br/><span className="text-white/50 text-xs">Articles</span></div>
                   <div><span className="text-xl font-bold text-primary">{allCategories.length}+</span><br/><span className="text-white/50 text-xs">Categories</span></div>
                   <div><span className="text-xl font-bold text-primary">{allAuthors.length}+</span><br/><span className="text-white/50 text-xs">Authors</span></div>
@@ -158,7 +159,7 @@ export default function Home() {
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-4 py-14 space-y-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14 space-y-14 sm:space-y-20">
         {/* Featured Stories Carousel + Recommended */}
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
@@ -173,14 +174,14 @@ export default function Home() {
             <h2 className="text-xl font-bold uppercase tracking-wider text-foreground">Recommended</h2>
             <div className="flex flex-col gap-3">
               {recommendedBlogs.map((blog, idx) => (
-                <Link key={idx} href={`/blogs/${generateSlug(blog.title)}`} className="premium-card flex gap-3 p-3 hover:-translate-y-0.5 transition-transform">
-                  <div className="relative w-20 h-16 rounded-lg overflow-hidden shrink-0">
+                <Link key={idx} href={`/blogs/${generateSlug(blog.title)}`} className="premium-card flex gap-3 p-3 hover:-translate-y-0.5 transition-transform min-h-[80px]">
+                  <div className="relative w-16 sm:w-20 h-14 sm:h-16 rounded-lg overflow-hidden shrink-0">
                     <Image src={blog.featured_image || "https://placehold.co/100x80"} alt={blog.title} fill className="object-cover" sizes="80px" />
                   </div>
                   <div className="flex flex-col justify-center min-w-0">
-                    <span className="text-[10px] font-semibold text-primary uppercase tracking-wide">{blog.category?.split('/')[0]}</span>
+                    <span className="text-[10px] sm:text-xs font-semibold text-primary uppercase tracking-wide">{blog.category?.split('/')[0]}</span>
                     <h4 className="font-bold text-sm leading-snug line-clamp-2 text-foreground">{blog.title}</h4>
-                    <div className="flex items-center gap-2 text-[11px] text-muted mt-1">
+                    <div className="flex items-center gap-2 text-[11px] sm:text-xs text-muted mt-1">
                       <span>{blog.author}</span>
                       <span>•</span>
                       <span>{blog.date}</span>
@@ -198,7 +199,7 @@ export default function Home() {
             <h2 className="text-xl font-bold uppercase tracking-wider text-foreground">Latest From Our Experts</h2>
             <Link href="/blogs" className="text-sm text-primary font-semibold hover:underline flex items-center gap-1">View All <ArrowRight className="w-3 h-3" /></Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {latestBlogs.map((blog, idx) => (
               <Link key={idx} href={`/blogs/${generateSlug(blog.title)}`} className="premium-card overflow-hidden flex flex-col h-full">
                 <div className="relative aspect-video overflow-hidden">
@@ -273,7 +274,7 @@ export default function Home() {
           <div className="lg:col-span-2 space-y-5">
             <h2 className="text-xl font-bold uppercase tracking-wider text-foreground">Latest Blogs</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {blogs.slice(0, 6).map((blog, idx) => (
+              {blogs.slice(0, 4).map((blog, idx) => (
                 <Link key={idx} href={`/blogs/${generateSlug(blog.title)}`} className="premium-card p-5 block">
                   <span className="text-xs font-semibold text-primary uppercase">{blog.category || "Category"}</span>
                   <h3 className="font-bold text-lg mb-2 line-clamp-2 text-foreground mt-1">{blog.title}</h3>
@@ -322,11 +323,16 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {authors.map((author) => (
               <Link key={author.slug} href={`/authors/${author.slug}`} className="premium-card p-5 flex gap-4 hover:-translate-y-1 transition-transform">
-                <div className="w-14 h-14 rounded-full bg-primary text-white flex items-center justify-center text-xl font-bold shrink-0 shadow-lg">{author.initials}</div>
-                <div className="min-w-0">
-                  <h3 className="font-bold text-lg leading-tight text-foreground">{author.name}</h3>
-                  <p className="text-sm text-muted line-clamp-2">{author.bio}</p>
-                  <div className="text-xs font-semibold text-primary mt-2">{author.postCount} posts</div>
+                <div className="w-14 h-14 rounded-full overflow-hidden text-primary flex items-center justify-center text-xl font-bold shrink-0 shadow-lg border" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border-premium)' }}>
+                  {author.featuredImage ? (
+                    <Image src={author.featuredImage} alt={author.name} width={56} height={56} className="object-cover w-full h-full" />
+                  ) : (
+                    author.initials
+                  )}
+                </div>
+                <div className="min-w-0 flex flex-col justify-center">
+                  <h3 className="font-bold text-lg leading-tight text-foreground font-heading">{author.name}</h3>
+                  <div className="text-xs font-semibold text-primary mt-1.5">{author.postCount} posts</div>
                 </div>
               </Link>
             ))}
@@ -353,31 +359,15 @@ export default function Home() {
         </section>
 
         {/* Newsletter CTA Section */}
-        <section className="relative overflow-hidden rounded-3xl">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary-dark to-accent opacity-95" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(255,255,255,0.15),transparent_50%)]" />
-          <div className="relative px-8 py-12 md:px-16 md:py-16 text-center">
-            <div className="max-w-2xl mx-auto space-y-4">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/20 text-white text-sm font-medium">
-                <Mail className="w-4 h-4" />
-                <span>Join 10,000+ subscribers</span>
-              </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-white">Master AI Before Everyone Else</h2>
-              <p className="text-white/80 text-lg max-w-xl mx-auto">
-                Get weekly insights on the latest AI tools, tutorials, and industry trends delivered straight to your inbox.
-              </p>
-              <p className="text-white/60 text-xs">No spam. Unsubscribe anytime. We respect your privacy.</p>
-            </div>
-          </div>
-        </section>
+        <NewsletterCTAClient />
 
         {/* Stats Banner */}
         <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { value: "50+", label: "AI Guides" },
-            { value: "100K+", label: "Monthly Readers" },
-            { value: "25+", label: "Expert Authors" },
-            { value: "15+", label: "Categories" },
+            { value: "10K+", label: "Monthly Readers" },
+            { value: "5+", label: "Expert Authors" },
+            { value: "5+", label: "Categories" },
           ].map((stat) => (
             <div key={stat.label} className="premium-card p-6 text-center">
               <div className="text-3xl font-bold text-primary">{stat.value}</div>
@@ -402,7 +392,7 @@ export default function Home() {
           </div>
         </section>
       </div>
-    </main>
+    </div>
     </>
   )
 }

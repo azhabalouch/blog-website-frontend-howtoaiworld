@@ -1,4 +1,5 @@
 import cacheData from "../data/cache.json"; 
+import authorsData from "../data/authors.json";
 
 export type BlogRecord = {   
   title: string;   
@@ -25,6 +26,10 @@ export type AuthorProfile = {
   featuredImage?: string;   
   initials: string;   
   bio: string;
+  email?: string;
+  location?: string;
+  details?: string;
+  rated_by_us?: string;
 };
 
 export function generateSlug(value: string) {   
@@ -86,6 +91,9 @@ export function getAuthors(): AuthorProfile[] {
         .map((part) => part[0]?.toUpperCase() || "")         
         .slice(0, 2)         
         .join("") || "A";       
+        
+      const staticAuthorData = authorsData.find(a => a.name === name) || {} as any;
+
       return {         
         name,         
         slug: generateSlug(name),         
@@ -93,9 +101,13 @@ export function getAuthors(): AuthorProfile[] {
         categories,         
         blogs: sortedBlogs,         
         latestBlog: sortedBlogs[0],         
-        featuredImage: sortedBlogs[0]?.featured_image,         
+        featuredImage: staticAuthorData.image || sortedBlogs[0]?.featured_image,         
         initials,         
-        bio: `${name} contributes ${sortedBlogs.length} article${sortedBlogs.length === 1 ? "" : "s"} across ${categories.slice(0, 2).join(" and ") || "our core topics"}.`,       
+        bio: staticAuthorData.bio || `${name} contributes ${sortedBlogs.length} article${sortedBlogs.length === 1 ? "" : "s"} across ${categories.slice(0, 2).join(" and ") || "our core topics"}.`,       
+        email: staticAuthorData.email,
+        location: staticAuthorData.location,
+        details: staticAuthorData.details,
+        rated_by_us: staticAuthorData.rated_by_us,
       };     
     })     
     .sort((left, right) => right.postCount - left.postCount || left.name.localeCompare(right.name));

@@ -79,42 +79,42 @@ export default function ShareSection({ title, excerpt, url }: ShareSectionProps)
       <div className="flex flex-wrap gap-2">
         <button
           onClick={shareToLinkedIn}
-          className="w-9 h-9 rounded-lg border border-card-border flex items-center justify-center text-muted hover:text-[#0A66C2] hover:border-[#0A66C2] hover:bg-surface transition-all"
-          title="Share on LinkedIn"
+          className="w-9 h-9 rounded-lg border border-card-border flex items-center justify-center text-muted hover:text-[#0A66C2] hover:border-[#0A66C2] hover:bg-surface transition-all min-w-[44px] min-h-[44px]"
+          aria-label="Share on LinkedIn"
         >
           <LinkedInIcon />
         </button>
         <button
           onClick={shareToX}
-          className="w-9 h-9 rounded-lg border border-card-border flex items-center justify-center text-muted hover:text-black hover:border-black hover:bg-surface transition-all dark:hover:text-white dark:hover:border-white"
-          title="Share on X"
+          className="w-9 h-9 rounded-lg border border-card-border flex items-center justify-center text-muted hover:text-black hover:border-black hover:bg-surface transition-all dark:hover:text-white dark:hover:border-white min-w-[44px] min-h-[44px]"
+          aria-label="Share on X"
         >
           <XIcon />
         </button>
         <button
           onClick={shareToFacebook}
-          className="w-9 h-9 rounded-lg border border-card-border flex items-center justify-center text-muted hover:text-[#1877F2] hover:border-[#1877F2] hover:bg-surface transition-all"
-          title="Share on Facebook"
+          className="w-9 h-9 rounded-lg border border-card-border flex items-center justify-center text-muted hover:text-[#1877F2] hover:border-[#1877F2] hover:bg-surface transition-all min-w-[44px] min-h-[44px]"
+          aria-label="Share on Facebook"
         >
           <FacebookIcon />
         </button>
         <button
           onClick={handleCopy}
-          className="w-9 h-9 rounded-lg border border-card-border flex items-center justify-center text-muted hover:text-primary hover:border-primary hover:bg-surface transition-all"
-          title={copied ? "Link copied!" : "Copy link"}
+          className="w-9 h-9 rounded-lg border border-card-border flex items-center justify-center text-muted hover:text-primary hover:border-primary hover:bg-surface transition-all min-w-[44px] min-h-[44px]"
+          aria-label={copied ? "Link copied" : "Copy link"}
         >
           {copied ? <Check className="w-4 h-4 text-green-500" /> : <LinkIcon className="w-4 h-4" />}
         </button>
         <button
           onClick={toggleEmbed}
-          className="w-9 h-9 rounded-lg border border-card-border flex items-center justify-center text-muted hover:text-primary hover:border-primary hover:bg-surface transition-all"
-          title="Embed article"
+          className="w-9 h-9 rounded-lg border border-card-border flex items-center justify-center text-muted hover:text-primary hover:border-primary hover:bg-surface transition-all min-w-[44px] min-h-[44px]"
+          aria-label="Embed article"
         >
           <Code className="w-4 h-4" />
         </button>
       </div>
       {copied && (
-        <p className="text-xs text-green-600 mt-2">Link copied to clipboard!</p>
+        <p className="text-xs text-green-600 mt-2" role="status" aria-live="polite">Link copied to clipboard!</p>
       )}
       {showEmbed && (
         <div className="mt-3 p-3 rounded-lg bg-surface border border-card-border">

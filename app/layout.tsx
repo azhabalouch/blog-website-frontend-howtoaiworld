@@ -86,15 +86,6 @@ export default function RootLayout({
             gtag("set", "url_passthrough", false);
           `}
         </Script>
-        
-        <Script
-          id="cookiebot"
-          strategy="beforeInteractive"
-          src="https://consent.cookiebot.com/uc.js"
-          data-cbid="402f2129-fdd2-44e0-b450-f6d922daebf4"
-          data-blockingmode="auto"
-          type="text/javascript"
-        />
 
         <Script id="gtag" strategy="afterInteractive" src="https://www.googletagmanager.com/gtag/js?id=G-HWT034PQT2" />
         <Script id="gtag-config" strategy="afterInteractive">
@@ -116,11 +107,10 @@ export default function RootLayout({
           `}
         </Script>
 
-        <Script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8450943980358095" crossOrigin="anonymous" strategy="afterInteractive" />
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8450943980358095" crossOrigin="anonymous" />
         <meta name="google-adsense-account" content="ca-pub-8450943980358095" />
         <link rel="alternate" type="application/rss+xml" title="Howtoaiworld RSS Feed" href="https://howtoaiworld.com/rss.xml" />
         <link rel="preconnect" href="https://www.googletagmanager.com" />
-        <link rel="preconnect" href="https://consent.cookiebot.com" />
         <link rel="preconnect" href="https://cdn.sender.net" />
         <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
         <link rel="dns-prefetch" href="https://azhabalouch.github.io" />
@@ -151,8 +141,11 @@ export default function RootLayout({
         <noscript>
           <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPVWNXWV" height="0" width="0" style={{ display: "none", visibility: "hidden" }}></iframe>
         </noscript>
+        <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-white focus:rounded-lg focus:shadow-xl focus:outline-none">
+          Skip to main content
+        </a>
         <Navbar />
-        <main className="flex-1">
+        <main id="main-content" className="flex-1">
           {children}
         </main>
         <Footer />

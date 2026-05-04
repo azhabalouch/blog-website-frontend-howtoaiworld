@@ -29,25 +29,10 @@ jobs:
       - name: Fetch new blogs (cache.py)
         run: python scripts/cache.py
 
-      - name: Commit cached data (Optional)
+      - name: Commit cached data and trigger Cloudflare
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add data/cache.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: fetch new blogs data" && git push)
-        continue-on-error: true
-
-      - name: Install Dependencies
-        run: npm install
-
-      - name: Build Next.js Site
-        run: npm run build
-
-      - name: Publish to Cloudflare Pages
-        uses: cloudflare/pages-action@v1
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: 'howtoaiworld'
-          directory: 'out'
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          git commit --allow-empty -m "chore: fetch new blogs data and trigger build"
+          git push
