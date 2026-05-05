@@ -24,7 +24,7 @@ export default function Footer() {
             <ul className="space-y-3 text-sm text-muted">
               <li><Link href="/" className="transition hover:text-primary">Home</Link></li>
               <li><Link href="/blogs" className="transition hover:text-primary">Blogs</Link></li>
-              <Link href="/authors" className="transition hover:text-primary">Authors</Link>
+              <li><Link href="/authors" className="transition hover:text-primary">Authors</Link></li>
               <li><Link href="/about" className="transition hover:text-primary">About Us</Link></li>
               <li><Link href="/contact" className="transition hover:text-primary">Contact Us</Link></li>
             </ul>
