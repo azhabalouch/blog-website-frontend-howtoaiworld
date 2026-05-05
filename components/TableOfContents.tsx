@@ -46,10 +46,11 @@ export default function TableOfContents({ headings }: TableOfContentsProps) {
       </button>
 
       <div
-        className={`overflow-hidden transition-all duration-300 ${
-          isExpanded ? "max-h-[500px] mt-4" : "max-h-0 mt-0"
+        className={`grid transition-all duration-300 ${
+          isExpanded ? "grid-rows-[1fr] mt-3" : "grid-rows-[0fr] mt-0"
         }`}
       >
+        <div className="overflow-hidden">
         <nav className="space-y-2 text-sm">
           {headings.map((heading, idx) => (
             <a
@@ -70,6 +71,7 @@ export default function TableOfContents({ headings }: TableOfContentsProps) {
             </a>
           ))}
         </nav>
+        </div>
       </div>
     </div>
   );

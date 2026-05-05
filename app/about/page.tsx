@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { Metadata } from "next";
 import Script from "next/script";
 
@@ -132,7 +133,9 @@ export default function AboutPage() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="premium-card p-5">
-                        <div className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center font-bold text-xl mb-4">A</div>
+                        <div className="relative w-16 h-16 overflow-hidden rounded-full mb-4">
+                            <Image src="/authors/azha-balouch.jpg" alt="Azha Balouch" fill className="object-cover" />
+                        </div>
                         <h3 className="font-bold text-lg text-foreground">Azha Balouch</h3>
                         <div className="text-primary text-sm font-medium mb-3">Lead Developer</div>
                         <p className="text-muted text-sm mb-4">Azha brings cutting-edge AI solutions to life. With expertise in machine learning and web development, he ensures our platform delivers the best user experience while integrating the latest AI technologies.</p>
@@ -143,7 +146,9 @@ export default function AboutPage() {
                         </div>
                     </div>
                     <div className="premium-card p-5">
-                        <div className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center font-bold text-xl mb-4">Z</div>
+                        <div className="relative w-16 h-16 overflow-hidden rounded-full mb-4">
+                            <Image src="/authors/zawiyar-ahmad.jpg" alt="Zawiyar Ahmed" fill className="object-cover" />
+                        </div>
                         <h3 className="font-bold text-lg text-foreground">Zawiyar Ahmed</h3>
                         <div className="text-primary text-sm font-medium mb-3">Blog Manager</div>
                         <p className="text-muted text-sm mb-4">Zawiyar curates and manages all our content, ensuring every article is engaging, accurate, and easy to understand. He has a talent for breaking down complex topics into bite-sized, actionable insights.</p>
@@ -154,7 +159,9 @@ export default function AboutPage() {
                         </div>
                     </div>
                     <div className="premium-card p-5">
-                        <div className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center font-bold text-xl mb-4">R</div>
+                        <div className="relative w-16 h-16 overflow-hidden rounded-full mb-4">
+                            <Image src="/authors/ramish-kamran.jpg" alt="Ramish Kamran" fill className="object-cover" />
+                        </div>
                         <h3 className="font-bold text-lg text-foreground">Ramish Kamran</h3>
                         <div className="text-primary text-sm font-medium mb-3">SEO Specialist</div>
                         <p className="text-muted text-sm mb-4">Ramish ensures our content reaches the right audience at the right time. His expertise in search optimization and digital marketing helps thousands discover valuable AI insights every day.</p>

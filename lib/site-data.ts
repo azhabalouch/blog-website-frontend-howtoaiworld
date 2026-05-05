@@ -37,7 +37,17 @@ export function generateSlug(value: string) {
 }
 
 export function getBlogs(): BlogRecord[] {   
-  return ((cacheData as { blogs?: BlogRecord[] }).blogs || []).slice();
+  const rawBlogs = ((cacheData as { blogs?: BlogRecord[] }).blogs || []).slice();
+  
+  return rawBlogs.map(blog => {
+      const slug = blog.slug || generateSlug(blog.title);
+      return {
+          ...blog,
+          slug,
+          featured_image: `/images/${slug}.jpg`,
+          content_images: [`/images/${slug}.jpg`]
+      };
+  });
 }
 
 export function getBlogBySlug(slug: string) {   
@@ -94,14 +104,15 @@ export function getAuthors(): AuthorProfile[] {
         
       const staticAuthorData = authorsData.find(a => a.name === name) || {} as any;
 
+      const authorSlug = generateSlug(name);
       return {         
         name,         
-        slug: generateSlug(name),         
+        slug: authorSlug,         
         postCount: sortedBlogs.length,         
         categories,         
         blogs: sortedBlogs,         
         latestBlog: sortedBlogs[0],         
-        featuredImage: staticAuthorData.image || sortedBlogs[0]?.featured_image,         
+        featuredImage: `/authors/${authorSlug}.jpg`,         
         initials,         
         bio: staticAuthorData.bio || `${name} contributes ${sortedBlogs.length} article${sortedBlogs.length === 1 ? "" : "s"} across ${categories.slice(0, 2).join(" and ") || "our core topics"}.`,       
         email: staticAuthorData.email,

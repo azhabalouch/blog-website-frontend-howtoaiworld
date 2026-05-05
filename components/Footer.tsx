@@ -4,8 +4,8 @@ import { Mail, ArrowRight, MessageCircle, Share2, Globe } from "lucide-react";
 export default function Footer() {
   return (
     <footer className="mt-12 shrink-0 border-t border-card-border bg-surface">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid gap-10 md:grid-cols-2 xl:grid-cols-4" aria-label="Footer navigation">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:py-12 sm:px-6 lg:px-8">
+        <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-4" aria-label="Footer navigation">
           <section className="space-y-4 xl:col-span-1">
             <div className="flex items-center gap-2.5">
               {/* <img className="w-9 h-8 rounded-full" src="/logo.jpg" alt="Howtoaiworld Logo"/> */}
@@ -23,7 +23,7 @@ export default function Footer() {
             <h4 className="text-lg font-semibold tracking-wide text-foreground">Quick Links</h4>
             <ul className="space-y-3 text-sm text-muted">
               <li><Link href="/" className="transition hover:text-primary">Home</Link></li>
-              <li><Link href="/blogs" className="transition hover:text-primary">Featured Articles</Link></li>
+              <li><Link href="/blogs" className="transition hover:text-primary">Blogs</Link></li>
               <li><Link href="/about" className="transition hover:text-primary">About Us</Link></li>
               <li><Link href="/contact" className="transition hover:text-primary">Contact Us</Link></li>
             </ul>

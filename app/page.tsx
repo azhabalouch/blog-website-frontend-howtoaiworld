@@ -217,8 +217,14 @@ export default function Home() {
                     </div>
                   )}
                   <div className="flex items-center gap-3 mt-auto">
-                    <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold shrink-0">
-                      {blog.author?.split(" ").map(w => w[0]).join("").slice(0,2)}
+                    <div className="w-8 h-8 rounded-full overflow-hidden shrink-0">
+                      <Image 
+                        src={`/authors/${generateSlug(blog.author || "")}.jpg`} 
+                        alt={blog.author || "Author"} 
+                        width={32} 
+                        height={32} 
+                        className="object-cover w-full h-full"
+                      />
                     </div>
                     <div>
                       <div className="text-sm font-bold text-foreground">{blog.author}</div>
@@ -365,7 +371,7 @@ export default function Home() {
         <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { value: "50+", label: "AI Guides" },
-            { value: "10K+", label: "Monthly Readers" },
+            { value: "1K+", label: "Monthly Readers" },
             { value: "5+", label: "Expert Authors" },
             { value: "5+", label: "Categories" },
           ].map((stat) => (

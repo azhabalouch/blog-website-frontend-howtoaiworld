@@ -113,7 +113,6 @@ export default function RootLayout({
         <link rel="preconnect" href="https://www.googletagmanager.com" />
         <link rel="preconnect" href="https://cdn.sender.net" />
         <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
-        <link rel="dns-prefetch" href="https://azhabalouch.github.io" />
 
         {/* Sender.net Newsletter Integration */}
         <Script id="sender-net-script" strategy="afterInteractive">

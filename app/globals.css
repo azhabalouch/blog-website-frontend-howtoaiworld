@@ -195,11 +195,16 @@ a, button, input, textarea, img, [class*="hover:"], [class*="transition"] {
   line-height: 1.8;
   color: var(--foreground);
   font-family: var(--font-body) !important;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  overflow-x: hidden;
 }
 
 /* Override any inline font-family from backend HTML */
 .article-content * {
   font-family: inherit !important;
+  max-width: 100%;
 }
 
 .article-content h1,
@@ -296,7 +301,7 @@ a, button, input, textarea, img, [class*="hover:"], [class*="transition"] {
 
 .article-content img {
   max-width: 100%;
-  width: auto;
+  width: 100%;
   height: auto;
   border-radius: 12px;
   margin: 2em auto;
@@ -391,29 +396,149 @@ a, button, input, textarea, img, [class*="hover:"], [class*="transition"] {
   border-collapse: collapse;
   margin: 2em 0;
   font-size: 0.95em;
+  table-layout: auto;
 }
 
 .article-content th,
 .article-content td {
-  padding: 0.75em 1em;
+  padding: 0.6em 0.75em;
   text-align: left;
   border-bottom: 1px solid var(--card-border);
+  word-break: break-word;
+  hyphens: auto;
 }
 
 .article-content th {
   font-weight: 600;
   background: var(--surface);
   color: var(--primary);
+  white-space: nowrap;
 }
 
 .article-content tr:hover {
   background: var(--surface);
 }
 
+/* Mobile table: wrap in scrollable container via prose-content */
+.prose-content > table,
+.article-content > table {
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.prose-content > table > thead,
+.prose-content > table > tbody,
+.prose-content > table > tfoot,
+.article-content > table > thead,
+.article-content > table > tbody,
+.article-content > table > tfoot {
+  display: table-row-group;
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .article-content th,
+  .article-content td {
+    padding: 0.4em 0.5em;
+    font-size: 0.85em;
+  }
+
+  .article-content th {
+    white-space: normal;
+  }
+}
+
 .article-content hr {
   border: none;
   border-top: 2px solid var(--card-border);
   margin: 3em 0;
+}
+
+/* Mobile article content optimizations */
+@media (max-width: 640px) {
+  .article-content {
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .article-content h1,
+  .article-content h2,
+  .article-content h3,
+  .article-content h4,
+  .article-content h5,
+  .article-content h6 {
+    margin-top: 1.5em;
+    margin-bottom: 0.6em;
+  }
+
+  .article-content h1 {
+    font-size: 1.5rem;
+  }
+
+  .article-content h2 {
+    font-size: 1.3rem;
+  }
+
+  .article-content h3 {
+    font-size: 1.15rem;
+  }
+
+  .article-content p {
+    font-size: 15px;
+    margin-bottom: 1.2em;
+  }
+
+  .article-content ul,
+  .article-content ol {
+    margin-bottom: 1em;
+    padding-left: 1.4em;
+  }
+
+  .article-content blockquote {
+    padding: 0.75em 1em;
+    margin: 1.5em 0;
+  }
+
+  .article-content img {
+    margin: 1.5em auto;
+  }
+
+  .article-content figure {
+    margin: 1.5rem 0;
+  }
+
+  .article-content pre {
+    padding: 1em;
+    font-size: 0.85em;
+  }
+
+  .article-content hr {
+    margin: 2em 0;
+  }
+}
+
+/* Prose content - inner HTML container */
+.prose-content {
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  overflow-x: hidden;
+}
+
+.prose-content img,
+.prose-content video,
+.prose-content iframe,
+.prose-content embed,
+.prose-content object {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+.prose-content div,
+.prose-content section {
+  max-width: 100%;
+  overflow-wrap: break-word;
 }
 
 /* Smooth scroll for anchor links */
@@ -453,9 +578,19 @@ html {
 
 /* Minimum touch target size for interactive elements */
 @media (pointer: coarse) {
-  button, a, select, input[type="checkbox"], input[type="radio"] {
+  button, select, input[type="checkbox"], input[type="radio"] {
     min-height: 44px;
     min-width: 44px;
+  }
+
+  /* Only apply min-height to standalone links, not inline text links */
+  a:not(p a):not(span a):not(li a) {
+    min-height: 44px;
+  }
+
+  /* Disable hover transforms on touch devices - they get stuck */
+  .premium-card:hover {
+    transform: none;
   }
 }
 
