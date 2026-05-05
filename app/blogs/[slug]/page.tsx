@@ -1,10 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
-import { User, Clock, Calendar } from "lucide-react";
+import { User, Clock, Calendar, ChevronRight, Home } from "lucide-react";
 import { getBlogBySlug, getBlogs, getAuthorBySlug, generateSlug } from "../../../lib/site-data";
 import ShareSection from "../../../components/ShareSection";
 import TableOfContents from "../../../components/TableOfContents";
+
+// Calculate reading time from HTML content
+function calculateReadingTime(htmlContent: string): number {
+  if (!htmlContent) return 1;
+  const text = htmlContent.replace(/<[^>]*>/g, '');
+  const words = text.trim().split(/\s+/).length;
+  return Math.max(1, Math.ceil(words / 200));
+}
 
 export async function generateStaticParams() {
   return getBlogs().map((blog) => ({
@@ -23,7 +31,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const blogUrl = `https://howtoaiworld.com/blogs/${generateSlug(blog.title)}`;
 
   return {
-    title: `${blog.title} - Howtoaiworld`,
+    title: blog.title,
     description: blog.excerpt,
     keywords: blog.keywords,
     alternates: {
@@ -33,10 +41,22 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: blog.title,
       description: blog.excerpt,
       url: blogUrl,
+      siteName: "Howtoaiworld",
       type: "article",
       publishedTime: blog.date,
+      modifiedTime: blog.date,
       authors: [blog.author],
+      tags: blog.keywords,
+      images: blog.featured_image
+        ? [{ url: blog.featured_image, width: 1200, height: 630, alt: blog.title }]
+        : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: blog.title,
+      description: blog.excerpt,
       images: blog.featured_image ? [blog.featured_image] : undefined,
+      creator: "@howtoaiworld",
     },
   };
 }
@@ -131,7 +151,7 @@ function ArticleContentWithImages({ blog }: { blog: any }) {
                     alt={captions[idx] || `${blog.title} image ${idx + 1}`}
                     fill
                     className="object-cover"
-                    priority
+                    loading="lazy"
                     sizes="(max-width: 768px) 100vw, 800px"
                   />
                 </div>
@@ -196,6 +216,11 @@ export default async function SingleBlogPage({
 
   const author = getAuthorBySlug(generateSlug(blog.author));
   const headings = extractHeadings(blog.content || "");
+  const readingTime = calculateReadingTime(blog.content || "");
+
+  // Strip HTML for word count and articleBody
+  const plainTextContent = (blog.content || '').replace(/<[^>]*>/g, '');
+  const wordCount = plainTextContent.trim().split(/\s+/).filter(Boolean).length;
 
   // BlogPosting structured data
   const blogPostingSchema = {
@@ -205,6 +230,10 @@ export default async function SingleBlogPage({
     "description": blog.excerpt,
     "url": `https://howtoaiworld.com/blogs/${generateSlug(blog.title)}`,
     "datePublished": blog.date,
+    "dateModified": blog.date,
+    "wordCount": wordCount,
+    "articleBody": plainTextContent.slice(0, 5000),
+    "section": blog.category?.split('/')[0]?.trim() || undefined,
     "author": {
       "@type": "Person",
       "name": blog.author,
@@ -218,7 +247,12 @@ export default async function SingleBlogPage({
         "url": "https://howtoaiworld.com/logo.jpg"
       }
     },
-    "image": blog.featured_image,
+    "image": blog.featured_image ? {
+      "@type": "ImageObject",
+      "url": `https://howtoaiworld.com${blog.featured_image}`,
+      "width": 1200,
+      "height": 630
+    } : undefined,
     "keywords": blog.keywords?.join(", "),
     "mainEntityOfPage": {
       "@type": "WebPage",
@@ -286,8 +320,28 @@ export default async function SingleBlogPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
     <article className="min-h-screen bg-background">
+      {/* Breadcrumb Navigation */}
+      <nav aria-label="Breadcrumb" className="max-w-7xl mx-auto px-4 pt-20 pb-2">
+        <ol className="flex items-center gap-1.5 text-sm text-muted flex-wrap">
+          <li>
+            <Link href="/" className="hover:text-primary transition-colors flex items-center gap-1">
+              <Home className="w-3.5 h-3.5" />
+              Home
+            </Link>
+          </li>
+          <li><ChevronRight className="w-3.5 h-3.5 text-muted/50" /></li>
+          <li>
+            <Link href="/blogs" className="hover:text-primary transition-colors">Blogs</Link>
+          </li>
+          <li><ChevronRight className="w-3.5 h-3.5 text-muted/50" /></li>
+          <li>
+            <span className="text-foreground font-medium line-clamp-1">{blog.title}</span>
+          </li>
+        </ol>
+      </nav>
+
       {/* Hero Banner */}
-      <div className="relative overflow-hidden pt-16 pb-12 md:pb-16 text-white" style={{ backgroundColor: "var(--primary)" }}>
+      <div className="relative overflow-hidden pt-10 pb-8 sm:pt-16 sm:pb-12 md:pb-16 text-white" style={{ backgroundColor: "var(--primary)" }}>
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_20%_80%,white,transparent_50%)]" />
         <div className="relative max-w-7xl mx-auto px-4">
           {/* Category & Tags */}
@@ -324,15 +378,15 @@ export default async function SingleBlogPage({
             </div>
             <div className="flex items-center gap-1.5 text-white/70">
               <Clock className="w-4 h-4" />
-              <span>6 min read</span>
+              <span>{readingTime} min read</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Content Layout */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10 md:py-14">
-        <div className="flex flex-col lg:flex-row gap-10 relative items-start">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10 md:py-14">
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 relative items-start">
           
           {/* Left Sidebar - Table of Contents (desktop) */}
           <aside className="hidden lg:block w-64 shrink-0 sticky top-24">
@@ -345,8 +399,8 @@ export default async function SingleBlogPage({
             />
           </aside>
 
-          {/* Mobile TOC + Share (shown below hero on mobile) */}
-          <div className="lg:hidden space-y-4 mb-6">
+          {/* Mobile TOC + Share (shown before content on mobile) */}
+          <div className="lg:hidden space-y-4 mb-4">
             <TableOfContents headings={headings} />
             <ShareSection
               title={blog.title}
@@ -356,7 +410,7 @@ export default async function SingleBlogPage({
           </div>
 
           {/* Main Content Area */}
-          <main className="flex-1 min-w-0">
+          <main className="flex-1 min-w-0 overflow-x-hidden">
             {/* Featured Image */}
             {blog.featured_image && (
               <div className="mb-6 md:mb-8">
@@ -404,7 +458,7 @@ export default async function SingleBlogPage({
           </main>
 
           {/* Right Sidebar - Keywords & Author Profile */}
-          <aside className="w-full lg:w-72 shrink-0 sticky top-24 space-y-5">
+          <aside className="w-full lg:w-72 shrink-0 lg:sticky lg:top-24 space-y-5">
             {/* Keywords */}
             {blog.keywords && blog.keywords.length > 0 && (
               <KeywordsSection keywords={blog.keywords} />

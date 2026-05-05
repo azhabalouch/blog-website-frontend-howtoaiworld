@@ -78,9 +78,9 @@ export default function AuthorsClient({ initialAuthors }: { initialAuthors: Auth
           <p className="text-lg text-muted">No authors found matching your criteria.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 xl:gap-10">
           {filteredAndSortedAuthors.map((author) => (
-            <Link key={author.slug} href={`/authors/${author.slug}`} className="premium-card p-8 flex flex-col group relative overflow-hidden">
+            <Link key={author.slug} href={`/authors/${author.slug}`} className="premium-card p-5 sm:p-8 flex flex-col group relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-[100px] -z-10 group-hover:scale-110 transition-transform duration-500"></div>
               <div className="flex items-start justify-between mb-8">
                 <div className="w-20 h-20 text-primary rounded-full flex items-center justify-center text-3xl font-bold overflow-hidden shadow-premium group-hover:shadow-elevated transition-shadow duration-300" style={{ backgroundColor: 'var(--surface)' }}>

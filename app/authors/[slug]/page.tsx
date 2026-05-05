@@ -93,13 +93,13 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
-    <div className="max-w-6xl mx-auto px-4 py-16 space-y-16">
-      <section className="premium-card p-8 md:p-12 relative overflow-hidden">
+    <div className="max-w-6xl mx-auto px-4 py-8 sm:py-16 space-y-10 sm:space-y-16">
+      <section className="premium-card p-5 sm:p-8 md:p-12 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-bl-[200px] -z-10"></div>
         <div className="flex flex-col md:flex-row gap-10 items-start z-10">
-          <div className="w-40 h-40 shrink-0 rounded-full overflow-hidden text-primary flex items-center justify-center text-4xl font-bold shadow-premium border" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border-premium)' }}>
+          <div className="w-24 h-24 sm:w-40 sm:h-40 shrink-0 rounded-full overflow-hidden text-primary flex items-center justify-center text-2xl sm:text-4xl font-bold shadow-premium border" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border-premium)' }}>
             {author.featuredImage ? (
-              <Image src={author.featuredImage} alt={author.name} width={160} height={160} className="object-cover w-full h-full" />
+              <Image src={author.featuredImage} alt={author.name} width={160} height={160} className="object-cover w-full h-full" sizes="(max-width: 640px) 96px, 160px" />
             ) : (
               author.initials
             )}
@@ -109,7 +109,7 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
               <div>
                 <div className="flex items-center gap-4 mb-3">
-                  <h1 className="text-4xl md:text-5xl font-bold text-foreground tracking-tight font-heading">{author.name}</h1>
+                  <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-foreground tracking-tight font-heading">{author.name}</h1>
                   {author.rated_by_us && (
                     <div className="flex items-center gap-1.5 bg-primary-light text-primary-dark px-3 py-1.5 rounded-full text-xs font-bold premium-glow border border-primary/20">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>

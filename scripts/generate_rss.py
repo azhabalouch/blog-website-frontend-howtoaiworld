@@ -6,6 +6,7 @@ Creates an RSS 2.0 feed for content syndication.
 
 import json
 import os
+import urllib.parse
 from datetime import datetime
 from xml.etree.ElementTree import Element, SubElement, tostring
 from xml.dom import minidom
@@ -14,6 +15,8 @@ from xml.dom import minidom
 BASE_URL = "https://howtoaiworld.com"
 DATA_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data",
                          "cache.json")
+AUTHORS_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data",
+                            "authors.json")
 PUBLIC_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "public")
 
 
@@ -26,6 +29,24 @@ def load_blogs():
     except Exception as e:
         print(f"Error loading blogs: {e}")
         return []
+
+
+def load_authors():
+    """Load authors from authors.json"""
+    try:
+        with open(AUTHORS_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"Error loading authors: {e}")
+        return []
+
+
+def get_author_email(author_name, authors_data):
+    """Get the email of an author by name"""
+    for author in authors_data:
+        if author.get('name') == author_name:
+            return author.get('email')
+    return "contact@howtoaiworld.com"
 
 
 def generate_slug(title):
@@ -54,6 +75,7 @@ def parse_date(date_str):
 def generate_rss():
     """Generate RSS 2.0 feed"""
     blogs = load_blogs()
+    authors_data = load_authors()
 
     # Create RSS root element
     rss = Element("rss")
@@ -113,8 +135,10 @@ def generate_rss():
         pub_date.text = parse_date(blog.get('date', ''))
 
         # Author
+        author_name = blog.get('author', 'Unknown')
+        author_email = get_author_email(author_name, authors_data)
         author = SubElement(item, "author")
-        author.text = f"{blog.get('author', 'Unknown')} ({BASE_URL})"
+        author.text = f"{author_email} ({author_name})"
 
         # Category
         if blog.get('category'):
@@ -142,10 +166,28 @@ def generate_rss():
 
         # Enclosure (featured image)
         if blog.get('featured_image'):
+            image_path = blog.get('featured_image')
+
+            # Resolve local file size if present in public directory
+            local_path = os.path.join(PUBLIC_DIR, image_path.lstrip('/'))
+            file_size = "0"
+            if os.path.exists(local_path):
+                file_size = str(os.path.getsize(local_path))
+
+            # URL encode the path to handle spaces in filenames
+            encoded_path = urllib.parse.quote(image_path)
+
             enclosure = SubElement(item, "enclosure")
-            enclosure.set("url", blog.get('featured_image'))
+
+            image_url = encoded_path
+            if image_url.startswith('/'):
+                image_url = f"{BASE_URL}{image_url}"
+            elif not image_url.startswith('http'):
+                image_url = f"{BASE_URL}/{image_url}"
+
+            enclosure.set("url", image_url)
             enclosure.set("type", "image/jpeg")
-            enclosure.set("length", "0")  # Length not required
+            enclosure.set("length", file_size)
 
     # Convert to pretty XML
     rough_string = tostring(rss, encoding='unicode')
@@ -163,36 +205,16 @@ def save_rss(content):
     filepath = os.path.join(PUBLIC_DIR, "rss.xml")
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write(content)
-    print(f"  Created: rss.xml")
     return filepath
 
 
 def main():
-    print("=" * 60)
-    print("Generating RSS Feed for Howtoaiworld")
-    print("=" * 60)
-
     # Ensure public directory exists
     os.makedirs(PUBLIC_DIR, exist_ok=True)
 
     blogs = load_blogs()
-    print(f"\nLoaded {len(blogs)} blogs from cache.json")
-
-    print("\nGenerating RSS feed...")
     rss_content = generate_rss()
     save_rss(rss_content)
-
-    print("\n" + "=" * 60)
-    print("RSS feed generated successfully!")
-    print("=" * 60)
-    print(f"\nFile created: {os.path.join(PUBLIC_DIR, 'rss.xml')}")
-    print(f"\nRSS Feed URL: {BASE_URL}/rss.xml")
-    print(
-        "\nSubmit to RSS aggregators and directories to increase visibility.")
-    print("Add this link to your website's <head> section:")
-    print(
-        f'  <link rel="alternate" type="application/rss+xml" title="Howtoaiworld RSS" href="{BASE_URL}/rss.xml" />'
-    )
 
 
 if __name__ == "__main__":
