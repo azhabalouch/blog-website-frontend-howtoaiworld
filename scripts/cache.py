@@ -1,68 +1,108 @@
+import requests
 import os
-import json
-import urllib.request
-import urllib.parse
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
-URL = "https://azhabalouch.github.io/blogs-data-api/api.json"
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-CACHE_FILE = os.path.join(BASE_DIR, "data", "cache.json")
-PUBLIC_IMAGES_DIR = os.path.join(BASE_DIR, "public", "images")
+# --- CONFIG ---
+REPO_OWNER = "azhabalouch"
+REPO_NAME = "blogs-data-api"
+BRANCH = "main"
 
+TOKEN = os.environ.get("API_REPO_TOKEN")
 
-def download_image(img_url):
-    if not img_url:
-        return
-    try:
-        parts = img_url.split('/images/')
-        if len(parts) > 1:
-            rel_path = urllib.parse.unquote(parts[1])
-            local_path = os.path.join(PUBLIC_IMAGES_DIR, rel_path)
-            local_path = os.path.normpath(local_path)
+BASE_API = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents"
+RAW_BASE = f"https://raw.githubusercontent.com/{REPO_OWNER}/{REPO_NAME}/{BRANCH}"
 
-            os.makedirs(os.path.dirname(local_path), exist_ok=True)
+HEADERS = {
+    "Authorization": f"token {TOKEN}",
+    "Accept": "application/vnd.github.v3+json"
+}
 
-            if not os.path.exists(local_path):
-                safe_url = urllib.parse.urlsplit(img_url)
-                # Ensure the path is properly quoted for spaces
-                safe_url = safe_url._replace(path=urllib.parse.quote(
-                    urllib.parse.unquote(safe_url.path)))
-                req = urllib.request.Request(
-                    safe_url.geturl(), headers={'User-Agent': 'Mozilla/5.0'})
-                with urllib.request.urlopen(req) as response, open(
-                        local_path, 'wb') as out_file:
-                    out_file.write(response.read())
-    except Exception as e:
-        print(f"Error downloading image {img_url}: {e}")
+# --- PATHS ---
+CACHE_PATH = Path("data/cache.json")
+IMAGES_ROOT = Path("public/images")
+
+CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
+IMAGES_ROOT.mkdir(parents=True, exist_ok=True)
 
 
+# --- FETCH JSON ---
+def fetch_api_json():
+    url = f"{RAW_BASE}/api.json"
+    print(f"Fetching JSON: {url}")
+
+    res = requests.get(url, headers=HEADERS)
+    res.raise_for_status()
+
+    CACHE_PATH.write_bytes(res.content)
+    print(f"Saved → {CACHE_PATH}")
+
+    return res.json()
+
+
+# --- GET FULL REPO TREE (ONE CALL) ---
+def get_repo_tree():
+    url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/git/trees/{BRANCH}?recursive=1"
+    res = requests.get(url, headers=HEADERS)
+    res.raise_for_status()
+    return res.json().get("tree", [])
+
+
+# --- DOWNLOAD FILE ---
+def download_file(download_url, save_path):
+    res = requests.get(download_url, headers=HEADERS)
+    res.raise_for_status()
+
+    save_path.parent.mkdir(parents=True, exist_ok=True)
+    save_path.write_bytes(res.content)
+    print(f"Downloaded → {save_path}")
+
+
+# --- MAIN ---
 def main():
-    try:
-        req = urllib.request.Request(URL,
-                                     headers={'User-Agent': 'Mozilla/5.0'})
-        response = urllib.request.urlopen(req)
-        data = json.loads(response.read().decode('utf-8'))
+    data = fetch_api_json()
 
-        # Ensure data directory exists
-        os.makedirs(os.path.dirname(CACHE_FILE), exist_ok=True)
+    # Get the entire repo tree in ONE call
+    print("Fetching repo tree...")
+    tree = get_repo_tree()
 
-        with open(CACHE_FILE, 'w', encoding='utf-8') as f:
-            json.dump(data, f, indent=2)
+    # Collect image files that need downloading
+    to_download = []
+    for item in tree:
+        if item["type"] != "blob":
+            continue
+        path = item["path"]
+        if not path.startswith("images/"):
+            continue
+        # e.g. images/slug-name/file.jpg → slug-name/file.jpg
+        relative = path[len("images/"):]
+        local_path = IMAGES_ROOT / relative
 
-        blogs = data.get('blogs', [])
-        for blog in blogs:
-            slug = blog.get('slug')
-            if slug:
-                blog_img_dir = os.path.join(PUBLIC_IMAGES_DIR, slug)
-                if os.path.exists(blog_img_dir) and os.listdir(blog_img_dir):
-                    continue
+        if local_path.exists():
+            continue
 
-            download_image(blog.get('featured_image'))
-            for img in blog.get('content_images', []):
-                download_image(img)
+        download_url = f"{RAW_BASE}/{path}"
+        to_download.append((download_url, local_path))
 
-    except Exception as e:
-        print(f"Error fetching data: {e}")
+    if not to_download:
+        print("All images up to date.")
+        return
+
+    print(f"Downloading {len(to_download)} new image(s)...")
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        futures = {
+            pool.submit(download_file, url, path): path
+            for url, path in to_download
+        }
+        for future in as_completed(futures):
+            try:
+                future.result()
+            except Exception as e:
+                print(f"Failed: {futures[future]} — {e}")
 
 
 if __name__ == "__main__":
+    if not TOKEN:
+        raise Exception("Missing API_REPO_TOKEN environment variable")
+
     main()

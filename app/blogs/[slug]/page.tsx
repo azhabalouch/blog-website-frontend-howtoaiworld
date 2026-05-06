@@ -72,7 +72,9 @@ function extractHeadings(htmlContent: string): { id: string; text: string; level
     // Strip HTML tags from text
     const text = match[2].replace(/<[^>]*>/g, '');
     const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    headings.push({ id, text, level });
+    if (id) {
+      headings.push({ id, text, level });
+    }
   }
   return headings;
 }
@@ -156,9 +158,9 @@ function ArticleContentWithImages({ blog }: { blog: any }) {
                   />
                 </div>
                 {captions[idx] && (
-                  <p className="text-center text-sm text-muted mt-3 italic">
+                  <figcaption className="content-image-caption mt-2 md:mt-3 px-2 md:px-0">
                     {captions[idx]}
-                  </p>
+                  </figcaption>
                 )}
               </div>
             )}

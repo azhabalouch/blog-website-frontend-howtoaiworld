@@ -43,9 +43,7 @@ export function getBlogs(): BlogRecord[] {
       const slug = blog.slug || generateSlug(blog.title);
       return {
           ...blog,
-          slug,
-          featured_image: `/images/${slug}.jpg`,
-          content_images: [`/images/${slug}.jpg`]
+          slug
       };
   });
 }

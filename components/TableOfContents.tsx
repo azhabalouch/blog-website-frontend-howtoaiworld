@@ -52,7 +52,7 @@ export default function TableOfContents({ headings }: TableOfContentsProps) {
       >
         <div className="overflow-hidden">
         <nav className="space-y-2 text-sm">
-          {headings.map((heading, idx) => (
+          {headings.filter(h => h.id).map((heading, idx) => (
             <a
               key={idx}
               href={`#${heading.id}`}
