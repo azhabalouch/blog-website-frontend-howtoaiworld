@@ -40,12 +40,12 @@ export default function PrivacyPage() {
         <div className="flex flex-wrap items-center gap-4 pt-6 border-t border-card-border">
           <div className="flex items-center gap-2 text-sm text-muted">
             <Clock className="w-4 h-4" />
-            <span>Effective: <time dateTime="2026-02-07" className="text-foreground font-medium">February 07, 2026</time></span>
+            <span>Effective: <time dateTime="2026-05-07" className="text-foreground font-medium">May 7th, 2026</time></span>
           </div>
           <div className="hidden sm:block w-px h-4 bg-card-border" />
           <div className="flex items-center gap-2 text-sm text-muted">
             <Lock className="w-4 h-4" />
-            <span>Last Updated: February 07, 2026</span>
+            <span>Last Updated: May 7th, 2026</span>
           </div>
         </div>
       </div>
