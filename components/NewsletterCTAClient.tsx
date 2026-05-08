@@ -5,9 +5,16 @@ import { Mail, X } from "lucide-react";
 
 export default function NewsletterCTAClient() {
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+
+  // Defer sender form rendering to avoid hydration mismatch
+  // Sender.net script modifies DOM which conflicts with React hydration
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Prevent scroll when modal is open
   useEffect(() => {
@@ -70,7 +77,7 @@ export default function NewsletterCTAClient() {
 
   return (
     <>
-      <div className="relative overflow-hidden rounded-3xl cursor-pointer group" onClick={() => setIsOpen(true)} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setIsOpen(true); } }}>
+      <section className="relative overflow-hidden rounded-3xl cursor-pointer group" onClick={() => setIsOpen(true)} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setIsOpen(true); } }}>
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary-dark to-accent opacity-95 transition-opacity group-hover:opacity-100" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(255,255,255,0.15),transparent_50%)]" />
         <div className="relative px-5 sm:px-8 py-10 sm:py-12 md:px-16 md:py-16 text-center">
@@ -91,7 +98,7 @@ export default function NewsletterCTAClient() {
             <p className="text-white/60 text-xs">No spam. Unsubscribe anytime. We respect your privacy.</p>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* The background overlay */}
       <div
@@ -118,9 +125,9 @@ export default function NewsletterCTAClient() {
             <p className="text-muted mt-2">Get the latest AI insights delivered to your inbox weekly.</p>
           </div>
 
-          {/* Sender.net Form stays in DOM so script finds it on load */}
+          {/* Sender.net Form - only render after mount to avoid hydration mismatch */}
           <div className="min-h-[150px] relative flex flex-col items-center">
-            <div style={{ width: "100%" }} className="sender-form-field" data-sender-form-id="eERpR0" />
+            {mounted && <div style={{ width: "100%" }} className="sender-form-field" data-sender-form-id="eERpR0" />}
           </div>
 
           <p className="text-xs text-center text-muted mt-6">We'll never share your email with anyone else.</p>

@@ -87,8 +87,8 @@ export default function RootLayout({
           `}
         </Script>
 
-        <Script id="gtag" strategy="lazyOnload" src="https://www.googletagmanager.com/gtag/js?id=G-HWT034PQT2" />
-        <Script id="gtag-config" strategy="lazyOnload">
+        <Script id="gtag" strategy="afterInteractive" src="https://www.googletagmanager.com/gtag/js?id=G-HWT034PQT2" />
+        <Script id="gtag-config" strategy="afterInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
@@ -97,7 +97,7 @@ export default function RootLayout({
           `}
         </Script>
 
-        <Script id="gtm" strategy="lazyOnload">
+        <Script id="gtm" strategy="afterInteractive">
           {`
             (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
             new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -107,17 +107,15 @@ export default function RootLayout({
           `}
         </Script>
 
-        <Script id="adsense" strategy="lazyOnload" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8450943980358095" crossOrigin="anonymous" />
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8450943980358095" crossOrigin="anonymous"></script>
         <meta name="google-adsense-account" content="ca-pub-8450943980358095" />
         <link rel="alternate" type="application/rss+xml" title="Howtoaiworld RSS Feed" href="https://howtoaiworld.com/rss.xml" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
+        <link rel="preconnect" href="https://cdn.sender.net" />
         <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
-        <link rel="dns-prefetch" href="https://cdn.sender.net" />
 
         {/* Sender.net Newsletter Integration */}
-        <Script id="sender-net-script" strategy="lazyOnload">
+        <Script id="sender-net-script" strategy="afterInteractive">
           {`
             (function (s, e, n, d, er) {
               s['Sender'] = er;

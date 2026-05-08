@@ -145,7 +145,6 @@ export default function Home() {
                     className="object-cover group-hover:scale-105 transition-transform duration-700"
                     sizes="(max-width: 1024px) 100vw, 50vw"
                     priority
-                    fetchPriority="high"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
                   <div className="absolute bottom-4 left-4 right-4">
@@ -181,7 +180,7 @@ export default function Home() {
                   </div>
                   <div className="flex flex-col justify-center min-w-0">
                     <span className="text-[10px] sm:text-xs font-semibold text-primary uppercase tracking-wide">{blog.category?.split('/')[0]}</span>
-                    <h3 className="font-bold text-sm leading-snug line-clamp-2 text-foreground">{blog.title}</h3>
+                    <h4 className="font-bold text-sm leading-snug line-clamp-2 text-foreground">{blog.title}</h4>
                     <div className="flex items-center gap-2 text-[11px] sm:text-xs text-muted mt-1">
                       <span>{blog.author}</span>
                       <span>•</span>
@@ -316,7 +315,7 @@ export default function Home() {
             <div className="premium-card p-6 mt-6">
               <h3 className="font-bold text-lg text-foreground mb-2">Stay Updated</h3>
               <p className="text-sm text-muted mb-4">Get the latest AI insights delivered to your inbox weekly.</p>
-              <div style={{ textAlign: "left" }} className="sender-form-field" data-sender-form-id="eERpR0" />
+              <div style={{ textAlign: "left" }} className="sender-form-field" data-sender-form-id="eERpR0" suppressHydrationWarning />
             </div>
           </div>
         </section>
