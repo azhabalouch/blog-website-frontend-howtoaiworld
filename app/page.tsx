@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import Script from "next/script";
+
 import { CheckCircle2, ShieldCheck, Cloud, BarChart2, Briefcase, Lock, Database, ArrowRight, Sparkles, BookOpen, Zap, Target, Award } from "lucide-react";
 import { getAuthors, getBlogs, getCategories, generateSlug } from "../lib/site-data";
 import FeaturedCarousel from "../components/FeaturedCarousel";
@@ -80,13 +80,11 @@ export default function Home() {
 
   return (
     <>
-      <Script
-        id="website-schema"
+      <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
       />
-      <Script
-        id="item-list-schema"
+      <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
       />
