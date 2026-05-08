@@ -31,7 +31,7 @@ export default function SenderFormEmbed() {
 
   return (
     <>
-      <Script id="sender-net-script" strategy="afterInteractive">
+      <Script id="sender-net-script" strategy="lazyOnload">
         {senderSnippet}
       </Script>
       <div className="min-h-[150px] relative flex flex-col items-center">

@@ -5,7 +5,6 @@ import { CheckCircle2, ShieldCheck, Cloud, BarChart2, Briefcase, Lock, Database,
 import { getAuthors, getBlogs, getCategories, generateSlug } from "../lib/site-data";
 import FeaturedCarousel from "../components/FeaturedCarousel";
 import NewsletterCTAClient from "../components/NewsletterCTAClient";
-import SenderFormEmbed from "../components/SenderFormEmbed";
 
 export default function Home() {
   const blogs = getBlogs();
@@ -276,7 +275,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Latest Blogs + Categories */}
+        {/* Latest Blogs */}
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-5">
             <h2 className="text-xl font-bold uppercase tracking-wider text-foreground">Latest Blogs</h2>
@@ -295,29 +294,25 @@ export default function Home() {
               ))}
             </div>
           </div>
-
+          
+          {/* Categories */}
           <div className="space-y-5">
             <h2 className="text-xl font-bold uppercase tracking-wider text-foreground">Browse Categories</h2>
-            <div className="grid grid-cols-2 gap-3">
+            <ul className="space-y-2">
               {categories.map((cat, idx) => {
                 const icons = [CheckCircle2, ShieldCheck, Cloud, BarChart2, Briefcase, Lock, Database];
                 const Icon = icons[idx % icons.length];
                 return (
-                  <Link key={cat.slug} href={`/blogs?category=${encodeURIComponent(cat.name)}`} className="premium-card p-3 flex items-center gap-2 cursor-pointer">
-                    <Icon className="w-4 h-4 text-primary" />
-                    <span className="text-sm font-medium flex-1 text-foreground">{cat.name}</span>
-                    <span className="text-xs text-muted">({cat.count})</span>
-                  </Link>
+                  <li key={cat.slug}>
+                    <Link href={`/blogs?category=${encodeURIComponent(cat.name)}`} className="premium-card p-3 flex items-center gap-2 cursor-pointer">
+                      <Icon className="w-4 h-4 text-primary" />
+                      <span className="text-sm font-medium flex-1 text-foreground">{cat.name}</span>
+                      <span className="text-xs text-muted">({cat.count})</span>
+                    </Link>
+                  </li>
                 );
               })}
-            </div>
-
-            {/* Newsletter */}
-            <div className="premium-card p-6 mt-6">
-              <h3 className="font-bold text-lg text-foreground mb-2">Stay Updated</h3>
-              <p className="text-sm text-muted mb-4">Get the latest AI insights delivered to your inbox weekly.</p>
-              <SenderFormEmbed />
-            </div>
+            </ul>
           </div>
         </section>
 
