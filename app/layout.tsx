@@ -66,22 +66,18 @@ export default function RootLayout({
           `}
         </Script>
  
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-HWT034PQT2"
-          strategy="afterInteractive"
-        />
-        <Script id="gtag-init" strategy="afterInteractive">
+        <Script id="gtm" strategy="afterInteractive">
           {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-HWT034PQT2');
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-MPVWNXWV');
           `}
         </Script>
  
         <link rel="alternate" type="application/rss+xml" title="Howtoaiworld RSS Feed" href="https://howtoaiworld.com/rss.xml" />
         <link rel="preconnect" href="https://www.googletagmanager.com" />
-        <link rel="preload" as="script" href="https://www.googletagmanager.com/gtag/js?id=G-HWT034PQT2" />
         <link rel="preconnect" href="https://cdn.sender.net" />
       </head>
       <body className="flex flex-col min-h-screen bg-background text-foreground font-sans">
