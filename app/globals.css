@@ -9,8 +9,8 @@
   --card-border: #E8E4DF;
   --muted: #7A7572;
   --primary: #CD7E41;
-  --primary-light: #F5E6D3;
-  --primary-dark: #A86428;
+  --primary-light: #F2DFC8;
+  --primary-dark: #955A22;
   --accent: #2D2C2A;
   --surface: #F0EDE8;
   --white: #FFFFFF;
@@ -111,6 +111,7 @@ small, caption, .sub-text, .caption {
   box-shadow: var(--shadow-premium);
   border-radius: 16px;
   transition: box-shadow 0.4s ease, border-color 0.4s ease, transform 0.3s ease;
+  will-change: transform;
 }
 
 .premium-card:hover {
@@ -127,6 +128,7 @@ small, caption, .sub-text, .caption {
   box-shadow: var(--shadow-premium);
   border-radius: 10px;
   transition: box-shadow 0.4s ease, background-color 0.3s ease, transform 0.2s ease;
+  will-change: transform;
 }
 
 .premium-button:hover {
@@ -147,20 +149,25 @@ small, caption, .sub-text, .caption {
   border-radius: 12px;
 }
 
-/* Smooth dark mode transitions */
+/* CSS Containment for carousel/animated sections to prevent forced reflows */
+.contain-layout {
+  contain: layout style;
+}
+
+/* Smooth dark mode transitions - only composited properties */
 *, *::before, *::after {
-  transition-property: background-color, border-color, color, box-shadow;
+  transition-property: background-color, border-color, color, box-shadow, opacity;
   transition-duration: 0.2s;
   transition-timing-function: ease;
 }
 
 a, button, input, textarea, img, [class*="hover:"], [class*="transition"] {
-  transition-property: all;
+  transition-property: background-color, border-color, color, box-shadow, opacity, transform;
   transition-duration: 0.2s;
   transition-timing-function: ease;
 }
 
-/* Carousel animation */
+/* Carousel animation - composited (opacity + transform only) */
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(1.02); }
   to { opacity: 1; transform: scale(1); }
@@ -168,6 +175,7 @@ a, button, input, textarea, img, [class*="hover:"], [class*="transition"] {
 
 .carousel-fade {
   animation: fadeIn 0.6s ease-out;
+  will-change: opacity, transform;
 }
 
 /* Scrollbar styling */

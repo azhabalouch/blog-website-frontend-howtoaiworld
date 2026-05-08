@@ -75,7 +75,7 @@ export default function ShareSection({ title, excerpt, url }: ShareSectionProps)
 
   return (
     <div className="mt-6">
-      <h4 className="font-bold text-sm text-foreground mb-3">Share Article</h4>
+      <h3 className="font-bold text-sm text-foreground mb-3">Share Article</h3>
       <div className="flex flex-wrap gap-2">
         <button
           onClick={shareToLinkedIn}
