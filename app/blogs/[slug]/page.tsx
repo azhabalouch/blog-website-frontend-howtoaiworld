@@ -84,7 +84,7 @@ function KeywordsSection({ keywords }: { keywords: string[] }) {
   if (!keywords || keywords.length === 0) return null;
   return (
     <div className="premium-card p-5">
-      <h4 className="font-bold text-sm text-foreground mb-4">Keywords</h4>
+      <h3 className="font-bold text-sm text-foreground mb-4">Keywords</h3>
       <div className="flex flex-wrap gap-2">
         {keywords.map((keyword) => (
           <span key={keyword} className="px-2.5 py-1 rounded-full bg-surface text-primary text-xs font-medium border border-primary/20">
@@ -496,7 +496,7 @@ export default async function SingleBlogPage({
             {/* Related from Author */}
             {author && author.blogs.length > 1 && (
               <div className="premium-card p-5">
-                <h4 className="font-bold text-sm text-foreground mb-4">More from {author.name.split(' ')[0]}</h4>
+                <h3 className="font-bold text-sm text-foreground mb-4">More from {author.name.split(' ')[0]}</h3>
                 <div className="space-y-3">
                   {author.blogs
                     .filter(b => b.title !== blog.title)
@@ -507,9 +507,9 @@ export default async function SingleBlogPage({
                         href={`/blogs/${generateSlug(relatedBlog.title)}`}
                         className="block group"
                       >
-                        <h5 className="text-sm font-medium text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-snug">
+                        <h4 className="text-sm font-medium text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-snug">
                           {relatedBlog.title}
-                        </h5>
+                        </h4>
                         <span className="text-xs text-muted">{relatedBlog.date}</span>
                       </Link>
                     ))}

@@ -20,7 +20,7 @@ export default function Footer() {
           </section>
 
           <nav className="space-y-4">
-            <h4 className="text-lg font-semibold tracking-wide text-foreground">Quick Links</h4>
+            <h2 className="text-lg font-semibold tracking-wide text-foreground">Quick Links</h2>
             <ul className="space-y-3 text-sm text-muted">
               <li><Link href="/" className="transition hover:text-primary">Home</Link></li>
               <li><Link href="/blogs" className="transition hover:text-primary">Blogs</Link></li>
@@ -31,7 +31,7 @@ export default function Footer() {
           </nav>
 
           <nav className="space-y-4">
-            <h4 className="text-lg font-semibold tracking-wide text-foreground">Legal</h4>
+            <h2 className="text-lg font-semibold tracking-wide text-foreground">Legal</h2>
             <ul className="space-y-3 text-sm text-muted">
               <li><Link href="/legal/privacy" className="transition hover:text-primary">Privacy Policy</Link></li>
               <li><Link href="/legal/terms" className="transition hover:text-primary">Terms of Service</Link></li>
@@ -40,7 +40,7 @@ export default function Footer() {
           </nav>
 
           <section className="space-y-4">
-            <h4 className="text-lg font-semibold tracking-wide text-foreground">Connect With Us</h4>
+            <h2 className="text-lg font-semibold tracking-wide text-foreground">Connect With Us</h2>
             <ul className="space-y-3 text-sm text-muted">
               <li>
                 <a href="https://x.com/howtoaiworld" rel="noopener noreferrer" target="_blank" className="transition hover:text-primary inline-flex items-center gap-2">

@@ -76,7 +76,7 @@ export default function FeaturedCarousel({ blogs }: { blogs: BlogRecord[] }) {
       aria-roledescription="carousel"
       aria-label="Featured Stories"
       aria-live="polite"
-      className="relative rounded-2xl overflow-hidden shadow-elevated aspect-[4/3] sm:aspect-video lg:aspect-[2/1] group"
+      className="relative rounded-2xl overflow-hidden shadow-elevated aspect-[4/3] sm:aspect-video lg:aspect-[2/1] group contain-layout"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={handleTouchStart}
@@ -91,7 +91,7 @@ export default function FeaturedCarousel({ blogs }: { blogs: BlogRecord[] }) {
           role="group"
           aria-roledescription="slide"
           aria-label={`Slide ${idx + 1} of ${total}: ${blog.title}`}
-          className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+          className={`absolute inset-0 transition-opacity duration-700 ease-in-out will-change-auto ${
             idx === current
               ? "opacity-100 z-10"
               : "opacity-0 z-0 pointer-events-none"
@@ -148,10 +148,10 @@ export default function FeaturedCarousel({ blogs }: { blogs: BlogRecord[] }) {
               key={idx}
               role="tab"
               onClick={(e) => { e.preventDefault(); setCurrent(idx); }}
-              className={`rounded-full transition-all duration-300 min-w-[44px] min-h-[28px] flex items-center justify-center ${
+              className={`rounded-full transition-transform duration-300 min-w-[44px] min-h-[28px] flex items-center justify-center ${
                 idx === current
-                  ? "h-3 sm:h-2 w-8 sm:w-8 bg-white"
-                  : "h-3 sm:h-2 w-3 sm:w-2 bg-white/40 hover:bg-white/60"
+                  ? "h-3 sm:h-2 w-8 sm:w-8 bg-white scale-100"
+                  : "h-3 sm:h-2 w-3 sm:w-2 bg-white/40 hover:bg-white/60 scale-90"
               }`}
               aria-selected={idx === current}
               aria-label={`Go to slide ${idx + 1}`}

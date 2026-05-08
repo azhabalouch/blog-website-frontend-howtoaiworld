@@ -224,19 +224,19 @@ export default function ContactPage() {
               <h3 className="font-bold text-foreground mb-4">Common Questions</h3>
               <div className="space-y-4 text-sm">
                 <div>
-                  <h4 className="font-semibold text-foreground mb-1">Can I contribute content?</h4>
+                  <h3 className="font-semibold text-foreground mb-1">Can I contribute content?</h3>
                   <p className="text-muted leading-relaxed">
                     Yes! We welcome guest contributors. Send us your pitch via the contact form.
                   </p>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-foreground mb-1">Do you offer partnerships?</h4>
+                  <h3 className="font-semibold text-foreground mb-1">Do you offer partnerships?</h3>
                   <p className="text-muted leading-relaxed">
                     We collaborate with AI companies and educational institutions. Reach out to discuss.
                   </p>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-foreground mb-1">Found a broken link?</h4>
+                  <h3 className="font-semibold text-foreground mb-1">Found a broken link?</h3>
                   <p className="text-muted leading-relaxed">
                     Let us know through the form and we&apos;ll fix it ASAP.
                   </p>

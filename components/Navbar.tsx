@@ -119,10 +119,10 @@ export default function Navbar() {
         </nav>
 
         <div className="hidden lg:flex items-center gap-3">
-          <form action="/blogs" method="GET" role="search" className="flex items-center border border-card-border rounded-xl px-3 h-9 bg-surface max-w-[200px]">
+          <form action="/blogs" method="GET" role="search" className="flex items-center border border-card-border rounded-xl px-3 h-11 bg-surface max-w-[200px]">
             <label htmlFor="desktop-search" className="sr-only">Search blogs</label>
-            <input id="desktop-search" type="text" name="q" placeholder="Search..." className="bg-transparent outline-none w-full text-sm text-foreground placeholder-muted" />
-            <button type="submit" aria-label="Search"><Search className="w-4 h-4 text-muted hover:text-primary cursor-pointer" /></button>
+            <input id="desktop-search" type="text" name="q" placeholder="Search..." className="bg-transparent outline-none w-full text-sm text-foreground placeholder-muted min-h-[44px]" />
+            <button type="submit" aria-label="Search" className="min-w-[44px] min-h-[44px] flex items-center justify-center"><Search className="w-4 h-4 text-muted hover:text-primary cursor-pointer" /></button>
           </form>
           <button onClick={toggleDarkMode} className="p-2 rounded-xl border border-card-border hover:bg-surface transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center" aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}>
             {darkMode ? <Sun className="w-4 h-4 text-primary" /> : <Moon className="w-4 h-4 text-muted" />}

@@ -145,6 +145,7 @@ export default function Home() {
                     className="object-cover group-hover:scale-105 transition-transform duration-700"
                     sizes="(max-width: 1024px) 100vw, 50vw"
                     priority
+                    fetchPriority="high"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
                   <div className="absolute bottom-4 left-4 right-4">
@@ -180,7 +181,7 @@ export default function Home() {
                   </div>
                   <div className="flex flex-col justify-center min-w-0">
                     <span className="text-[10px] sm:text-xs font-semibold text-primary uppercase tracking-wide">{blog.category?.split('/')[0]}</span>
-                    <h4 className="font-bold text-sm leading-snug line-clamp-2 text-foreground">{blog.title}</h4>
+                    <h3 className="font-bold text-sm leading-snug line-clamp-2 text-foreground">{blog.title}</h3>
                     <div className="flex items-center gap-2 text-[11px] sm:text-xs text-muted mt-1">
                       <span>{blog.author}</span>
                       <span>•</span>

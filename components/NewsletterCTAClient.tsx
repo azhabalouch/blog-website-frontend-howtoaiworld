@@ -70,7 +70,7 @@ export default function NewsletterCTAClient() {
 
   return (
     <>
-      <section className="relative overflow-hidden rounded-3xl cursor-pointer group" onClick={() => setIsOpen(true)} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setIsOpen(true); } }}>
+      <div className="relative overflow-hidden rounded-3xl cursor-pointer group" onClick={() => setIsOpen(true)} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setIsOpen(true); } }}>
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary-dark to-accent opacity-95 transition-opacity group-hover:opacity-100" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(255,255,255,0.15),transparent_50%)]" />
         <div className="relative px-5 sm:px-8 py-10 sm:py-12 md:px-16 md:py-16 text-center">
@@ -91,7 +91,7 @@ export default function NewsletterCTAClient() {
             <p className="text-white/60 text-xs">No spam. Unsubscribe anytime. We respect your privacy.</p>
           </div>
         </div>
-      </section>
+      </div>
 
       {/* The background overlay */}
       <div
