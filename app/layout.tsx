@@ -77,8 +77,6 @@ export default function RootLayout({
         </Script>
  
         <link rel="alternate" type="application/rss+xml" title="Howtoaiworld RSS Feed" href="https://howtoaiworld.com/rss.xml" />
-        <link rel="preconnect" href="https://www.googletagmanager.com" />
-        <link rel="preconnect" href="https://cdn.sender.net" />
       </head>
       <body className="flex flex-col min-h-screen bg-background text-foreground font-sans">
         <noscript>

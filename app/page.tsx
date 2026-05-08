@@ -6,6 +6,7 @@ import { CheckCircle2, ShieldCheck, Cloud, BarChart2, Briefcase, Lock, Database,
 import { getAuthors, getBlogs, getCategories, generateSlug } from "../lib/site-data";
 import FeaturedCarousel from "../components/FeaturedCarousel";
 import NewsletterCTAClient from "../components/NewsletterCTAClient";
+import cloudflareImageLoader from "../lib/cloudflare-image-loader";
 
 export default function Home() {
   const blogs = getBlogs();
@@ -60,6 +61,11 @@ export default function Home() {
   const recommendedBlogs = blogs.slice(4, 8);
   const latestBlogs = blogs.slice(8, 16);
 
+  // Preload URL for the LCP hero image
+  const heroPreloadUrl = heroBlog
+    ? cloudflareImageLoader({ src: heroBlog.featured_image || "https://placehold.co/800x500", width: 750, quality: 75 })
+    : undefined;
+
   // Get full counts for stats, then slice for display
   const allCategories = getCategories();
   const allAuthors = getAuthors();
@@ -91,6 +97,9 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
       />
+      {heroPreloadUrl && (
+        <link rel="preload" as="image" href={heroPreloadUrl} fetchPriority="high" />
+      )}
     <div>
       {/* Hero Section - Exclusive Featured Article */}
       <section className="relative overflow-hidden">
@@ -146,6 +155,7 @@ export default function Home() {
                     className="object-cover group-hover:scale-105 transition-transform duration-700"
                     sizes="(max-width: 1024px) 100vw, 50vw"
                     priority
+                    fetchPriority="high"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
                   <div className="absolute bottom-4 left-4 right-4">
