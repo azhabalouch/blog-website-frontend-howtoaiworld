@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Script from "next/script";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -41,7 +42,8 @@ const organizationSchema = {
 export default function AboutPage() {
     return (
         <>
-      <script
+      <Script
+        id="organization-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
       />

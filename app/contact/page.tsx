@@ -1,5 +1,6 @@
 import { Mail, MapPin, Clock, Send, Sparkles, MessageSquare, Users } from "lucide-react";
 import Link from "next/link";
+import Script from "next/script";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -41,7 +42,8 @@ const contactPageSchema = {
 export default function ContactPage() {
   return (
     <>
-      <script
+      <Script
+        id="contactpage-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(contactPageSchema) }}
       />

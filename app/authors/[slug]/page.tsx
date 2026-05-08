@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import Script from "next/script";
 import { notFound } from "next/navigation";
 import { getAuthorBySlug, getAuthors, generateSlug } from "../../../lib/site-data";
 
@@ -82,11 +83,13 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
 
   return (
     <>
-      <script
+      <Script
+        id="person-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
       />
-      <script
+      <Script
+        id="breadcrumb-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />

@@ -1,4 +1,5 @@
 import { getAuthors } from "../../lib/site-data";
+import Script from "next/script";
 import type { Metadata } from "next";
 import AuthorsClient from "../../components/AuthorsClient";
 
@@ -22,7 +23,8 @@ export default function AuthorsPage() {
 
   return (
     <>
-      <script
+      <Script
+        id="authors-collectionpage-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
