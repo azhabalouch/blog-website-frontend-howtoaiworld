@@ -111,30 +111,7 @@ export default function RootLayout({
         <meta name="google-adsense-account" content="ca-pub-8450943980358095" />
         <link rel="alternate" type="application/rss+xml" title="Howtoaiworld RSS Feed" href="https://howtoaiworld.com/rss.xml" />
         <link rel="preconnect" href="https://www.googletagmanager.com" />
-        <link rel="preconnect" href="https://cdn.sender.net" />
         <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
-
-        {/* Sender.net Newsletter Integration */}
-        <Script id="sender-net-script" strategy="afterInteractive">
-          {`
-            (function (s, e, n, d, er) {
-              s['Sender'] = er;
-              s[er] = s[er] || function () {
-                (s[er].q = s[er].q || []).push(arguments)
-              }, s[er].l = 1 * new Date();
-              s[er].on = function(event, callback) {
-                s[er].listeners = s[er].listeners || {};
-                (s[er].listeners[event] = s[er].listeners[event] || []).push(callback);
-              };
-              var a = e.createElement(n),
-                  m = e.getElementsByTagName(n)[0];
-              a.async = 1;
-              a.src = d;
-              m.parentNode.insertBefore(a, m)
-            })(window, document, 'script', 'https://cdn.sender.net/accounts_resources/universal.js', 'sender');
-            sender('6ec66dfe790619');
-          `}
-        </Script>
       </head>
       <body className="flex flex-col min-h-screen bg-background text-foreground font-sans">
         <noscript>

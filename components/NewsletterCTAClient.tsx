@@ -2,19 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Mail, X } from "lucide-react";
+import SenderFormEmbed from "./SenderFormEmbed";
 
 export default function NewsletterCTAClient() {
   const [isOpen, setIsOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
-
-  // Defer sender form rendering to avoid hydration mismatch
-  // Sender.net script modifies DOM which conflicts with React hydration
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // Prevent scroll when modal is open
   useEffect(() => {
@@ -125,12 +119,9 @@ export default function NewsletterCTAClient() {
             <p className="text-muted mt-2">Get the latest AI insights delivered to your inbox weekly.</p>
           </div>
 
-          {/* Sender.net Form - only render after mount to avoid hydration mismatch */}
-          <div className="min-h-[150px] relative flex flex-col items-center">
-            {mounted && <div style={{ width: "100%" }} className="sender-form-field" data-sender-form-id="eERpR0" />}
-          </div>
+          <SenderFormEmbed />
 
-          <p className="text-xs text-center text-muted mt-6">We'll never share your email with anyone else.</p>
+          <p className="text-xs text-center text-muted mt-6">We&apos;ll never share your email with anyone else.</p>
         </div>
       </div>
     </>

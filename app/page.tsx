@@ -1,10 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
-import { CheckCircle2, ShieldCheck, Cloud, BarChart2, Briefcase, Lock, Database, ArrowRight, Mail, Sparkles, TrendingUp, BookOpen, Zap, Target, Award } from "lucide-react";
+import { CheckCircle2, ShieldCheck, Cloud, BarChart2, Briefcase, Lock, Database, ArrowRight, Sparkles, BookOpen, Zap, Target, Award } from "lucide-react";
 import { getAuthors, getBlogs, getCategories, generateSlug } from "../lib/site-data";
 import FeaturedCarousel from "../components/FeaturedCarousel";
 import NewsletterCTAClient from "../components/NewsletterCTAClient";
+import SenderFormEmbed from "../components/SenderFormEmbed";
 
 export default function Home() {
   const blogs = getBlogs();
@@ -315,7 +316,7 @@ export default function Home() {
             <div className="premium-card p-6 mt-6">
               <h3 className="font-bold text-lg text-foreground mb-2">Stay Updated</h3>
               <p className="text-sm text-muted mb-4">Get the latest AI insights delivered to your inbox weekly.</p>
-              <div style={{ textAlign: "left" }} className="sender-form-field" data-sender-form-id="eERpR0" suppressHydrationWarning />
+              <SenderFormEmbed />
             </div>
           </div>
         </section>
