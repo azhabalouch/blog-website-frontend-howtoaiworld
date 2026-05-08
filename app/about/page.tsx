@@ -1,6 +1,5 @@
 import Image from "next/image";
 import type { Metadata } from "next";
-import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "About Us - Howtoaiworld | Making AI Simple for Everyone",
@@ -42,8 +41,7 @@ const organizationSchema = {
 export default function AboutPage() {
     return (
         <>
-      <Script
-        id="organization-schema"
+      <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
       />

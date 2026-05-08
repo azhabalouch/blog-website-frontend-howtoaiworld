@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import { Suspense } from "react";
 import BlogsContent from "./BlogsContent";
 import { getBlogs, getCategories, getAuthors } from "../../lib/site-data";
@@ -61,8 +60,7 @@ export default function BlogsPage() {
 
   return (
     <>
-      <Script
-        id="collection-page-schema"
+      <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionPageSchema) }}
       />

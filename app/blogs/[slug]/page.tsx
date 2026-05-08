@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import Script from "next/script";
 import { User, Clock, Calendar, ChevronRight, Home } from "lucide-react";
 import { getBlogBySlug, getBlogs, getAuthorBySlug, generateSlug } from "../../../lib/site-data";
 import ShareSection from "../../../components/ShareSection";
@@ -304,20 +303,17 @@ export default async function SingleBlogPage({
 
   return (
     <>
-      <Script
-        id="blog-posting-schema"
+      <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingSchema) }}
       />
       {faqSchema && (
-        <Script
-          id="faq-schema"
+        <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
         />
       )}
-      <Script
-        id="breadcrumb-schema"
+      <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />

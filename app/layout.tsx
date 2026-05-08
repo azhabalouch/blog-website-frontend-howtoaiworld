@@ -56,8 +56,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <Script id="theme-init" strategy="beforeInteractive">
-          {`
+        <script dangerouslySetInnerHTML={{ __html: `
             (function() {
               try {
                 var theme = localStorage.getItem('theme');
@@ -66,10 +65,8 @@ export default function RootLayout({
                 }
               } catch(e) {}
             })();
-          `}
-        </Script>
-        <Script id="google-consent-mode" strategy="beforeInteractive">
-          {`
+          `}} />
+        <script dangerouslySetInnerHTML={{ __html: `
             window.dataLayer = window.dataLayer || [];
             function gtag() { dataLayer.push(arguments); }
             gtag("consent", "default", {
@@ -84,30 +81,7 @@ export default function RootLayout({
             });
             gtag("set", "ads_data_redaction", true);
             gtag("set", "url_passthrough", false);
-          `}
-        </Script>
-
-        <Script id="gtag" strategy="afterInteractive" src="https://www.googletagmanager.com/gtag/js?id=G-HWT034PQT2" />
-        <Script id="gtag-config" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-HWT034PQT2');
-          `}
-        </Script>
-
-        <Script id="gtm" strategy="afterInteractive">
-          {`
-            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','GTM-MPVWNXWV');
-          `}
-        </Script>
-
-        <Script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8450943980358095" crossOrigin="anonymous" strategy="afterInteractive" />
+          `}} />
         <meta name="google-adsense-account" content="ca-pub-8450943980358095" />
         <link rel="alternate" type="application/rss+xml" title="Howtoaiworld RSS Feed" href="https://howtoaiworld.com/rss.xml" />
         <link rel="preconnect" href="https://www.googletagmanager.com" />
@@ -117,6 +91,25 @@ export default function RootLayout({
         <noscript>
           <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPVWNXWV" height="0" width="0" style={{ display: "none", visibility: "hidden" }}></iframe>
         </noscript>
+        <Script id="gtag" strategy="afterInteractive" src="https://www.googletagmanager.com/gtag/js?id=G-HWT034PQT2" />
+        <Script id="gtag-config" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-HWT034PQT2');
+          `}
+        </Script>
+        <Script id="gtm" strategy="afterInteractive">
+          {`
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-MPVWNXWV');
+          `}
+        </Script>
+        <Script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8450943980358095" crossOrigin="anonymous" strategy="lazyOnload" />
         <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-white focus:rounded-lg focus:shadow-xl focus:outline-none">
           Skip to main content
         </a>

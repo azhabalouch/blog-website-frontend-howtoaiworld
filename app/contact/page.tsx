@@ -1,7 +1,6 @@
 import { Mail, MapPin, Clock, Send, Sparkles, MessageSquare, Users } from "lucide-react";
 import Link from "next/link";
 import type { Metadata } from "next";
-import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "Contact Us - Howtoaiworld | Get in Touch",
@@ -42,8 +41,7 @@ const contactPageSchema = {
 export default function ContactPage() {
   return (
     <>
-      <Script
-        id="contact-schema"
+      <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(contactPageSchema) }}
       />
