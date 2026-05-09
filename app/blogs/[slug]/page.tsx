@@ -392,6 +392,12 @@ export default async function SingleBlogPage({
           
           {/* Left Sidebar - Table of Contents (desktop) */}
           <aside className="hidden lg:block w-64 shrink-0 sticky top-24">
+            {/* Last Update Date */}
+            <div className="flex items-center gap-2 mb-5 text-sm text-muted">
+              <Calendar className="w-4 h-4" />
+              <span>Updated: {blog.date}</span>
+            </div>
+
             <TableOfContents headings={headings} />
 
             <ShareSection
@@ -403,6 +409,11 @@ export default async function SingleBlogPage({
 
           {/* Mobile TOC + Share (shown before content on mobile) */}
           <div className="lg:hidden space-y-4 mb-4">
+            {/* Last Update Date */}
+            <div className="flex items-center gap-2 text-sm text-muted">
+              <Calendar className="w-4 h-4" />
+              <span>Updated: {blog.date}</span>
+            </div>
             <TableOfContents headings={headings} />
             <ShareSection
               title={blog.title}
