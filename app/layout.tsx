@@ -43,9 +43,13 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+  other: {
+    "google-adsense-account": "ca-pub-8450943980358095",
+  },
 };
  
 export default function RootLayout({
+
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -79,7 +83,6 @@ export default function RootLayout({
         <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8450943980358095"
-          crossOrigin="anonymous"
           strategy="afterInteractive"
         />
  
