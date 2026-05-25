@@ -76,6 +76,14 @@ export default function RootLayout({
           `}
         </Script>
  
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8450943980358095"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
+ 
+        <meta name="google-adsense-account" content="ca-pub-8450943980358095" />
         <link rel="alternate" type="application/rss+xml" title="Howtoaiworld RSS Feed" href="https://howtoaiworld.com/rss.xml" />
       </head>
       <body className="flex flex-col min-h-screen bg-background text-foreground font-sans">
