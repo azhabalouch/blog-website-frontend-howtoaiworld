@@ -43,9 +43,6 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  other: {
-    "google-adsense-account": "ca-pub-8450943980358095",
-  },
 };
  
 export default function RootLayout({
@@ -86,7 +83,6 @@ export default function RootLayout({
           strategy="afterInteractive"
         />
  
-        <meta name="google-adsense-account" content="ca-pub-8450943980358095" />
         <link rel="alternate" type="application/rss+xml" title="Howtoaiworld RSS Feed" href="https://howtoaiworld.com/rss.xml" />
       </head>
       <body className="flex flex-col min-h-screen bg-background text-foreground font-sans">
