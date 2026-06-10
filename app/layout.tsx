@@ -3,6 +3,7 @@ import Script from "next/script";
 import "./globals.css";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import AdSenseScript from "../components/AdSenseScript";
  
 export const metadata: Metadata = {
   title: {
@@ -43,6 +44,9 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+  other: {
+    "google-adsense-account": "ca-pub-5501938670097396",
+  },
 };
  
 export default function RootLayout({
@@ -77,12 +81,7 @@ export default function RootLayout({
           `}
         </Script>
 
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5501938670097396"
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
-        />
+        <AdSenseScript />
  
         <link rel="alternate" type="application/rss+xml" title="Howtoaiworld RSS Feed" href="https://howtoaiworld.com/rss.xml" />
       </head>
