@@ -1,7 +1,7 @@
 'use client';
 
-import Script from "next/script";
 import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 
 export default function AdSenseScript() {
   const pathname = usePathname();
@@ -10,16 +10,16 @@ export default function AdSenseScript() {
   const noAdPages = ['/legal', '/contact', '/about'];
   const shouldDisableAds = noAdPages.some(page => pathname.startsWith(page));
 
-  if (shouldDisableAds) {
-    return null;
-  }
+  useEffect(() => {
+    if (shouldDisableAds) return;
 
-  return (
-    <Script
-      async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5501938670097396"
-      crossOrigin="anonymous"
-      strategy="afterInteractive"
-    />
-  );
+    // Inject AdSense script directly to avoid data-nscript attribute issue
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5501938670097396';
+    script.crossOrigin = 'anonymous';
+    document.head.appendChild(script);
+  }, [shouldDisableAds]);
+
+  return null;
 }
